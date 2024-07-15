@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0](https://github.com/devlegacy/ts-fastify-oauth-2-0-and-oidc/compare/ts-fastify-oauth-2-0-and-oidc@v1.2.0...ts-fastify-oauth-2-0-and-oidc@v1.3.0) (2024-07-15)
+
+
+### Features
+
+* **auth:** :sparkles: add twitter authorization code flow with pkce ([#9](https://github.com/devlegacy/ts-fastify-oauth-2-0-and-oidc/issues/9)) ([5d2ea57](https://github.com/devlegacy/ts-fastify-oauth-2-0-and-oidc/commit/5d2ea57d6b08006e4239bd75efd45e0e87c80b70))
+
 ## [1.2.0](https://github.com/devlegacy/ts-fastify-oauth-2-0-and-oidc/compare/ts-fastify-oauth-2-0-and-oidc@v1.1.0...ts-fastify-oauth-2-0-and-oidc@v1.2.0) (2024-07-15)
 
 
