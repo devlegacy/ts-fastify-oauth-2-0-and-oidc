@@ -100,19 +100,19 @@ const config = convict(
       authorizationUrl: {
         doc: 'The Spotify authorization url.',
         format: 'url',
-        default: '',
+        default: 'https://accounts.spotify.com/authorize',
         env: 'SPOTIFY_AUTHORIZATION_URL',
       },
       tokenUrl: {
         doc: 'The Spotify token url.',
         format: 'url',
-        default: '',
+        default: 'https://accounts.spotify.com/api/token',
         env: 'SPOTIFY_TOKEN_URL',
       },
       redirectUri: {
         doc: 'The Spotify redirect uri.',
         format: 'url',
-        default: '',
+        default: 'http://localhost:8080',
         env: 'SPOTIFY_REDIRECT_URI',
       },
       apiUrl: {
