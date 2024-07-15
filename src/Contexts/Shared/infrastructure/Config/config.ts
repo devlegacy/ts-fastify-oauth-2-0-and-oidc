@@ -58,6 +58,32 @@ const config = convict(
         arg: 'port',
       },
     },
+    accessToken: {
+      secret: {
+        doc: 'The secret to sign the access token.',
+        format: String,
+        default: 'secret',
+        env: 'ACCESS_TOKEN_SECRET',
+      },
+      expirationTime: {
+        doc: 'The expiration time in secomds of the access token.',
+        format: Number,
+        default: 900,
+        env: 'ACCESS_TOKEN_EXPIRATION_TIME',
+      },
+      privateKeyPath: {
+        doc: 'The path to the private key to sign the access token.',
+        format: String,
+        default: '',
+        env: 'ACCESS_TOKEN_PRIVATE_KEY_PATH',
+      },
+      publicKeyPath: {
+        doc: 'The path to the public key to verify the access token.',
+        format: String,
+        default: '',
+        env: 'ACCESS_TOKEN_PUBLIC_KEY_PATH',
+      },
+    },
   },
 )
 
