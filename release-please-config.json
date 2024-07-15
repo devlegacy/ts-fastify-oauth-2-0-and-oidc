@@ -6,7 +6,7 @@
       "tag-separator": "@",
       "bump-minor-pre-major": false,
       "bump-patch-for-minor-pre-major": false,
-      "package-name": "ts-fastify-template"
+      "package-name": "ts-fastify-oauth-2-0-and-oidc"
     }
   }
 }

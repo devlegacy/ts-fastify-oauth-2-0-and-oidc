@@ -17,13 +17,11 @@ import {
   type Config,
 } from '#@/src/Contexts/Shared/infrastructure/Config/config.js'
 import {
-  info,
-  logger,
-} from '#@/src/Contexts/Shared/infrastructure/Logger/PinoLogger.js'
-
-import {
   fastifyBootstrap,
-} from '../Contexts/Shared/infrastructure/http/fastifyBootstrap.js'
+} from '#@/src/Contexts/Shared/infrastructure/http/fastifyBootstrap.js'
+import {
+  info, logger,
+} from '#@/src/Contexts/Shared/infrastructure/Logger/PinoLogger.js'
 
 const fastify = Fastify({
   logger: logger() as FastifyBaseLogger,
@@ -53,11 +51,13 @@ export class AppBackend {
     })
     await this.#adapter.listen(this.#config.get('http'))
     if (this.#config.get('app.env') === 'local') {
-      info(this.#adapter.printRoutes({
-        commonPrefix: false,
-        includeHooks: true,
-        includeMeta: true,
-      }))
+      info(
+        this.#adapter.printRoutes({
+          commonPrefix: false,
+          includeHooks: true,
+          includeMeta: true,
+        }),
+      )
     }
   }
 

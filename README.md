@@ -1,7 +1,7 @@
 <h1 align="center">Fastify 🐯 + TypeScript 🟦</h1>
 <p align="center">
     <!-- https://shields.io/category/monitoring -->
-    <a href="https://github.com/devlegacy/ts-fastify-template/actions/workflows/nodejs.yml" target="_blank"><img src="https://github.com/devlegacy/ts-fastify-template/actions/workflows/nodejs.yml/badge.svg?branch=master" alt="Node.js CI ⬢"/></a>
+    <a href="https://github.com/devlegacy/ts-fastify-oauth-2-0-and-oidc/actions/workflows/nodejs.yml" target="_blank"><img src="https://github.com/devlegacy/ts-fastify-oauth-2-0-and-oidc/actions/workflows/nodejs.yml/badge.svg?branch=master" alt="Node.js CI ⬢"/></a>
     <a href="https://gitlab.com/devlegacy" target="_blank"><img src="https://img.shields.io/website?logo=gitlab&label=Devlegacy&color=brightgreen&up_message=OS&labelColor=282e33&url=https://gitlab.com/devlegacy" alt="🦊 Devlegacy OS"/></a>
     <a href="https://github.com/devlegacy" target="_blank"><img src="https://img.shields.io/website?logo=github&label=Devlegacy&color=brightgreen&up_message=OS&labelColor=282e33&url=https://github.com/devlegacy" alt="🐙 Devlegacy OS"/></a>
     <a href="https://cz-git.qbb.sh/cli/" target="_blank"><img src="https://img.shields.io/badge/commitizen-CLI-red.svg?logo=git&labelColor=282e33&style=flat" alt="CLI-Link"/></a>

@@ -3,12 +3,12 @@ import process, {
 } from 'node:process'
 
 import {
+  config,
+} from '#@/src/Contexts/Shared/infrastructure/Config/config.js'
+import {
   error,
 } from '#@/src/Contexts/Shared/infrastructure/Logger/PinoLogger.js'
 
-import {
-  config,
-} from '../Contexts/Shared/infrastructure/Config/config.js'
 import {
   AppBackend,
 } from './server.js'
