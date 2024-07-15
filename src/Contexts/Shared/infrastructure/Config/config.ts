@@ -84,6 +84,44 @@ const config = convict(
         env: 'ACCESS_TOKEN_PUBLIC_KEY_PATH',
       },
     },
+    spotify: {
+      clientId: {
+        doc: 'The Spotify client id.',
+        format: String,
+        default: '',
+        env: 'SPOTIFY_CLIENT_ID',
+      },
+      clientSecret: {
+        doc: 'The Spotify client secret.',
+        format: String,
+        default: '',
+        env: 'SPOTIFY_CLIENT_SECRET',
+      },
+      authorizationUrl: {
+        doc: 'The Spotify authorization url.',
+        format: 'url',
+        default: '',
+        env: 'SPOTIFY_AUTHORIZATION_URL',
+      },
+      tokenUrl: {
+        doc: 'The Spotify token url.',
+        format: 'url',
+        default: '',
+        env: 'SPOTIFY_TOKEN_URL',
+      },
+      redirectUri: {
+        doc: 'The Spotify redirect uri.',
+        format: 'url',
+        default: '',
+        env: 'SPOTIFY_REDIRECT_URI',
+      },
+      apiUrl: {
+        doc: 'The Spotify api url.',
+        format: 'url',
+        default: 'https://api.spotify.com/v1',
+        env: 'SPOTIFY_API_URL',
+      },
+    },
   },
 )
 

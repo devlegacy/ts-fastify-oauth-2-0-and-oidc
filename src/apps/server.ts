@@ -16,6 +16,7 @@ import Fastify, {
 
 import {
   type Config,
+  config,
 } from '#@/src/Contexts/Shared/infrastructure/Config/config.js'
 import {
   fastifyBootstrap,
@@ -55,28 +56,28 @@ export class AppBackend {
         dir,
       },
     })
-    // this.#adapter
-    //   .register(import('@fastify/view'), {
-    //     engine: {
-    //       ejs: import('ejs'),
-    //     },
-    //     layout: './src/apps/layout.ejs',
-    //     includeViewExtension: true,
-    //     viewExt: 'ejs',
-    //   })
-    //   .get('/', async (req, res) => {
-    //     return res.viewAsync('./src/apps/home.ejs', {
-    //       title: 'Home',
-    //     })
-    //   })
-    //   .get('/home/spotify', async (req, res) => {
-    //     const accessToken = req.cookies['access_token'] ?? ''
-    //     return res.viewAsync('./src/apps/spotifyHome.ejs', {
-    //       title: 'Home',
-    //       accessToken,
-    //       spotifyApiUrl: process.env.SPOTIFY_API_URL,
-    //     })
-    //   })
+    this.#adapter
+      .register(import('@fastify/view'), {
+        engine: {
+          ejs: import('ejs'),
+        },
+        layout: './src/apps/layout.ejs',
+        includeViewExtension: true,
+        viewExt: 'ejs',
+      })
+      .get('/', async (req, res) => {
+        return res.viewAsync('./src/apps/home.ejs', {
+          title: 'Home',
+        })
+      })
+      .get('/home/spotify', async (req, res) => {
+        const accessToken = req.cookies['access_token'] ?? ''
+        return res.viewAsync('./src/apps/spotifyHome.ejs', {
+          title: 'Home',
+          accessToken,
+          spotifyApiUrl: config.get('spotify.apiUrl'),
+        })
+      })
     await this.#adapter.listen(this.#config.get('http'))
     if (this.#config.get('app.env') === 'local') {
       info(this.#adapter.printRoutes(printRoutesOptions))

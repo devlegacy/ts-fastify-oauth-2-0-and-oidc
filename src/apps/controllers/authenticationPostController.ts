@@ -1,7 +1,11 @@
 import type {
   FastifyInstance,
+  FastifyRequest,
 } from 'fastify'
 
+import {
+  config,
+} from '#@/src/Contexts/Shared/infrastructure/Config/config.js'
 import {
   getBasicCredentials,
 } from '#@/src/Contexts/Shared/infrastructure/http/getBasicCredentials.js'
@@ -12,6 +16,7 @@ import {
   getUser,
 } from '#@/src/Contexts/Users/infrastructure/getUser.js'
 
+// eslint-disable-next-line max-lines-per-function
 export default async function (fastify: FastifyInstance) {
   fastify
     .post(
@@ -29,50 +34,53 @@ export default async function (fastify: FastifyInstance) {
         }
       },
     )
-    // .get(
-    //   '/authentication/spotify',
-    //   async function handler(req, res) {
-    //     const scopes = [
-    //       'user-read-private',
-    //       'user-read-email',
-    //       'playlist-read-private',
-    //     ]
-    //     const query = new URLSearchParams({
-    //       response_type: 'code',
-    //       client_id: process.env?.SPOTIFY_CLIENT_ID ?? '',
-    //       scope: scopes.join(' '),
-    //       redirect_uri: process.env?.SPOTIFY_REDIRECT_URI ?? '',
-    //     })
-    //     const redirect = new URL(process.env.SPOTIFY_AUTHORIZATION_URL ?? '')
-    //     redirect.search = query.toString()
-    //     res
-    //       .status(302)
-    //       .redirect(redirect.toString())
-    //   },
-    // )
-    // .get(
-    //   '/authentication/spotify/callback',
-    //   async function handler(req: FastifyRequest<{ Querystring: { code: string } }>, res) {
-    //     const options = {
-    //       method: 'POST',
-    //       headers: {
-    //         'Content-Type': 'application/x-www-form-urlencoded',
-    //         Authorization: `Basic ${Buffer.from(`${process.env.SPOTIFY_CLIENT_ID}:${process.env.SPOTIFY_CLIENT_SECRET}`).toString('base64')}`,
-    //       },
-    //       body: new URLSearchParams({
-    //         grant_type: 'authorization_code',
-    //         code: req.query.code,
-    //         redirect_uri: process.env.SPOTIFY_REDIRECT_URI ?? '',
-    //       }).toString(),
-    //     }
-    //     const response = await fetch(process.env.SPOTIFY_TOKEN_URL ?? '', options)
-    //     const json = await response.json() as { access_token: string }
-    //     res
-    //       .header('set-cookie', `access_token=${json.access_token}; Path=/; HttpOnly`)
-    //       .status(302)
-    //       .redirect('/home/spotify')
-    //   },
-    // )
+    .get(
+      '/authentication/spotify',
+      async function handler(req, res) {
+        const scopes = [
+          'user-read-private',
+          'user-read-email',
+          'playlist-read-private',
+        ]
+        const query = new URLSearchParams({
+          response_type: 'code',
+          client_id: config.get('spotify.clientId'),
+          scope: scopes.join(' '),
+          redirect_uri: config.get('spotify.redirectUri'),
+        })
+        const redirect = new URL(config.get('spotify.authorizationUrl'))
+        redirect.search = query.toString()
+        res
+          .status(302)
+          .redirect(redirect.toString())
+      },
+    )
+    .get(
+      '/authentication/spotify/callback',
+      async function handler(req: FastifyRequest<{ Querystring: { code: string } }>, res) {
+        const options = {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            Authorization: `Basic ${Buffer.from(`${config.get('spotify.clientId')}:${config.get('spotify.clientSecret')}`).toString('base64')}`,
+          },
+          body: new URLSearchParams({
+            grant_type: 'authorization_code',
+            code: req.query.code,
+            redirect_uri: config.get('spotify.redirectUri'),
+          }).toString(),
+        }
+        const response = await fetch(config.get('spotify.tokenUrl') ?? '', options)
+        const json = await response.json() as { access_token: string }
+        res
+          .setCookie('access_token', json.access_token, {
+            path: '/',
+            httpOnly: true,
+          })
+          .status(302)
+          .redirect('/home/spotify')
+      },
+    )
     // .get(
     //   '/authentication/twitter',
     //   async function handler(req, res) {
