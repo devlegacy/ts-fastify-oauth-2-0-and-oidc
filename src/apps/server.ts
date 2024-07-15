@@ -78,6 +78,27 @@ export class AppBackend {
           spotifyApiUrl: config.get('spotify.apiUrl'),
         })
       })
+      .get('/home/twitter', async (req, res) => {
+        const accessToken = req.cookies['access_token'] ?? ''
+        const response = await fetch(`${config.get('app.url')}/api/twitter/bypass`, {
+          headers: {
+            Authorization: accessToken,
+            ...req.headers,
+          },
+          credentials: 'include',
+        })
+        const {
+          me,
+          tweets,
+        } = await response.json() as { me: { id: string }, tweets: { id: string }[] }
+        return res.viewAsync('./src/apps/twitterHome.ejs', {
+          title: 'Home',
+          accessToken,
+          me,
+          tweets,
+          // twitterApiUrl: config.get('twitter.apiUrl'),
+        })
+      })
     await this.#adapter.listen(this.#config.get('http'))
     if (this.#config.get('app.env') === 'local') {
       info(this.#adapter.printRoutes(printRoutesOptions))

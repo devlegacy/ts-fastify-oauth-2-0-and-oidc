@@ -122,6 +122,44 @@ const config = convict(
         env: 'SPOTIFY_API_URL',
       },
     },
+    twitter: {
+      clientId: {
+        doc: 'The Twitter client id.',
+        format: String,
+        default: '',
+        env: 'TWITTER_CLIENT_ID',
+      },
+      clientSecret: {
+        doc: 'The Twitter client secret.',
+        format: String,
+        default: '',
+        env: 'TWITTER_CLIENT_SECRET',
+      },
+      authorizationUrl: {
+        doc: 'The Twitter authorization url.',
+        format: 'url',
+        default: 'https://api.twitter.com/oauth/authorize',
+        env: 'TWITTER_AUTHORIZATION_URL',
+      },
+      redirectUri: {
+        doc: 'The Twitter redirect uri.',
+        format: 'url',
+        default: 'http://localhost:8080',
+        env: 'TWITTER_REDIRECT_URI',
+      },
+      tokenUrl: {
+        doc: 'The Twitter token url.',
+        format: 'url',
+        default: 'https://api.twitter.com/2/oauth2/token',
+        env: 'TWITTER_TOKEN_URL',
+      },
+      apiUrl: {
+        doc: 'The Twitter api url.',
+        format: 'url',
+        default: 'https://api.twitter.com/2',
+        env: 'TWITTER_API_URL',
+      },
+    },
   },
 )
 

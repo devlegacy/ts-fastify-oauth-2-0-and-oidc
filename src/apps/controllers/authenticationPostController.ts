@@ -1,3 +1,7 @@
+import {
+  randomBytes,
+} from 'node:crypto'
+
 import type {
   FastifyInstance,
   FastifyRequest,
@@ -6,6 +10,9 @@ import type {
 import {
   config,
 } from '#@/src/Contexts/Shared/infrastructure/Config/config.js'
+import {
+  generateCodeChallenge,
+} from '#@/src/Contexts/Shared/infrastructure/generateCodeChallenge.js'
 import {
   getBasicCredentials,
 } from '#@/src/Contexts/Shared/infrastructure/http/getBasicCredentials.js'
@@ -81,72 +88,75 @@ export default async function (fastify: FastifyInstance) {
           .redirect('/home/spotify')
       },
     )
-    // .get(
-    //   '/authentication/twitter',
-    //   async function handler(req, res) {
-    //     const scopes = [
-    //       'users.read',
-    //       'tweet.read',
-    //     ]
-    //     const state = randomBytes(16).toString('base64')
-    //     // proof key for code exchange (PKCE)
-    //     const codeVerifier = randomBytes(128).toString('base64')
-    //     const codeChallenge = generateCodeChallenge(codeVerifier)
-    //     const query = new URLSearchParams({
-    //       response_type: 'code',
-    //       client_id: process.env?.TWITTER_CLIENT_ID ?? '',
-    //       scope: scopes.join(' '),
-    //       redirect_uri: process.env?.TWITTER_REDIRECT_URI ?? '',
-    //       state,
-    //       code_challenge: codeChallenge,
-    //       code_challenge_method: 'S256', // SHA-256
-    //     })
-    //     const redirect = new URL(process.env.TWITTER_AUTHORIZATION_URL ?? '')
-    //     redirect.search = query.toString()
+    .get(
+      '/authentication/twitter',
+      async function handler(req, res) {
+        const scopes = [
+          'tweet.read',
+          'users.read',
+        ]
+        const state = randomBytes(16).toString('base64')
+        // proof key for code exchange (PKCE)
+        const codeVerifier = randomBytes(128).toString('base64')
+        const codeChallenge = generateCodeChallenge(codeVerifier)
+        const query = new URLSearchParams({
+          response_type: 'code',
+          client_id: config.get('twitter.clientId'),
+          scope: scopes.join(' '),
+          redirect_uri: config.get('twitter.redirectUri'),
+          state,
+          code_challenge: codeChallenge,
+          code_challenge_method: 'S256', // SHA-256
+        })
+        const redirect = new URL(config.get('twitter.authorizationUrl'))
+        redirect.search = query.toString()
 
-  //     res
-  //       .header('set-cookie', [
-  //         `code_verifier=${codeVerifier}; Path=/; HttpOnly`,
-  //         `verifier=${codeVerifier}; Path=/; HttpOnly`,
-  //       ])
-  //       .status(302)
-  //       .redirect(redirect.toString())
-  //   },
-  // )
-  // .get(
-  //   '/authentication/twitter/callback',
-  //   async function handler(req: FastifyRequest<{ Querystring: { state: string, code: string } }>, res) {
-  //     const data = req.headers['cookie'] ?? ''
-  //     const cookies = data.split(';')
-  //     const state = cookies.find((cookie) => cookie.trim().startsWith('state'))
-  //       ?.split('=')[1]
-  //     if (state !== req.query.state) {
-  //       res.status(302).redirect('/home/twitter/#?error=ERROR_STATE_MISMATCH')
-  //     }
+        res
+          .setCookie('verifier', codeVerifier, {
+            path: '/',
+            httpOnly: true,
+          })
+          .setCookie('state', state, {
+            path: '/',
+            httpOnly: true,
+          })
+          .status(302)
+          .redirect(redirect.toString())
+      },
+    )
+    .get(
+      '/authentication/twitter/callback',
+      async function handler(req: FastifyRequest<{ Querystring: { state: string, code: string } }>, res) {
+        const state = req.cookies['state'] ?? ''
+        if (state !== req.query.state) {
+          res.status(302).redirect('/home/twitter/#?error=ERROR_STATE_MISMATCH')
+        }
 
-  //     const verifier = cookies.find((cookie) => cookie.trim().startsWith('verifier'))
-  //       ?.split('=')[1]
-  //     const options = {
-  //       method: 'POST',
-  //       headers: {
-  //         'Content-Type': 'application/x-www-form-urlencoded',
-  //       },
-  //       body: new URLSearchParams({
-  //         code: req.query.code,
-  //         grant_type: 'authorization_code',
-  //         redirect_uri: process.env.TWITTER_REDIRECT_URI ?? '',
-  //         client_id: process.env.TWITTER_CLIENT_ID ?? '',
-  //         code_verifier: verifier ?? '',
-  //       }).toString(),
-  //     }
-  //     const response = await fetch(process.env.TWITTER_TOKEN_URL ?? '', options)
-  //     const json = await response.json() as { access_token: string }
-  //     res
-  //       .header('set-cookie', `access_token=${json.access_token}; Path=/; HttpOnly`)
-  //       .status(302)
-  //       .redirect('/home/twitter/')
-  //   },
-  // )
+        const verifier = req.cookies['verifier'] ?? ''
+        const options = {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: new URLSearchParams({
+            code: req.query.code,
+            grant_type: 'authorization_code',
+            redirect_uri: config.get('twitter.redirectUri'),
+            client_id: config.get('twitter.clientId'),
+            code_verifier: verifier,
+          }).toString(),
+        }
+        const response = await fetch(config.get('twitter.tokenUrl'), options)
+        const json = await response.json() as { access_token: string }
+        res
+          .setCookie('access_token', json.access_token, {
+            path: '/',
+            httpOnly: true,
+          })
+          .status(302)
+          .redirect('/home/twitter')
+      },
+    )
   // .get('/authentication/discord', async function handler() {
   //   const scopes = [
   //     'identify',
