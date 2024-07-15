@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.0](https://github.com/devlegacy/ts-fastify-oauth-2-0-and-oidc/compare/ts-fastify-oauth-2-0-and-oidc@v1.1.0...ts-fastify-oauth-2-0-and-oidc@v1.2.0) (2024-07-15)
+
+
+### Features
+
+* **auth:** authorization code flow with spotify ([#7](https://github.com/devlegacy/ts-fastify-oauth-2-0-and-oidc/issues/7)) ([3f74e4a](https://github.com/devlegacy/ts-fastify-oauth-2-0-and-oidc/commit/3f74e4ad698b18ced5af92067267189312af39f6))
+
 ## [1.1.0](https://github.com/devlegacy/ts-fastify-oauth-2-0-and-oidc/compare/ts-fastify-oauth-2-0-and-oidc@v1.0.0...ts-fastify-oauth-2-0-and-oidc@v1.1.0) (2024-07-15)
 
 
