@@ -1,0 +1,76 @@
+#!/usr/bin/env node
+
+import {
+  glob,
+} from 'node:fs/promises'
+import process from 'node:process'
+import {
+  run,
+} from 'node:test'
+import {
+  spec,
+  tap,
+} from 'node:test/reporters'
+import {
+  styleText,
+} from 'node:util'
+
+process.env.SWCRC = true
+process.env.TS_NODE_PROJECT = 'tsconfig.json'
+process.env.NODE_OPTIONS = '--import @swc-node/register/esm-register'
+// process.env.NODE_OPTIONS = '--loader ts-node/esm'
+
+const env = {
+  // Node.js environment variables
+  NODE_ENV: process.env.NODE_ENV || null,
+  NODE_OPTIONS: process.env.NODE_OPTIONS || null,
+  TZ: process.env.TZ || null,
+
+  // TypeScript environment variables
+  SWCRC: process.env.SWCRC || null,
+  TS_NODE_PROJECT: process.env.TS_NODE_PROJECT || null,
+
+  // Custom environment variables
+  APP_ENV: process.env.APP_ENV || null,
+}
+
+// eslint-disable-next-line no-console
+console.log(styleText(
+  'green',
+  JSON.stringify(
+    env,
+    null,
+    2,
+  ),
+))
+
+const files = await glob(
+  './tests/**/*.test.ts',
+  // {
+  //   ignore: [
+  //     './node_modules/**',
+  //   ],
+  // },
+)
+
+// console.log(await Array.fromAsync(files))
+// console.log(Readable.from(files))
+
+const reporter = process.stdout.isTTY ? new spec() : tap
+
+run({
+  files: await Array.fromAsync(files),
+  concurrency: 1,
+  timeout: 60000,
+})
+  .on(
+    'test:fail',
+    () => {
+      process.exitCode = 1
+    },
+  )
+  .compose(reporter)
+  .pipe(process.stdout)
+
+// node --import @swc-node/register/esm-register --env-file .env --test-reporter dot --test ./tests/**/*.test.ts
+// node --import @swc-node/register/esm-register --env-file .env --experimental-test-coverage --test ./tests/**/*.test.ts #C8

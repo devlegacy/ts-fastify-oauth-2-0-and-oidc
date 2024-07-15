@@ -1,0 +1,28 @@
+#!/usr/bin/env sh
+
+COLORS_PATH=$(dirname "$0")/../.bin/colors.sh
+[ -f "${COLORS_PATH}" ] && source "${COLORS_PATH}"
+
+is_commit_available="$(git rev-list -n 1 --all)"
+if [[ "$is_commit_available" ]]; then
+  # Validate branch name
+  # Read more on: https://www.devwithimagination.com/2020/04/13/git-commit-hooks-for-branch-naming-using-husky/
+  local_branch_name="$(git rev-parse --abbrev-ref HEAD)"
+  recommend_branch_name='^((fix|feat|imp|hotfix)\/[a-zA-Z0-9\-]+)$'
+
+  if [[ ! $local_branch_name =~ $recommend_branch_name ]]; then
+      echo "${COLOR_RED}There is something wrong with your branch name <${COLOR_YELLOW}$local_branch_name${COLOR_RED}>. Branch names in this project must adhere to this contract: <${COLOR_GREEN}$recommend_branch_name${COLOR_RED}>. Your commit will be rejected. You should rename your branch to a valid name and try again.${COLOR_RESET}"
+      exit 1
+  fi
+fi
+
+# npm test
+
+echo "${COLOR_YELLOW}Starting 🔦 lint files, please wait ⏳ :)${COLOR_RESET}"
+# Run lint files on staged files
+if npx --no -- lint-staged --quiet --config ./.lintstagedrc.json; then
+  echo "${COLOR_GREEN}Lint task ended successfully, you can do your push 🚀${COLOR_RESET}"
+else
+  echo "${COLOR_RED}Lint task failed, please fix the errors before pushing.${COLOR_RESET}"
+  exit 1
+fi

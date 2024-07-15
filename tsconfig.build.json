@@ -1,0 +1,12 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "rootDir": "${configDir}/src",
+    "outDir": "${configDir}/dist",
+    "noEmit": false,
+    "pretty": false,
+    "removeComments": true
+  },
+  "exclude": ["node_modules", "tests", "**/*.mjs", "**/*.cjs", "**/*.js"]
+}

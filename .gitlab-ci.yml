@@ -1,0 +1,249 @@
+workflow:
+  name: Node.js CI ⬢
+# https://docs.gitlab.com/ee/ci/examples/#cicd-templates
+# image: alpine:latest
+image: ubuntu:latest
+stages:
+  - test
+  - build
+  # - staging
+  # - integration_test
+  - deploy
+
+# include:
+# # https://gitlab.com/gitlab-org/gitlab/-/blob/master/lib/gitlab/ci/templates/Jobs/SAST.gitlab-ci.yml
+# - template: Security/SAST.gitlab-ci.yml
+# - template: Dependency-Scanning.gitlab-ci.yml
+# - template: DAST.gitlab-ci.yml
+
+variables:
+  NODE_VERSION: '21.x, 22.x'
+  # https://gitlab.com/gitlab-org/security-products/analyzers/nodejs-scan
+  # https://docs.gitlab.com/ee/user/application_security/sast/#supported-languages-and-frameworks
+  # SAST_DEFAULT_ANALYZERS: "nodejs-scan"
+# cache:
+#   paths:
+#     - node_modules/
+
+before_script:
+  - apt-get update && apt-get install -y curl unzip
+  - echo "${ENV_FILE}" > .env
+  # difference >>
+  # - echo "${ENV_FILE}" >> .env
+  # fnm does not work with alpine yet
+  - curl -fsSL https://fnm.vercel.app/install | bash
+  - export PATH="/root/.local/share/fnm:$PATH"
+  - eval "$(fnm env)"
+  - 'for VERSION in ${NODE_VERSION//,/ }; do fnm install $VERSION; done'
+  - corepack enable
+  - corepack prepare pnpm@latest --activate
+  # - curl -fsSL https://download.docker.com/linux/static/stable/x86_64/docker-26.1.4.tgz -o docker.tgz
+  # - tar xzvf docker.tgz --strip 1 -C /usr/local/bin docker/docker
+  # - dockerd-entrypoint.sh &
+  # - sleep 20
+  # - curl -fsSL https://get.docker.com -o get-docker.sh
+  # - sh get-docker.sh
+  # - nohup dockerd > /var/log/dockerd.log 2>&1 &
+  # - sleep 20
+  # - docker info
+  # - echo "Running in shell $SHELL $0"
+  # - export SHELL=/bin/sh
+  # - echo "Running in shell $SHELL $0"
+  # - export
+  # - apk add --no-cache curl bash ca-certificates openssl ncurses coreutils python3 make gcc g++ libgcc linux-headers grep util-linux binutils findutils
+  # - echo "${ENV_FILE}" > .env
+  # - curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
+  # - export NVM_DIR="$HOME/.nvm"
+  # # This loads nvm
+  # - '[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"'
+  # - 'for VERSION in ${NODE_VERSION//,/ }; do nvm install $VERSION; done'
+
+# Static Application Security Testing (SAST)
+# https://semgrep.dev/docs/semgrep-ci/sample-ci-configs/#sample-gitlab-cicd-configuration-snippet
+# docker run -v $(pwd):/opt/app --rm -it registry.gitlab.com/gitlab-ci-utils/gitlab-semgrep-plus:latest sh
+sast:
+  stage: test
+  image: returntocorp/semgrep:latest
+  # image: semgrep/semgrep
+  # image: registry.gitlab.com/gitlab-ci-utils/gitlab-semgrep-plus:latest
+  before_script: []
+  allow_failure: true
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+  # only:
+  #   - merge_requests
+  variables:
+    SEARCH_MAX_DEPTH: 20
+    SEMGREP_GITLAB_JSON: '1'
+    SEMGREP_APP_TOKEN: $SEMGREP_APP_TOKEN
+  script:
+    # auth
+    # - semgrep ci --gitlab-sast --no-suppress-errors > gl-sast-report.json || echo "Semgrep failed, but the pipeline will continue."
+    - semgrep ci --gitlab-sast -o gl-sast-report.json || echo "Semgrep failed, but the pipeline will continue."
+    # - semgrep scan --json -o gl-sast-report.json || echo "Semgrep failed, but the pipeline will continue."
+  after_script:
+    - echo "SAST analysis completed. Check the GitLab web page for the report."
+  artifacts:
+    reports:
+      sast: gl-sast-report.json
+    # expire_in: 1 week
+    # when: always
+
+# docker run -v $(pwd):/opt/app --rm -it registry.gitlab.com/security-products/gemnasium:latest sh
+dependency-scanning:
+  stage: test
+  image: registry.gitlab.com/security-products/gemnasium:latest
+  before_script: []
+  allow_failure: true
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+  # only:
+  #   - merge_requests
+  script:
+    - /analyzer run || echo "Gemnasium failed, but the pipeline will continue."
+  after_script:
+    - echo "Dependency scanning completed. Check the GitLab web page for the report."
+  artifacts:
+    paths:
+      - '**/gl-sbom-*.cdx.json'
+      - '**/gl-dependency-scanning-report.json'
+    reports:
+      dependency_scanning: gl-dependency-scanning-report.json
+      cyclonedx: '**/gl-sbom-*.cdx.json'
+
+# https://github.com/snyk-labs/snyk-cicd-integration-examples/blob/master/GitLabCICD/gitlab-npm.yml
+# install-dependencies:
+#   stage: install
+#   script:
+#     - echo "Installing dependencies"
+#     - npm ci
+#   artifacts:
+#     expire_in: 1hr
+#     paths:
+#       - node_modules/
+#   cache:
+#     paths:
+#       - node_modules/
+#     key: "${CI_COMMIT_REF_SLUG}-node_modules-${CI_PIPELINE_ID}-${NODE_VERSION}"
+#   parallel:
+#     matrix:
+#       - NODE_VERSION: ["21.x", "22.x"]
+
+test:
+  stage: test
+  # only:
+  # - master
+  # - merge_requests
+  script:
+    - echo "Using Node.js $NODE_VERSION"
+    - fnm use $NODE_VERSION
+    # - nvm use $NODE_VERSION
+    - pnpm install
+    - pnpm run lint
+    - pnpm test
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+  parallel:
+    matrix:
+      - NODE_VERSION: ['21.x', '22.x']
+  # cache:
+  #   paths:
+  #     - node_modules/
+  #   key: "${CI_COMMIT_REF_SLUG}-node_modules-${CI_PIPELINE_ID}"
+
+build:
+  stage: build
+  # only:
+  # - master
+  # - merge_requests
+  script:
+    - echo "Using Node.js $NODE_VERSION"
+    - fnm use $NODE_VERSION
+    # - nvm use $NODE_VERSION
+    - pnpm install
+    - pnpm run build --if-present
+  # needs: ["test"]
+  artifacts:
+    paths:
+      - build/
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+  parallel:
+    matrix:
+      - NODE_VERSION: ['21.x', '22.x']
+
+deploy_staging:
+  stage: deploy
+  before_script: []
+  # only:
+  #   - master
+  script:
+    - echo "Deploying to staging server"
+  # needs: ["build"]
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "master" && $CI_PIPELINE_SOURCE == "push"'
+  # needs:
+  #   - job: test
+  #     artifacts: true
+  #   - job: build
+  #     artifacts: true
+
+deploy_production:
+  stage: deploy
+  before_script: []
+  image: docker:latest
+  services:
+    - docker:dind
+  variables:
+    DOCKER_DRIVER: overlay2
+  # before_script:
+  #   - curl -fsSL https://download.docker.com/linux/static/stable/x86_64/docker-20.10.7.tgz -o docker.tgz
+  #   - tar xzvf docker.tgz --strip 1 -C /usr/local/bin docker/docker
+  #   - dockerd-entrypoint.sh &
+  #   - sleep 20  # Give Docker some time to start
+  # only:
+  #   - master
+  script:
+    - echo "Deploying to staging server"
+    # - docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
+    - apk add --no-cache curl
+    - echo "${CI_PROJECT_NAME}"
+    - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+    - docker build -t $DOCKER_USERNAME/${CI_PROJECT_NAME}:latest .
+    - docker push $DOCKER_USERNAME/${CI_PROJECT_NAME}:latest
+    # Trigger Render.com deployment
+    - curl -X POST ${RENDER_DEPLOY_HOOK}
+  when: manual
+  # needs: ["build"]
+  # dependencies: ["build"]
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "master" && $CI_PIPELINE_SOURCE == "push"'
+  # needs:
+  #   - job: test
+  #     artifacts: true
+  #   - job: build
+  #     artifacts: true
+
+# docker run -v $(pwd):/opt/app --rm -it registry.gitlab.com/security-products/api-security:latest sh
+# docker run -v $(pwd):/opt/app --rm -it registry.gitlab.com/security-products/api-security:3-fips sh
+# https://gitlab.com/gitlab-org/gitlab/-/blob/master/lib/gitlab/ci/templates/Security/DAST-API.gitlab-ci.yml
+# https://gitlab.com/gitlab-org/security-products
+# docker run -v $(pwd):/opt/app --rm -it registry.gitlab.com/security-products/dast:latest sh
+# http://host.docker.internal:3000
+# /analyze -t http://host.docker.internal:3000 -r ./report.html
+# /analyze -t http://host.docker.internal:3000/api/status -r /opt/app/report.html
+dast_api:
+  stage: deploy
+  image: registry.gitlab.com/security-products/dast:latest
+  before_script: []
+  allow_failure: true
+  script:
+    - /analyze -t "${APP_URL}" || echo "DAST failed, but the pipeline will continue."
+  when: manual
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "master" && $CI_PIPELINE_SOURCE == "push"'
+  artifacts:
+    paths:
+      - 'gl-dast-report.json'
+    reports:
+      dast: gl-dast-report.json

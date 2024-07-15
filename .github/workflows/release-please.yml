@@ -1,0 +1,20 @@
+name: Release Workflow
+on:
+  push:
+    branches:
+      - master
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      # https://github.com/googleapis/release-please-action
+      - uses: googleapis/release-please-action@v4
+        id: release
+        with:
+          # GITHUB_TOKEN GitHub Actions automatically provides a default secret called GITHUB_TOKEN to all workflows.
+          token: ${{ secrets.GITHUB_TOKEN }}

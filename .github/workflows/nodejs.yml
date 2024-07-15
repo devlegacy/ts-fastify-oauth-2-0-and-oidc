@@ -1,0 +1,73 @@
+name: Node.js CI ⬢
+run-name: Node.js CI ⬢
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+env:
+  FASTIFY_AUTOLOAD_TYPESCRIPT: 1
+  SWCRC: true
+  TS_NODE_PROJECT: tsconfig.json
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      # fail-fast: false
+      matrix:
+        # REVIEW: In node 21 we can't use node --run yet
+        node-version: [21.x, 22.x] # current versions + next versions o prepare future migrations
+        # node-version: [22.x] # current versions + next versions o prepare future migrations
+    steps:
+      ## Setup workspace
+      # https://github.com/actions/checkout
+      # This action is typically used as one of the first steps in a workflow to gain access to the repository's content. Without this step, none of the repository files would be available to the workflow, and tasks like building, testing, or deploying the code would be impossible.
+      - name: Checkout 📖
+        uses: actions/checkout@v4
+      # https://github.com/actions/cache
+      - name: Create env file 🖥️
+        run: |
+          touch .env
+        # echo API_ENDPOINT="https://xxx.execute-api.us-west-2.amazonaws.com" >> .env
+        # echo API_KEY=${{ secrets.API_KEY }} >> .env
+        # cat .env
+      ## Setup Node.js
+      - name: Enable Corepack and pnpm ⚙️
+        run: |
+          corepack enable
+          corepack prepare pnpm@latest --activate
+          pnpm config set store-dir ~/.pnpm-store
+      # https://github.com/actions/setup-node
+      - name: Use Node.js ⚙️ ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          # cache: npm
+          cache: 'pnpm'
+      - name: Cache dependencies 🔒
+        id: cache-pnpm-store
+        uses: actions/cache@v4
+        with:
+          # path: node_modules
+          path: ~/.pnpm-store
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('package.json') }}-${{ hashFiles('pnpm-lock.yaml') }}-${{ hashFiles('.github/workflows/nodejs.yml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+      - name: pnpm install 📦
+        # if: steps.cache-pnpm-store.outputs.cache-hit != 'true'
+        # npm ci vs npm install
+        run: |
+          pnpm install --frozen-lockfile
+      - name: pnpm run lint 🧹
+        run: |
+          pnpm run lint
+      - name: pnpm test 🧪
+        run: |
+          pnpm run test
+      - name: pnpm run build 🏗️
+        run: |
+          pnpm run build

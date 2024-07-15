@@ -1,0 +1,48 @@
+{
+  "files.exclude": {
+    ".bin": true, // 📁
+    ".c8rc.json": true,
+    ".czrc": true,
+    ".dockerignore": true,
+    ".editorconfig": true,
+    ".etc": true, // 📁
+    ".git": true, // 📁
+    ".gitattributes": true,
+    ".github": true, // REVIEW: 📁 CI/CD
+    ".gitignore": true,
+    ".gitlab-ci.yml": true, // REVIEW: CI/CD
+    ".husky": true, // 📁
+    ".idea": true, // 📁
+    ".lintstagedrc.json": true,
+    ".npmignore": true,
+    ".npmrc": true,
+    ".nvmrc": true,
+    ".prettierignore": true,
+    ".prettierrc": true,
+    ".swcrc*": true,
+    ".vscode": true, // 📁
+    "*lock*": true, // lock files
+    "commitlint.config.cjs": true,
+    "cucumber.mjs": true,
+    "cz.cjs": true,
+    "dist": true, // 📁
+    "eslint.config.js": true,
+    "node_modules": true, // 📁
+    "tsconfig*.json": true
+  },
+  "[javascript]": {
+    "editor.codeActionsOnSave": {
+      "source.fixAll.eslint": "explicit"
+    },
+    "editor.defaultFormatter": "dbaeumer.vscode-eslint"
+  },
+  "[typescript]": {
+    "editor.codeActionsOnSave": {
+      "source.fixAll.eslint": "explicit"
+    },
+    "editor.defaultFormatter": "dbaeumer.vscode-eslint"
+  },
+  "eslint.format.enable": true,
+  "eslint.useFlatConfig": true,
+  "eslint.validate": ["typescript", "javascript"]
+}

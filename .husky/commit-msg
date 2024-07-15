@@ -1,0 +1,21 @@
+#!/usr/bin/env sh
+
+COLORS_PATH=$(dirname "$0")/../.bin/colors.sh
+[ -f "${COLORS_PATH}" ] && source "${COLORS_PATH}"
+
+commit_message="$(cat $1)"
+
+echo "${COLOR_YELLOW}Validating commit message 💬...${COLOR_RESET}"
+if npx --no -- commitlint --edit "${1}"; then
+  echo "${COLOR_GREEN}✅ Commit message passed checks, you can do your commit 🚀.${COLOR_RESET}"
+else
+  echo "${COLOR_RED}❌ Commit message failed. Please revise your commit message according to the project's commit message guidelines.${COLOR_RESET}"
+  exit 1
+fi
+
+# Recommend install and use: https://git-scm.com/downloads
+# Test with gitbash w10  x64 ✅
+# Test with windows terminal - cmd - w10 x64 ✅
+# Test with cmd - w10 x64 ✅
+# Test with powershell - w10 x64 ✅
+# Test with github desktop ⏳ | Read more on: https://github.com/desktop/desktop/issues/10999
