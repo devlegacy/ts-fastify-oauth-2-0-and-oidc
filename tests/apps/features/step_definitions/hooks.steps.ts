@@ -17,22 +17,25 @@ import {
   AppBackend,
 } from '#@/src/apps/server.js'
 import {
+  ONE_SECOND_IN_MILLISECONDS,
+} from '#@/src/Contexts/Shared/domain/time.js'
+import {
   config,
 } from '#@/src/Contexts/Shared/infrastructure/Config/config.js'
 
 const application = new AppBackend(config)
 
 let api: TestAgent<Test>
-setDefaultTimeout(60 * 1000)
+setDefaultTimeout(60 * ONE_SECOND_IN_MILLISECONDS)
 
 BeforeAll(async () => {
   await application.start()
   api = supertest(application.httpServer!)
-  await wait(1000)
+  await wait(ONE_SECOND_IN_MILLISECONDS)
 })
 
 AfterAll(async () => {
-  await wait(1000)
+  await wait(ONE_SECOND_IN_MILLISECONDS)
   await application.stop()
 })
 
