@@ -23,17 +23,18 @@ export default async function (fastify: FastifyInstance) {
         data: me,
       } = await meRequest.json() as { data: { id: string } }
 
-      const tweetsRequest = await fetch(`${config.get('twitter.apiUrl')}/users/${me.id}?user.fields=most_recent_tweet_id`, {
-        headers: {
-          Authorization: `Bearer ${req.cookies.access_token}`,
-          // 'Content-Type': 'application/json',
-        },
-      })
-      const tweets = await tweetsRequest.json()
+      // free tier doesn't allow to get tweets
+      // const tweetsRequest = await fetch(`${config.get('twitter.apiUrl')}/users/${me.id}/tweets`, {
+      //   headers: {
+      //     Authorization: `Bearer ${req.cookies.access_token}`,
+      //     // 'Content-Type': 'application/json',
+      //   },
+      // })
+      // const tweets = await tweetsRequest.json()
 
       return {
         me,
-        tweets,
+        // tweets,
       }
     },
   )

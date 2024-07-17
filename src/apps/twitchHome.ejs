@@ -1,0 +1,61 @@
+<h1>Home Spa Twitch</h1>
+
+<script type="module">
+  const getAuthenticationState = () => {
+    let state = sessionStorage.getItem('state')
+    if (!state) {
+      state = Math.random().toString(36).substring(7)
+      sessionStorage.setItem('state', state)
+    }
+    return state
+  }
+  const getHashParams = (queryKey) => {
+    const hashParams = window.location.hash.replace('#', '')?.split('&')
+
+    if (queryKey) {
+      return hashParams
+        ?.find((param) => param.startsWith(queryKey))
+        ?.split('=')[1]
+    }
+
+    return hashParams
+  }
+  const cleanUrlHash = () => {
+    history.replaceState({}, document.title, window.location.href.split('#')[0])
+  }
+
+  const queryAccessToken = getHashParams('access_token')
+  const queryState = getHashParams('state')
+  const state = sessionStorage.getItem('state')
+  if (queryState !== state) {
+    console.error(new Error('ERRO_STATE_MISMATCH'))
+    // store React/Vue setAccessToken(null)
+  }
+  if (queryAccessToken) {
+    cleanUrlHash()
+    // store React/Vue setAccessToken(queryAccessToken)
+  }
+
+  const userProfileRequest = await fetch('<%= TWITCH_API_URL %>/users', {
+    headers: {
+      Authorization: `Bearer ${queryAccessToken}`,
+      'Client-Id': '<%= TWITCH_CLIENT_ID %>',
+      'Content-Type': 'application/json',
+    },
+  })
+  const userProfile = await userProfileRequest.json()
+  console.log(userProfile)
+
+  const userChannelRequest = await fetch(
+    `<%= TWITCH_API_URL %>/channels/followed?user_id=${userProfile.data[0].id}`,
+    {
+      headers: {
+        Authorization: `Bearer ${queryAccessToken}`,
+        'Client-Id': '<%= TWITCH_CLIENT_ID %>',
+        'Content-Type': 'application/json',
+      },
+    }
+  )
+  const userChannel = await userChannelRequest.json()
+  console.log(userChannel)
+</script>

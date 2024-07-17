@@ -160,6 +160,32 @@ const config = convict(
         env: 'TWITTER_API_URL',
       },
     },
+    twitch: {
+      clientId: {
+        doc: 'The Twitch client id.',
+        format: String,
+        default: '',
+        env: 'TWITCH_CLIENT_ID',
+      },
+      apiUrl: {
+        doc: 'The Twitch api url.',
+        format: 'url',
+        default: 'https://api.twitch.tv/helix',
+        env: 'TWITCH_API_URL',
+      },
+      redirectUri: {
+        doc: 'The Twitch redirect uri.',
+        format: 'url',
+        default: 'http://localhost:8080',
+        env: 'TWITCH_REDIRECT_URI',
+      },
+      authorizationUrl: {
+        doc: 'The Twitch authorization url.',
+        format: 'url',
+        default: 'https://id.twitch.tv/oauth2/authorize',
+        env: 'TWITCH_AUTHORIZATION_URL',
+      },
+    },
   },
 )
 

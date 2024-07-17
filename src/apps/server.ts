@@ -68,6 +68,9 @@ export class AppBackend {
       .get('/', async (req, res) => {
         return res.viewAsync('./src/apps/home.ejs', {
           title: 'Home',
+          TWITCH_CLIENT_ID: config.get('twitch.clientId'),
+          TWITCH_REDIRECT_URI: config.get('twitch.redirectUri'),
+          TWITCH_AUTHORIZATION_URL: config.get('twitch.authorizationUrl'),
         })
       })
       .get('/home/spotify', async (req, res) => {
@@ -85,17 +88,17 @@ export class AppBackend {
             Authorization: accessToken,
             ...req.headers,
           },
-          credentials: 'include',
+          // credentials: 'include',
         })
         const {
           me,
-          tweets,
-        } = await response.json() as { me: { id: string }, tweets: { id: string }[] }
+          // tweets,
+        } = await response.json() as { me: { id: string } }
         return res.viewAsync('./src/apps/twitterHome.ejs', {
           title: 'Home',
           accessToken,
           me,
-          tweets,
+          // tweets,
           // twitterApiUrl: config.get('twitter.apiUrl'),
         })
       })
