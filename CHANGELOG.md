@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.0](https://github.com/devlegacy/ts-fastify-oauth-2-0-and-oidc/compare/ts-fastify-oauth-2-0-and-oidc@v1.3.0...ts-fastify-oauth-2-0-and-oidc@v1.4.0) (2024-07-17)
+
+
+### Features
+
+* **auth:** add implicit grant flow ([#11](https://github.com/devlegacy/ts-fastify-oauth-2-0-and-oidc/issues/11)) ([2e1b878](https://github.com/devlegacy/ts-fastify-oauth-2-0-and-oidc/commit/2e1b8783305729a0242345df863177757805e2c8))
+
 ## [1.3.0](https://github.com/devlegacy/ts-fastify-oauth-2-0-and-oidc/compare/ts-fastify-oauth-2-0-and-oidc@v1.2.0...ts-fastify-oauth-2-0-and-oidc@v1.3.0) (2024-07-15)
 
 
