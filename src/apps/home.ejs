@@ -1,3 +1,31 @@
 <h1>Login</h1>
 <a href='/api/authentication/spotify'>Connect to Spotify</a>
 <a href='/api/authentication/twitter'>Connect to Twitter</a>
+<a href='' class="twitch">Connect with twitch</a>
+
+<script>
+  const twitchScopes = [
+    'user:read:email',
+    'user:read:follows',
+  ]
+
+  const getAuthenticationState = () => {
+    let state = sessionStorage.getItem('state')
+    if (!state) {
+      state = Math.random().toString(36).substring(7)
+      sessionStorage.setItem('state', state)
+    }
+    return state
+  }
+
+  const parameters = {
+    response_type: 'token',
+    client_id: "<%= TWITCH_CLIENT_ID %>",
+    redirect_uri: "<%= TWITCH_REDIRECT_URI %>",
+    scope: twitchScopes.join(' '),
+    state
+  }
+  const queryParams = new URLSearchParams(parameters).toString()
+  const url = `<%= TWITCH_AUTHORIZATION_URL %>?${queryParams}`
+  document.querySelector('.twitch').setAttribute('href', url)
+</script>

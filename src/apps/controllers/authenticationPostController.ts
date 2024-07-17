@@ -157,6 +157,17 @@ export default async function (fastify: FastifyInstance) {
           .redirect('/home/twitter')
       },
     )
+    .get(
+      // single page application (SPA) callback
+      '/authentication/twitch/callback',
+      async function handler(req: FastifyRequest<{ Querystring: { state: string, code: string } }>, res) {
+        return res.viewAsync('./src/apps/twitchHome.ejs', {
+          title: 'Home',
+          TWITCH_API_URL: config.get('twitch.apiUrl'),
+          TWITCH_CLIENT_ID: config.get('twitch.clientId'),
+        })
+      },
+    )
   // .get('/authentication/discord', async function handler() {
   //   const scopes = [
   //     'identify',

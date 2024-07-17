@@ -45,8 +45,8 @@ importers:
         specifier: 1.7.4
         version: 1.7.4
       pino:
-        specifier: 9.3.0
-        version: 9.3.0
+        specifier: 9.3.1
+        version: 9.3.1
       pino-pretty:
         specifier: 11.2.1
         version: 11.2.1
@@ -56,7 +56,7 @@ importers:
     devDependencies:
       '@commitlint/cli':
         specifier: 19.3.0
-        version: 19.3.0(@types/node@20.14.10)(typescript@5.5.3)
+        version: 19.3.0(@types/node@20.14.11)(typescript@5.5.3)
       '@commitlint/config-conventional':
         specifier: 19.2.2
         version: 19.2.2
@@ -73,8 +73,8 @@ importers:
         specifier: 2.3.0
         version: 2.3.0(eslint@9.7.0)(typescript@5.5.3)
       '@swc-node/register':
-        specifier: 1.10.7
-        version: 1.10.7(@swc/core@1.6.13)(@swc/types@0.1.9)(typescript@5.5.3)
+        specifier: 1.10.9
+        version: 1.10.9(@swc/core@1.6.13)(@swc/types@0.1.9)(typescript@5.5.3)
       '@swc/cli':
         specifier: 0.4.0
         version: 0.4.0(@swc/core@1.6.13)
@@ -100,8 +100,8 @@ importers:
         specifier: 8.42.3
         version: 8.42.3
       '@types/node':
-        specifier: 20.14.10
-        version: 20.14.10
+        specifier: 20.14.11
+        version: 20.14.11
       '@types/supertest':
         specifier: 6.0.2
         version: 6.0.2
@@ -146,7 +146,7 @@ importers:
         version: 7.0.0
       ts-node:
         specifier: 10.9.2
-        version: 10.9.2(@swc/core@1.6.13)(@types/node@20.14.10)(typescript@5.5.3)
+        version: 10.9.2(@swc/core@1.6.13)(@types/node@20.14.11)(typescript@5.5.3)
       typescript:
         specifier: 5.5.3
         version: 5.5.3
@@ -412,53 +412,58 @@ packages:
     resolution: {integrity: sha512-oGB+UxlgWcgQkgwo8GcEGwemoTFt3FIO9ababBmaGwXIoBKZ+GTy0pP185beGg7Llih/NSHSV2XAs1lnznocSg==}
     engines: {node: '>= 8'}
 
-  '@oxc-resolver/binding-darwin-arm64@1.10.0':
-    resolution: {integrity: sha512-sJpH25yjQQf+59g4WAhrZYSiLiev2kFmHIvANeX8/ZAUEvtmRKmw/sCfK1cS6F6iRWNlSSjKbmahaY0ubS95ug==}
+  '@oxc-resolver/binding-darwin-arm64@1.10.2':
+    resolution: {integrity: sha512-aOCZYXqmFL+2sXlaVkYbAOtICGGeTFtmdul8OimQfOXHJods6YHJ2nR6+rEeBcJzaXyXPP18ne1IsEc4AYL1IA==}
     cpu: [arm64]
     os: [darwin]
 
-  '@oxc-resolver/binding-darwin-x64@1.10.0':
-    resolution: {integrity: sha512-ETtWuoq5nmg1810bMeKCQ5vKq85Sy+arx7LDVEUFvkz4g0+6WP1SVYr4st7jBh8k6AhXAw1d7H5zRTL6Sfep/w==}
+  '@oxc-resolver/binding-darwin-x64@1.10.2':
+    resolution: {integrity: sha512-6WD7lHGkoduFZfUgnC2suKOlqttQRKxWsiVXiiGPu3mfXvQAhMd/gekuH1t8vOhFlPJduaww15n5UB0bSjCK+w==}
     cpu: [x64]
     os: [darwin]
 
-  '@oxc-resolver/binding-linux-arm-gnueabihf@1.10.0':
-    resolution: {integrity: sha512-0h8Tn0c2aUagCO0nNU0YwSqBbNBKrc4/0uSwM/gAKrzmjEbup2dZEDkvAoBzEFgGc8DFdvKv/uxydgJvpyAGZQ==}
+  '@oxc-resolver/binding-freebsd-x64@1.10.2':
+    resolution: {integrity: sha512-nEqHWx/Ot5p7Mafj8qH6vFlLSvHjECxAcZwhnAMqRuQu1NgXC/QM3emkdhVGy7QJgsxZbHpPaF6TERNf5/NL9Q==}
+    cpu: [x64]
+    os: [freebsd]
+
+  '@oxc-resolver/binding-linux-arm-gnueabihf@1.10.2':
+    resolution: {integrity: sha512-+AlZI0fPnpfArh8aC5k2295lmQrxa2p8gBLxC3buvCkz0ZpbVLxyyAXz3J2jGwJnmc5MUPLEqPYw6ZlAGH4XHA==}
     cpu: [arm]
     os: [linux]
 
-  '@oxc-resolver/binding-linux-arm64-gnu@1.10.0':
-    resolution: {integrity: sha512-RtJAj35/v4mm4MIEwlz8nomcgEpktdgOoIRdVaneSDjfTSQdagC34Bx9TRGLKt5u3xgP4xYx0rFTSBCmJUJoSQ==}
+  '@oxc-resolver/binding-linux-arm64-gnu@1.10.2':
+    resolution: {integrity: sha512-8fZ8NszFaUZaoA8eUwkF2lHjgUs76aFiewWgG/cjcZmwKp+ErZQLW8eOvIWZ4SohHQ+ScvhVsSaU2PU38c88gw==}
     cpu: [arm64]
     os: [linux]
 
-  '@oxc-resolver/binding-linux-arm64-musl@1.10.0':
-    resolution: {integrity: sha512-d9PBWbK3SCrj/018LoCyQ34LEEKZXyVwA/UCtRzCvZmgRxlRDmrim/xgl2IyXEqu3/9eeGnGnip1ceATGnAacA==}
+  '@oxc-resolver/binding-linux-arm64-musl@1.10.2':
+    resolution: {integrity: sha512-oPrLICrw96Ym9n04FWXWGkbkpF6qJtZ57JSnqI3oQ24xHTt4iWyjHKHQO46NbJAK9sFb3Qce4BzV8faDI5Rifg==}
     cpu: [arm64]
     os: [linux]
 
-  '@oxc-resolver/binding-linux-x64-gnu@1.10.0':
-    resolution: {integrity: sha512-dv2YPpCk2SQNQI/NiPSr207bdsIBD/1Gn7zpz/r9o6cl0RucHRk4KsMRamkJvWR+jIw0CwGTsgQZZTImcObLCQ==}
+  '@oxc-resolver/binding-linux-x64-gnu@1.10.2':
+    resolution: {integrity: sha512-eli74jTAUiIfqi8IPFqiPxQS69Alcr6w/IFRyf3XxrkxeFGgcgxJkRIxWNTKJ6T3EXxjuma+49LdZn6l9rEj7A==}
     cpu: [x64]
     os: [linux]
 
-  '@oxc-resolver/binding-linux-x64-musl@1.10.0':
-    resolution: {integrity: sha512-RdIxtyhPfxd8uUX2IkotnLHAkdrvVvEhv0ZNB31K6CtwVekZKWxSETzodN8+2LLNgp+4CClMHxhc59IapGUPKA==}
+  '@oxc-resolver/binding-linux-x64-musl@1.10.2':
+    resolution: {integrity: sha512-HH9zmjNSQo3rkbqJH5nIjGrtjC+QPrUy0KGGMR/oRCSLuD0cNFJ/Uly1XAugwSm4oEw0+rv6PmeclXmVTKsxhw==}
     cpu: [x64]
     os: [linux]
 
-  '@oxc-resolver/binding-wasm32-wasi@1.10.0':
-    resolution: {integrity: sha512-drqVsc2dj7rUdZ/UBzDxfyuPL8ZBjKYKiuW7RBrYKSOYKA4qNDIqB2qDUTv940WDF4WhrHFpHEjT6Y1Sp+Fvxw==}
+  '@oxc-resolver/binding-wasm32-wasi@1.10.2':
+    resolution: {integrity: sha512-3ItX23q33sfVBtMMdMhVDSe0NX5zBHxHfmFiXhSJuwNaVIwGpLFU7WU2nmq9oNdnmTOvjL8vlhOqiGvumBLlRA==}
     engines: {node: '>=14.0.0'}
     cpu: [wasm32]
 
-  '@oxc-resolver/binding-win32-arm64-msvc@1.10.0':
-    resolution: {integrity: sha512-RbDplFsBJkj4huit8d7XG2wKQ7IMdQhLAUBeK02JzsDDrpNsgD1fa3YOy2oGO3GPUWEJXyhq1okFyyVIHrUf3g==}
+  '@oxc-resolver/binding-win32-arm64-msvc@1.10.2':
+    resolution: {integrity: sha512-aVoj2V+jmQ1N+lVy9AhaLmzssJM0lcKt8D0UL83aNLZJ5lSN7hgBuUXTVmL+VF268f167khjo38z+fbELDVm8Q==}
     cpu: [arm64]
     os: [win32]
 
-  '@oxc-resolver/binding-win32-x64-msvc@1.10.0':
-    resolution: {integrity: sha512-0atlXXYIzdzvXBlPwdFde3PppPyapb+KofI9jjM88na9ytsC7Unn9hlV7egr2JSaGKCiEBDK8zOxoG1ueEauVA==}
+  '@oxc-resolver/binding-win32-x64-msvc@1.10.2':
+    resolution: {integrity: sha512-l8BDQWyP0Piw8hlmYPUqTRKLsq+ceG9h+9p6ZrjNzwW9AmJX7T7T2hgoVVHqS6f4WNA/CFkb3RyZP9QTzNkyyA==}
     cpu: [x64]
     os: [win32]
 
@@ -506,8 +511,8 @@ packages:
       '@swc/core': '>= 1.4.13'
       '@swc/types': '>= 0.1'
 
-  '@swc-node/register@1.10.7':
-    resolution: {integrity: sha512-rCL7bGJT58nZAQcVi3+khOIOHK0zmD96QLbI5wvimK3YJ9/F2Xsp804iXSdvGfbtFDwUD9R8aglriNNXsBiIVQ==}
+  '@swc-node/register@1.10.9':
+    resolution: {integrity: sha512-iXy2sjP0phPEpK2yivjRC3PAgoLaT4sjSk0LDWCTdcTBJmR4waEog0E6eJbvoOkLkOtWw37SB8vCkl/bbh4+8A==}
     peerDependencies:
       '@swc/core': '>= 1.4.13'
       typescript: '>= 4.3'
@@ -678,8 +683,8 @@ packages:
   '@types/methods@1.1.4':
     resolution: {integrity: sha512-ymXWVrDiCxTBE3+RIrrP533E70eA+9qu7zdWoHuOmGujkYtzf4HQF96b8nwHLqhuf4ykX61IGRIB38CC6/sImQ==}
 
-  '@types/node@20.14.10':
-    resolution: {integrity: sha512-MdiXf+nDuMvY0gJKxyfZ7/6UFsETO7mGKF54MVD/ekJS6HdFtpZFBgrh6Pseu64XTb2MLyFPlbW6hj8HYRQNOQ==}
+  '@types/node@20.14.11':
+    resolution: {integrity: sha512-kprQpL8MMeszbz6ojB5/tU8PLN4kesnN8Gjzw349rDlNgsSzg90lAVj3llK99Dh7JON+t9AuscPPFW6mPbTnSA==}
 
   '@types/normalize-package-data@2.4.4':
     resolution: {integrity: sha512-37i+OaWTh9qeK4LSHPsyRC7NahnGotNuZvjLSgcPzblpHB3rrCJxAOgI5gCdKm7coonsaX1Of0ILiTcnZjbfxA==}
@@ -2247,8 +2252,8 @@ packages:
     resolution: {integrity: sha512-uksVLsqG3pVdzzPvmAHpBK0wKxYItuzZr7SziusRPoz67tGV8rL1szZ6IdeUrbqLjGDwApBtN29eEE3IqGHOjg==}
     engines: {node: '>=4'}
 
-  oxc-resolver@1.10.0:
-    resolution: {integrity: sha512-FkObNl6JVrbqvvRqXCQhYZvrJHqEJNAjWDuPxHx9CblwoYzL5zcM74Ba30ek3YUopaUSNit3ceaILqShAx+hgw==}
+  oxc-resolver@1.10.2:
+    resolution: {integrity: sha512-NIbwVqoU8Bhl7PVtItHCg+VFFokIDwBgIgFUwFG2Y8ePhxftFh5xG+KLar5PLWXlCP4WunPIuXD3jr3v6/MfRw==}
 
   p-cancelable@2.1.1:
     resolution: {integrity: sha512-BZOr3nRQHOntUjTrH8+Lh54smKHoHyur8We1V8DSMVrl5A2malOOwuJRnKRDjSnkoeBh4at6BwEnb5I7Jl31wg==}
@@ -2369,8 +2374,8 @@ packages:
   pino-std-serializers@7.0.0:
     resolution: {integrity: sha512-e906FRY0+tV27iq4juKzSYPbUj2do2X2JX4EzSca1631EB2QJQUqGbDuERal7LCtOpxl6x3+nvo9NPZcmjkiFA==}
 
-  pino@9.3.0:
-    resolution: {integrity: sha512-W9e1K47Gb8VJLn43j8lythxaKdzHG8tUPYvO8r1kWg7Z7ry/78UJeZ/1UA7ejumgvSPcJ9eBt4AN4gjJioDG7w==}
+  pino@9.3.1:
+    resolution: {integrity: sha512-afSfrq/hUiW/MFmQcLEwV9Zh8Ry6MrMTOyBU53o/fc0gEl+1OZ/Fks/xQCM2nOC0C/OfDtQMnT2d8c3kpcfSzA==}
     hasBin: true
 
   pirates@4.0.6:
@@ -3064,11 +3069,11 @@ snapshots:
   '@colors/colors@1.5.0':
     optional: true
 
-  '@commitlint/cli@19.3.0(@types/node@20.14.10)(typescript@5.5.3)':
+  '@commitlint/cli@19.3.0(@types/node@20.14.11)(typescript@5.5.3)':
     dependencies:
       '@commitlint/format': 19.3.0
       '@commitlint/lint': 19.2.2
-      '@commitlint/load': 19.2.0(@types/node@20.14.10)(typescript@5.5.3)
+      '@commitlint/load': 19.2.0(@types/node@20.14.11)(typescript@5.5.3)
       '@commitlint/read': 19.2.1
       '@commitlint/types': 19.0.3
       execa: 8.0.1
@@ -3115,7 +3120,7 @@ snapshots:
       '@commitlint/rules': 19.0.3
       '@commitlint/types': 19.0.3
 
-  '@commitlint/load@19.2.0(@types/node@20.14.10)(typescript@5.5.3)':
+  '@commitlint/load@19.2.0(@types/node@20.14.11)(typescript@5.5.3)':
     dependencies:
       '@commitlint/config-validator': 19.0.3
       '@commitlint/execute-rule': 19.0.0
@@ -3123,7 +3128,7 @@ snapshots:
       '@commitlint/types': 19.0.3
       chalk: 5.3.0
       cosmiconfig: 9.0.0(typescript@5.5.3)
-      cosmiconfig-typescript-loader: 5.0.0(@types/node@20.14.10)(cosmiconfig@9.0.0(typescript@5.5.3))(typescript@5.5.3)
+      cosmiconfig-typescript-loader: 5.0.0(@types/node@20.14.11)(cosmiconfig@9.0.0(typescript@5.5.3))(typescript@5.5.3)
       lodash.isplainobject: 4.0.6
       lodash.merge: 4.6.2
       lodash.uniq: 4.5.0
@@ -3424,36 +3429,39 @@ snapshots:
       '@nodelib/fs.scandir': 2.1.5
       fastq: 1.17.1
 
-  '@oxc-resolver/binding-darwin-arm64@1.10.0':
+  '@oxc-resolver/binding-darwin-arm64@1.10.2':
     optional: true
 
-  '@oxc-resolver/binding-darwin-x64@1.10.0':
+  '@oxc-resolver/binding-darwin-x64@1.10.2':
     optional: true
 
-  '@oxc-resolver/binding-linux-arm-gnueabihf@1.10.0':
+  '@oxc-resolver/binding-freebsd-x64@1.10.2':
     optional: true
 
-  '@oxc-resolver/binding-linux-arm64-gnu@1.10.0':
+  '@oxc-resolver/binding-linux-arm-gnueabihf@1.10.2':
     optional: true
 
-  '@oxc-resolver/binding-linux-arm64-musl@1.10.0':
+  '@oxc-resolver/binding-linux-arm64-gnu@1.10.2':
     optional: true
 
-  '@oxc-resolver/binding-linux-x64-gnu@1.10.0':
+  '@oxc-resolver/binding-linux-arm64-musl@1.10.2':
     optional: true
 
-  '@oxc-resolver/binding-linux-x64-musl@1.10.0':
+  '@oxc-resolver/binding-linux-x64-gnu@1.10.2':
     optional: true
 
-  '@oxc-resolver/binding-wasm32-wasi@1.10.0':
+  '@oxc-resolver/binding-linux-x64-musl@1.10.2':
+    optional: true
+
+  '@oxc-resolver/binding-wasm32-wasi@1.10.2':
     dependencies:
       '@napi-rs/wasm-runtime': 0.2.4
     optional: true
 
-  '@oxc-resolver/binding-win32-arm64-msvc@1.10.0':
+  '@oxc-resolver/binding-win32-arm64-msvc@1.10.2':
     optional: true
 
-  '@oxc-resolver/binding-win32-x64-msvc@1.10.0':
+  '@oxc-resolver/binding-win32-x64-msvc@1.10.2':
     optional: true
 
   '@pkgjs/parseargs@0.11.0':
@@ -3513,14 +3521,14 @@ snapshots:
       '@swc/core': 1.6.13
       '@swc/types': 0.1.9
 
-  '@swc-node/register@1.10.7(@swc/core@1.6.13)(@swc/types@0.1.9)(typescript@5.5.3)':
+  '@swc-node/register@1.10.9(@swc/core@1.6.13)(@swc/types@0.1.9)(typescript@5.5.3)':
     dependencies:
       '@swc-node/core': 1.13.3(@swc/core@1.6.13)(@swc/types@0.1.9)
       '@swc-node/sourcemap-support': 0.5.1
       '@swc/core': 1.6.13
       colorette: 2.0.20
       debug: 4.3.5(supports-color@8.1.1)
-      oxc-resolver: 1.10.0
+      oxc-resolver: 1.10.2
       pirates: 4.0.6
       tslib: 2.6.3
       typescript: 5.5.3
@@ -3623,12 +3631,12 @@ snapshots:
     dependencies:
       '@types/http-cache-semantics': 4.0.4
       '@types/keyv': 3.1.4
-      '@types/node': 20.14.10
+      '@types/node': 20.14.11
       '@types/responselike': 1.0.3
 
   '@types/conventional-commits-parser@5.0.0':
     dependencies:
-      '@types/node': 20.14.10
+      '@types/node': 20.14.11
 
   '@types/convict-format-with-validator@6.0.5':
     dependencies:
@@ -3636,7 +3644,7 @@ snapshots:
 
   '@types/convict@6.1.6':
     dependencies:
-      '@types/node': 20.14.10
+      '@types/node': 20.14.11
 
   '@types/cookiejar@2.1.5': {}
 
@@ -3671,11 +3679,11 @@ snapshots:
 
   '@types/keyv@3.1.4':
     dependencies:
-      '@types/node': 20.14.10
+      '@types/node': 20.14.11
 
   '@types/methods@1.1.4': {}
 
-  '@types/node@20.14.10':
+  '@types/node@20.14.11':
     dependencies:
       undici-types: 5.26.5
 
@@ -3683,13 +3691,13 @@ snapshots:
 
   '@types/responselike@1.0.3':
     dependencies:
-      '@types/node': 20.14.10
+      '@types/node': 20.14.11
 
   '@types/superagent@8.1.7':
     dependencies:
       '@types/cookiejar': 2.1.5
       '@types/methods': 1.1.4
-      '@types/node': 20.14.10
+      '@types/node': 20.14.11
 
   '@types/supertest@6.0.2':
     dependencies:
@@ -4169,9 +4177,9 @@ snapshots:
 
   core-util-is@1.0.3: {}
 
-  cosmiconfig-typescript-loader@5.0.0(@types/node@20.14.10)(cosmiconfig@9.0.0(typescript@5.5.3))(typescript@5.5.3):
+  cosmiconfig-typescript-loader@5.0.0(@types/node@20.14.11)(cosmiconfig@9.0.0(typescript@5.5.3))(typescript@5.5.3):
     dependencies:
-      '@types/node': 20.14.10
+      '@types/node': 20.14.11
       cosmiconfig: 9.0.0(typescript@5.5.3)
       jiti: 1.21.6
       typescript: 5.5.3
@@ -4648,7 +4656,7 @@ snapshots:
       fast-json-stringify: 5.16.1
       find-my-way: 8.2.0
       light-my-request: 5.13.0
-      pino: 9.3.0
+      pino: 9.3.1
       process-warning: 3.0.0
       proxy-addr: 2.0.7
       rfdc: 1.4.1
@@ -5370,18 +5378,19 @@ snapshots:
     dependencies:
       arch: 2.2.0
 
-  oxc-resolver@1.10.0:
+  oxc-resolver@1.10.2:
     optionalDependencies:
-      '@oxc-resolver/binding-darwin-arm64': 1.10.0
-      '@oxc-resolver/binding-darwin-x64': 1.10.0
-      '@oxc-resolver/binding-linux-arm-gnueabihf': 1.10.0
-      '@oxc-resolver/binding-linux-arm64-gnu': 1.10.0
-      '@oxc-resolver/binding-linux-arm64-musl': 1.10.0
-      '@oxc-resolver/binding-linux-x64-gnu': 1.10.0
-      '@oxc-resolver/binding-linux-x64-musl': 1.10.0
-      '@oxc-resolver/binding-wasm32-wasi': 1.10.0
-      '@oxc-resolver/binding-win32-arm64-msvc': 1.10.0
-      '@oxc-resolver/binding-win32-x64-msvc': 1.10.0
+      '@oxc-resolver/binding-darwin-arm64': 1.10.2
+      '@oxc-resolver/binding-darwin-x64': 1.10.2
+      '@oxc-resolver/binding-freebsd-x64': 1.10.2
+      '@oxc-resolver/binding-linux-arm-gnueabihf': 1.10.2
+      '@oxc-resolver/binding-linux-arm64-gnu': 1.10.2
+      '@oxc-resolver/binding-linux-arm64-musl': 1.10.2
+      '@oxc-resolver/binding-linux-x64-gnu': 1.10.2
+      '@oxc-resolver/binding-linux-x64-musl': 1.10.2
+      '@oxc-resolver/binding-wasm32-wasi': 1.10.2
+      '@oxc-resolver/binding-win32-arm64-msvc': 1.10.2
+      '@oxc-resolver/binding-win32-x64-msvc': 1.10.2
 
   p-cancelable@2.1.1: {}
 
@@ -5491,7 +5500,7 @@ snapshots:
 
   pino-std-serializers@7.0.0: {}
 
-  pino@9.3.0:
+  pino@9.3.1:
     dependencies:
       atomic-sleep: 1.0.0
       fast-redact: 3.5.0
@@ -5966,14 +5975,14 @@ snapshots:
     dependencies:
       typescript: 5.5.3
 
-  ts-node@10.9.2(@swc/core@1.6.13)(@types/node@20.14.10)(typescript@5.5.3):
+  ts-node@10.9.2(@swc/core@1.6.13)(@types/node@20.14.11)(typescript@5.5.3):
     dependencies:
       '@cspotcode/source-map-support': 0.8.1
       '@tsconfig/node10': 1.0.11
       '@tsconfig/node12': 1.0.11
       '@tsconfig/node14': 1.0.3
       '@tsconfig/node16': 1.0.4
-      '@types/node': 20.14.10
+      '@types/node': 20.14.11
       acorn: 8.12.1
       acorn-walk: 8.3.3
       arg: 4.1.3
