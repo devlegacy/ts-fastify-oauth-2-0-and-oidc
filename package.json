@@ -11,13 +11,13 @@
     "build": "swc ./src/ --config-file ./.swcrc.build --out-dir ./dist/ --strip-leading-paths && rsync -avm --include='*.ejs' --include='*/' --exclude='*' ./src/ ./dist/ && ./.bin/replace-import-paths",
     "build:clean": "rm -Rf ./dist; exit 0",
     "start": "node --env-file=.env ./dist/apps/main.js",
-    "start:debug": "node --env-file=.env --experimental-transform-types --watch --inspect=0.0.0.0:0 ./src/apps/main.ts",
+    "start:debug": "node --env-file=.env --import @swc-node/register/esm-register --watch --inspect=0.0.0.0:0 ./src/apps/main.ts",
     "lint": "eslint --color \"./src/**/*.ts\"",
     "lint:fix": "node --run lint -- --fix",
     "test": "node --run test:unit && node --run test:features",
     "test:coverage": "c8 node --run test:unit && node --run test:features",
-    "test:features": "node --experimental-transform-types ./node_modules/@cucumber/cucumber/bin/cucumber-js --config ./cucumber.js -p app_backend",
-    "test:unit": "node --env-file=.env --experimental-transform-types --test ./tests/**/*.test.ts"
+    "test:features": "node --import @swc-node/register/esm-register ./node_modules/@cucumber/cucumber/bin/cucumber-js --config ./cucumber.js -p app_backend",
+    "test:unit": "node --env-file=.env --import @swc-node/register/esm-register --test ./tests/**/*.test.ts"
   },
   "imports": {
     "#@/*": "./*"
@@ -33,7 +33,7 @@
     "@fastify/view": "10.0.1",
     "convict": "6.2.4",
     "convict-format-with-validator": "6.2.0",
-    "dotenv-expand": "11.0.7",
+    "dotenv-expand": "12.0.0",
     "ejs": "3.1.10",
     "fast-jwt": "4.0.5",
     "fastify": "5.1.0",
@@ -63,7 +63,7 @@
     "@types/uuid": "10.0.0",
     "c8": "10.1.2",
     "cz-git": "1.11.0",
-    "eslint": "9.15.0",
+    "eslint": "9.14.0",
     "eslint-plugin-import": "2.31.0",
     "eslint-plugin-security": "3.0.1",
     "eslint-plugin-simple-import-sort": "12.1.1",
