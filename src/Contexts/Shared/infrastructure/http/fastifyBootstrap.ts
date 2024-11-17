@@ -44,7 +44,7 @@ export const fastifyBootstrap = (
         return filename.includes('Controller')
       },
     })
-    .register(import('@fastify/cors'), options.cors)
+    .register(import('@fastify/cors'), options.cors || {})
     .register(import('@fastify/compress'))
     .register(import('@fastify/cookie'))
     // eslint-disable-next-line complexity

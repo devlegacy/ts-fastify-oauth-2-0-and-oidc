@@ -26,7 +26,7 @@ import {
 } from '#@/src/Contexts/Shared/infrastructure/Logger/PinoLogger.js'
 
 const fastify = Fastify({
-  logger: logger() as FastifyBaseLogger,
+  loggerInstance: logger() as FastifyBaseLogger,
 })
 const printRoutesOptions: PrintRoutesOptions = {
   commonPrefix: false,
@@ -35,6 +35,7 @@ const printRoutesOptions: PrintRoutesOptions = {
 }
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
+
 export class AppBackend {
   readonly #config: Config
   #adapter = fastify

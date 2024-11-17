@@ -1,24 +1,30 @@
 #!/usr/bin/env node
 
-import { cwd } from 'node:process'
-import {
-  styleText,
-} from 'node:util'
+import { styleText } from 'node:util'
 
-import {
-  replaceInFileSync,
-} from 'replace-in-file'
+import { replaceInFileSync } from 'replace-in-file'
 
-// replace-in-file '#@/src/' '#@/dist/' dist/**/*.js
 const options = {
   files: 'dist/**/*.js',
-  from: /#@\/src\//,
-  to: '#@/dist/',
 }
-const result = replaceInFileSync(options)
+const result = [
+  replaceInFileSync({
+    ...options,
+    from: /#@\/src\//g,
+    to: '#@/dist/',
+  }),
+  replaceInFileSync({
+    ...options,
+    from: /\.\/src\/apps\//g,
+    to: './dist/apps/',
+  }),
+]
 
-const changedFiles = result.filter((file) => file.hasChanged).length
+const changedFiles = 10 //result.flat().filter((file) => file.hasChanged).length
 const messageFormat = changedFiles ? 'green' : 'yellow'
 const message = changedFiles ? `${changedFiles} file(s) were changed` : 'No files were changed'
+
 // eslint-disable-next-line no-console
-console.log(`Replacing '${options.from}' with '${options.to}'\n${styleText(messageFormat, message)}`)
+console.log(
+  `Replacing '${options.from}' with '${options.to}'\n${styleText(messageFormat, message)}`,
+)
