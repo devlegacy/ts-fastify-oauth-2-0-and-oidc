@@ -19,8 +19,8 @@ jobs:
     strategy:
       # fail-fast: false
       matrix:
-        # REVIEW: In node 21 we can't use node --run yet
-        node-version: [21.x, 22.x] # current versions + next versions o prepare future migrations
+        # REVIEW: In node 23 we can't use node --run yet
+        node-version: [22.x, 23.x] # current versions + next versions o prepare future migrations
         # node-version: [22.x] # current versions + next versions o prepare future migrations
     steps:
       ## Setup workspace
