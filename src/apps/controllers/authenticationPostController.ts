@@ -8,6 +8,9 @@ import type {
 } from 'fastify'
 
 import {
+  ONE_MINUTE_IN_MILLISECONDS,
+} from '#@/src/Contexts/Shared/domain/time.js'
+import {
   accessTokenSigner,
 } from '#@/src/Contexts/Shared/infrastructure/accessTokenSigner.js'
 import {
@@ -44,6 +47,9 @@ export default async function (fastify: FastifyInstance) {
     .get(
       '/authentication/spotify',
       async function handler(req, res) {
+        /**
+         * [Scopes | Spotify for Developers](https://developer.spotify.com/documentation/web-api/concepts/scopes)
+         */
         const scopes = [
           'user-read-private',
           'user-read-email',
@@ -57,9 +63,11 @@ export default async function (fastify: FastifyInstance) {
         })
         const redirect = new URL(config.get('spotify.authorizationUrl'))
         redirect.search = query.toString()
+        // Redirect to the Spotify Accounts service (Concern request UI)
         res
           .status(302)
           .redirect(redirect.toString())
+        // Then if the user do the authorize grant is redirected to callback URL
       },
     )
     .get(
@@ -78,11 +86,24 @@ export default async function (fastify: FastifyInstance) {
           }).toString(),
         }
         const response = await fetch(config.get('spotify.tokenUrl') ?? '', options)
-        const json = await response.json() as { access_token: string }
+        type SpotifyTokenResponse = {
+          access_token: string
+          /**
+           * time in seconds
+           */
+          expires_in: number
+          refresh_token: string
+          scope: string
+          token_type: string
+        }
+        const resource = await response.json() as SpotifyTokenResponse
         res
-          .setCookie('access_token', json.access_token, {
+          // .setCookie('access_token', resource.access_token, {
+          .setCookie('spotify_access_token', resource.access_token, {
             path: '/',
             httpOnly: true,
+            expires: new Date(Date.now() + resource.expires_in * ONE_MINUTE_IN_MILLISECONDS),
+            // domain: config.get('app.url'),
           })
           .status(302)
           .redirect('/home/spotify')

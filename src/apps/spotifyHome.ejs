@@ -1,17 +1,10 @@
-<h1>Home Spotify</h1>
+<h1><%= title %></h1>
 <h2 class='username'></h2>
 <article class='playlists'></article>
 <script type='module'>
-  const headers = new Headers()
-  headers.append('Authorization', 'Bearer <%= accessToken %>')
-  const meRequest = await fetch('<%= spotifyApiUrl %>/me', {
-    headers,
-  })
-  const me = await meRequest.json()
-  const playlistsRequest = await fetch(`<%= spotifyApiUrl %>/users/${me.id}/playlists`, {
-    headers,
-  })
-  const playlists = await playlistsRequest.json()
-  document.querySelector('.username').textContent = me.display_name
-  document.querySelector('.playlists').innerHTML = '<strong>Playlist:</strong>' + playlists.items.map((playlist) => playlist.name).join(', ')
+  const meResource = <%- JSON.stringify(meResource) %>
+  const playlistResources = <%- JSON.stringify(playlistResources) %>
+
+  document.querySelector('.username').textContent = meResource.display_name
+  document.querySelector('.playlists').innerHTML = '<strong>Playlist:</strong>' + playlistResources.items.map((playlist) => playlist.name).join(', ')
 </script>
