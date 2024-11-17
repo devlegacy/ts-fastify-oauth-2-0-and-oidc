@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.5.0](https://github.com/devlegacy/ts-fastify-oauth-2-0-and-oidc/compare/ts-fastify-oauth-2-0-and-oidc@v1.4.0...ts-fastify-oauth-2-0-and-oidc@v1.5.0) (2024-11-17)
+
+
+### Features
+
+* authorization code flow ([#15](https://github.com/devlegacy/ts-fastify-oauth-2-0-and-oidc/issues/15)) ([dbf0e5a](https://github.com/devlegacy/ts-fastify-oauth-2-0-and-oidc/commit/dbf0e5a705436646d3df384ad39baf22e674e097))
+* authorization code flow with pkce ([#16](https://github.com/devlegacy/ts-fastify-oauth-2-0-and-oidc/issues/16)) ([260f447](https://github.com/devlegacy/ts-fastify-oauth-2-0-and-oidc/commit/260f447419aae473522186758c25c116e935614b))
+* introduction to oauth 2.0 and OIDC ([#13](https://github.com/devlegacy/ts-fastify-oauth-2-0-and-oidc/issues/13)) ([ed569c9](https://github.com/devlegacy/ts-fastify-oauth-2-0-and-oidc/commit/ed569c9d961bbd5e3358537922aaf66d9d4d1e2d))
+
 ## [1.4.0](https://github.com/devlegacy/ts-fastify-oauth-2-0-and-oidc/compare/ts-fastify-oauth-2-0-and-oidc@v1.3.0...ts-fastify-oauth-2-0-and-oidc@v1.4.0) (2024-07-17)
 
 
