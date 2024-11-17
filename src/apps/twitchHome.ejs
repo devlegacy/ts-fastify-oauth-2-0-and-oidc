@@ -1,15 +1,18 @@
 <h1>Home Spa Twitch</h1>
 
+<section id="user"></section>
+<section id="channels"></section>
+
 <script type="module">
-  const getAuthenticationState = () => {
-    let state = sessionStorage.getItem('state')
+  const authenticationStateRetriever = (key = 'state') => {
+    let state = sessionStorage.getItem(key)
     if (!state) {
       state = Math.random().toString(36).substring(7)
-      sessionStorage.setItem('state', state)
+      sessionStorage.setItem(key, state)
     }
     return state
   }
-  const getHashParams = (queryKey) => {
+  const hashParamsParser = (queryKey = 'state') => {
     const hashParams = window.location.hash.replace('#', '')?.split('&')
 
     if (queryKey) {
@@ -24,16 +27,16 @@
     history.replaceState({}, document.title, window.location.href.split('#')[0])
   }
 
-  const queryAccessToken = getHashParams('access_token')
-  const queryState = getHashParams('state')
-  const state = sessionStorage.getItem('state')
+  const queryAccessToken = hashParamsParser('access_token')
+  const queryState = hashParamsParser('state')
+  const state = authenticationStateRetriever('twitch_state')
   if (queryState !== state) {
-    console.error(new Error('ERRO_STATE_MISMATCH'))
     // store React/Vue setAccessToken(null)
+    console.error(new Error('ERRO_STATE_MISMATCH'))
   }
   if (queryAccessToken) {
-    cleanUrlHash()
     // store React/Vue setAccessToken(queryAccessToken)
+    cleanUrlHash()
   }
 
   const userProfileRequest = await fetch('<%= TWITCH_API_URL %>/users', {
@@ -45,7 +48,11 @@
   })
   const userProfile = await userProfileRequest.json()
   console.log(userProfile)
-
+  document.getElementById('user').innerHTML = `
+    <strong>${userProfile.data[0].display_name}</strong>
+    <p>${userProfile.data[0].email}</p>
+    <img src="${userProfile.data[0].profile_image_url}" alt="${userProfile.data[0].display_name}" />
+  `
   const userChannelRequest = await fetch(
     `<%= TWITCH_API_URL %>/channels/followed?user_id=${userProfile.data[0].id}`,
     {
@@ -58,4 +65,18 @@
   )
   const userChannel = await userChannelRequest.json()
   console.log(userChannel)
+  document.getElementById('channels').innerHTML = `
+    <h2>Channels</h2>
+    <ul>
+      ${userChannel.data
+        .map(
+          (channel) => `
+          <li>
+            <p>${channel.broadcaster_name}</p>
+          </li>
+        `
+        )
+        .join('')}
+    </ul>
+  `
 </script>
