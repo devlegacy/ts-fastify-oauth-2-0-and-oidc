@@ -230,14 +230,16 @@ export default async function (fastify: FastifyInstance) {
         fetch(`${config.get('discord.apiUrl')}/users/@me`, {
           headers,
         })
-          .then((response) => response.json() as Promise<{ username: string, discriminator: string }>),
+          .then((response) => response.json() as Promise<{ id: string, username: string, discriminator: string }>),
         fetch(`${config.get('discord.apiUrl')}/users/@me/guilds`, {
           headers,
         })
           .then((response) => response.json() as Promise<{ name: string }[]>),
       ])
       return {
-        user: `${user.username}#${user.discriminator}`,
+        user: `${user.username}`,
+        url: `https://discordapp.com/users/${user.id}`,
+        discord: `discord://discordapp.com/users/${user.id}`,
         guilds: guilds.map((guild: { name: string }) => guild.name),
       }
     })
