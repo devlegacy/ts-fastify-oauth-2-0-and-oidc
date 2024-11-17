@@ -66,7 +66,7 @@ const config = convict(
         env: 'ACCESS_TOKEN_SECRET',
       },
       expirationTime: {
-        doc: 'The expiration time in secomds of the access token.',
+        doc: 'The expiration time in seconds of the access token.',
         format: Number,
         default: 900,
         env: 'ACCESS_TOKEN_EXPIRATION_TIME',
@@ -184,6 +184,32 @@ const config = convict(
         format: 'url',
         default: 'https://id.twitch.tv/oauth2/authorize',
         env: 'TWITCH_AUTHORIZATION_URL',
+      },
+    },
+    discord: {
+      clientId: {
+        doc: 'The Discord client id.',
+        format: String,
+        default: '',
+        env: 'DISCORD_CLIENT_ID',
+      },
+      clientSecret: {
+        doc: 'The Discord client secret.',
+        format: String,
+        default: '',
+        env: 'DISCORD_CLIENT_SECRET',
+      },
+      tokenUrl: {
+        doc: 'The Discord token url.',
+        format: 'url',
+        default: 'https://discord.com/api/v9/oauth2/token',
+        env: 'DISCORD_TOKEN_URL',
+      },
+      apiUrl: {
+        doc: 'The Discord api url.',
+        format: 'url',
+        default: 'https://discord.com/api/v9',
+        env: 'DISCORD_API_URL',
       },
     },
   },

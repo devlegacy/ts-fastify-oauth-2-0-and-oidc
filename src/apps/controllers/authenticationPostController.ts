@@ -8,6 +8,9 @@ import type {
 } from 'fastify'
 
 import {
+  accessTokenSigner,
+} from '#@/src/Contexts/Shared/infrastructure/accessTokenSigner.js'
+import {
   config,
 } from '#@/src/Contexts/Shared/infrastructure/Config/config.js'
 import {
@@ -16,9 +19,6 @@ import {
 import {
   getBasicCredentials,
 } from '#@/src/Contexts/Shared/infrastructure/http/getBasicCredentials.js'
-import {
-  signAccessToken,
-} from '#@/src/Contexts/Shared/infrastructure/signAccessToken.js'
 import {
   getUser,
 } from '#@/src/Contexts/Users/infrastructure/getUser.js'
@@ -35,7 +35,7 @@ export default async function (fastify: FastifyInstance) {
         } = getBasicCredentials(req)
 
         const user = getUser(username, password)
-        const accessToken = signAccessToken(user)
+        const accessToken = accessTokenSigner(user)
         return {
           access_token: accessToken,
         }
@@ -168,42 +168,47 @@ export default async function (fastify: FastifyInstance) {
         })
       },
     )
-  // .get('/authentication/discord', async function handler() {
-  //   const scopes = [
-  //     'identify',
-  //     'guilds',
-  //   ]
-  //   const options = {
-  //     method: 'POST',
-  //     headers: {
-  //       'Content-Type': 'application/x-www-form-urlencoded',
-  //     },
-  //     body: new URLSearchParams({
-  //       grant_type: 'client_credentials',
-  //       client_id: process.env.DISCORD_CLIENT_ID ?? '',
-  //       scope: scopes.join(' '),
-  //       client_secret: process.env.DISCORD_CLIENT_SECRET ?? '',
-  //     }).toString(),
-  //   }
-  //   const response = await fetch(process.env.DISCORD_TOKEN_URL ?? '', options)
-  //   const json = await response.json() as { access_token: string }
-  //   const headers = new Headers()
-  //   headers.append('Authorization', `Bearer ${json.access_token}`)
+    // bot and testing
+    // no resource owner
+    // machine-to-machine (M2M) authentication
+    .get('/authentication/discord', async function handler() {
+      const scopes = [
+        'identify',
+        'guilds',
+      ]
+      const options = {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({
+          grant_type: 'client_credentials',
+          client_id: config.get('discord.clientId'),
+          scope: scopes.join(' '),
+          client_secret: config.get('discord.clientSecret'),
+        }).toString(),
+      }
+      const response = await fetch(config.get('discord.tokenUrl'), options)
+      const json = await response.json() as { access_token: string }
+      const headers = new Headers()
+      headers.append('Authorization', `Bearer ${json.access_token}`)
 
-  //   const [
-  //     user,
-  //     guilds,
-  //   ] = await Promise.all([
-  //     fetch(process.env.DISCORD_USER_URL ?? '', {
-  //       headers,
-  //     }).then((response) => response.json() as Promise<{ username: string, discriminator: string }>),
-  //     fetch(process.env.DISCORD_GUILD_URL ?? '', {
-  //       headers,
-  //     }).then((response) => response.json() as Promise<{ name: string }[]>),
-  //   ])
-  //   return {
-  //     user: `${user.username}#${user.discriminator}`,
-  //     guilds: guilds.map((guild: { name: string }) => guild.name),
-  //   }
-  // })
+      const [
+        user,
+        guilds,
+      ] = await Promise.all([
+        fetch(`${config.get('discord.apiUrl')}/users/@me`, {
+          headers,
+        })
+          .then((response) => response.json() as Promise<{ username: string, discriminator: string }>),
+        fetch(`${config.get('discord.apiUrl')}/users/@me/guilds`, {
+          headers,
+        })
+          .then((response) => response.json() as Promise<{ name: string }[]>),
+      ])
+      return {
+        user: `${user.username}#${user.discriminator}`,
+        guilds: guilds.map((guild: { name: string }) => guild.name),
+      }
+    })
 }

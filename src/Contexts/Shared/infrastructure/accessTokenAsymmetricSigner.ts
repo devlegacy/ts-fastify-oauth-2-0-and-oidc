@@ -10,9 +10,10 @@ import {
 
 import {
   createSigner,
+  type SignerOptions,
 } from 'fast-jwt'
 import {
-  v4 as uuid,
+  v7 as uuid,
 } from 'uuid'
 
 import {
@@ -22,13 +23,15 @@ import {
   config,
 } from '#@/src/Contexts/Shared/infrastructure/Config/config.js'
 
-export const signAsymmetricAccessToken = (user: { id: string, fullName: string }) => {
+type SignerOptionsType = SignerOptions & Record<string, string | number>
+
+export const accessTokenAsymmetricSigner = (user: { id: string, fullName: string }) => {
   const expiresIn = config.get('accessToken.expirationTime') * ONE_SECOND_IN_MILLISECONDS
   /**
    * [JSON Web Token (JWT)](https://www.iana.org/assignments/jwt/jwt.xhtml)
    * [JSON Web Token Claims](https://auth0.com/docs/secure/tokens/json-web-tokens/json-web-token-claims#registered-claims)
    */
-  const registeredClaims = {
+  const registeredClaims: SignerOptionsType = {
     // iss: config.get('app.url'), // token issuer, authorization server
     sub: user.id, // user id
     // aud: 'urn:fast-jwt:aud', // audience, who the token is intended for
@@ -40,14 +43,14 @@ export const signAsymmetricAccessToken = (user: { id: string, fullName: string }
    * [JSON Web Token (JWT)](https://www.iana.org/assignments/jwt/jwt.xhtml)
    * [JSON Web Token Claims](https://auth0.com/docs/secure/tokens/json-web-tokens/json-web-token-claims#public-claims)
    */
-  const publicClaims = {
+  const publicClaims: SignerOptionsType = {
     name: user.fullName,
   }
 
   /**
    * [JSON Web Token Claims](https://auth0.com/docs/secure/tokens/json-web-tokens/json-web-token-claims#private-claims)
    */
-  const privateClaims = {
+  const privateClaims: SignerOptionsType = {
     appId: '',
     ref: '',
   }
