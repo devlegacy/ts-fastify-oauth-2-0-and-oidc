@@ -83,10 +83,10 @@ export class AppBackend {
           headers,
         })
         const meResource = await meRequest.json() as { id: string }
-        const playlistRequest = await fetch(`${config.get('spotify.apiUrl')}/users/${meResource.id}/playlists`, {
+        const playlistsRequest = await fetch(`${config.get('spotify.apiUrl')}/users/${meResource.id}/playlists`, {
           headers,
         })
-        const playlistResources = await playlistRequest.json()
+        const playlistResources = await playlistsRequest.json()
         // const headers = new Headers()
         // headers.append('Authorization', 'Bearer <%= accessToken %>')
         // const meRequest = await fetch('<%= spotifyApiUrl %>/me', {
@@ -107,7 +107,7 @@ export class AppBackend {
         })
       })
       .get('/home/twitter', async (req, res) => {
-        const accessToken = req.cookies['access_token'] ?? ''
+        const accessToken = req.cookies['access_token'] ?? req.cookies['twitter_access_token'] ?? ''
         const response = await fetch(`${config.get('app.url')}/api/twitter/bypass`, {
           headers: {
             Authorization: accessToken,
@@ -117,14 +117,14 @@ export class AppBackend {
         })
         const {
           me,
-          // tweets,
-        } = await response.json() as { me: { id: string } }
+          tweets,
+        } = await response.json() as { me: { id: string }, tweets: unknown[] }
         return res.viewAsync('./src/apps/twitterHome.ejs', {
           title: 'Home',
           accessToken,
           me,
-          // tweets,
-          // twitterApiUrl: config.get('twitter.apiUrl'),
+          tweets,
+          twitterApiUrl: config.get('twitter.apiUrl'),
         })
       })
     await this.#adapter.listen(this.#config.get('http'))
