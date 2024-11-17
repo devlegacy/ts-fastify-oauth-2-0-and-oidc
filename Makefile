@@ -46,13 +46,17 @@ package/globals: ## 🌐 Install all global dependencies required for the projec
 		oxlint \
 		release-please
 
-.PHONY: package/update
-package/update: ## ⬆️ Update all project dependencies to their latest versions.
-	@$(call print_message, "updating dependencies")
-	@ncu -u
-	@corepack up
-	@NODE_ENV= pnpm install
-	@NODE_ENV= pnpm audit --fix
+.PHONY: deps/update
+.SILENT: deps/update
+deps/update: ## ⬆️ Update all project dependencies to their latest versions.
+# $(print_message) "updating dependencies"
+	ncu -u && ncu --target minor -u && ncu --target patch -u
+	corepack prepare pnpm@latest --activate
+	NODE_ENV= corepack up
+	NODE_ENV= pnpm up --recursive
+	NODE_ENV= pnpm install
+	NODE_ENV= pnpm audit --fix
+	NODE_ENV= pnpm dedupe
 
 .PHONY: setup/vscode
 setup/vscode: ## ⚙️ Setup the Visual Studio Code workspace.

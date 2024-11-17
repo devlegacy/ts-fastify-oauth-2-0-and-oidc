@@ -1,48 +1,43 @@
-module.exports = (async () => {
-  const [
-    {
-      default: configConventional,
-    },
-    {
-      default: {
-        defaultConfig,
-        RuleConfigSeverity,
-      },
-    },
-  ] = await Promise.all([
-    import('@commitlint/config-conventional'),
-    import('cz-git'),
-  ])
+const { default: config } = require('@commitlint/config-conventional')
+const { defaultConfig, RuleConfigSeverity } = require('cz-git')
 
-  const typeEnums = configConventional?.rules?.['type-enum']?.at(2) || []
+const typeEnums = config?.rules?.['type-enum']?.at(2) || []
 
-  /** @type {import('cz-git').UserConfig} */
-  return {
-    extends: [
-      '@commitlint/config-conventional',
+/**
+ * @type {import('cz-git').UserConfig}
+ */
+module.exports = {
+  extends: [
+    '@commitlint/config-conventional',
+  ],
+  rules: {
+    'body-max-line-length': [
+      RuleConfigSeverity.Error,
+      'always',
+      200,
     ],
-    rules: {
-      'type-enum': [
-        RuleConfigSeverity.Error,
-        'always',
-        [
-          ...typeEnums,
-          // 'imp', // REVIEW: Implement
-          // 'update', // REVIEW: Implement
-          'wip',
-        ],
+    'type-enum': [
+      RuleConfigSeverity.Error,
+      'always',
+      [
+        ...typeEnums,
+        // 'imp', // REVIEW: Implement
+        // 'update', // REVIEW: Implement
+        'wip',
       ],
-    },
-    prompt: {
-      useEmoji: true,
-      types: [
-        ...defaultConfig.types,
-        {
-          value: 'wip',
-          name: 'wip:      A work in progress feature',
-          emoji: ':construction:',
-        },
-      ],
-    },
-  }
-})()
+    ],
+  },
+  prompt: {
+    useEmoji: true,
+    useAI: false,
+    aiNumber: 5,
+    types: [
+      ...defaultConfig.types,
+      {
+        value: 'wip',
+        name: 'wip:      A work in progress feature',
+        emoji: ':construction:',
+      },
+    ],
+  },
+}
