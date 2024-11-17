@@ -50,6 +50,7 @@ export class AppBackend {
     this.#httpServer = this.#adapter.server
   }
 
+  // eslint-disable-next-line max-lines-per-function
   async #startHttpServer() {
     const dir = resolve(__dirname, './controllers')
     fastifyBootstrap(this.#adapter, {
@@ -75,10 +76,33 @@ export class AppBackend {
         })
       })
       .get('/home/spotify', async (req, res) => {
-        const accessToken = req.cookies['access_token'] ?? ''
+        const accessToken = req.cookies['access_token'] ?? req.cookies['spotify_access_token'] ?? ''
+        const headers = new Headers()
+        headers.append('Authorization', `Bearer ${accessToken}`)
+        const meRequest = await fetch(`${config.get('spotify.apiUrl')}/me`, {
+          headers,
+        })
+        const meResource = await meRequest.json() as { id: string }
+        const playlistRequest = await fetch(`${config.get('spotify.apiUrl')}/users/${meResource.id}/playlists`, {
+          headers,
+        })
+        const playlistResources = await playlistRequest.json()
+        // const headers = new Headers()
+        // headers.append('Authorization', 'Bearer <%= accessToken %>')
+        // const meRequest = await fetch('<%= spotifyApiUrl %>/me', {
+        //   headers,
+        // })
+        // const me = await meRequest.json()
+        // const playlistsRequest = await fetch(`<%= spotifyApiUrl %>/users/${me.id}/playlists`, {
+        //   headers,
+        // })
+        // const playlists = await playlistsRequest.json()
+
         return res.viewAsync('./src/apps/spotifyHome.ejs', {
-          title: 'Home',
-          accessToken,
+          title: 'Home Spotify 🎧',
+          // accessToken,
+          meResource,
+          playlistResources,
           spotifyApiUrl: config.get('spotify.apiUrl'),
         })
       })
