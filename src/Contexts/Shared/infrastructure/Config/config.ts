@@ -212,6 +212,44 @@ const config = convict(
         env: 'DISCORD_API_URL',
       },
     },
+    auth0: {
+      clientId: {
+        doc: 'The Auth0 client id.',
+        format: String,
+        default: '',
+        env: 'AUTH0_CLIENT_ID',
+      },
+      clientSecret: {
+        doc: 'The Auth0 client secret.',
+        format: String,
+        default: '',
+        env: 'AUTH0_CLIENT_SECRET',
+      },
+      tokenUrl: {
+        doc: 'The Auth0 token url.',
+        format: 'url',
+        default: '',
+        env: 'AUTH0_TOKEN_URL',
+      },
+      audience: {
+        doc: 'The Auth0 audience.',
+        format: 'url',
+        default: '',
+        env: 'AUTH0_AUDIENCE',
+      },
+      username: {
+        doc: 'The Auth0 username.',
+        format: String,
+        default: '',
+        env: 'AUTH0_USERNAME',
+      },
+      password: {
+        doc: 'The Auth0 password.',
+        format: String,
+        default: '',
+        env: 'AUTH0_PASSWORD',
+      },
+    },
   },
 )
 

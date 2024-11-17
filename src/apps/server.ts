@@ -127,6 +127,13 @@ export class AppBackend {
           twitterApiUrl: config.get('twitter.apiUrl'),
         })
       })
+      .get('/home/auth0', async (req, res) => {
+        const accessToken = req.cookies['access_token'] ?? req.cookies['auth0_access_token'] ?? ''
+        return res.viewAsync('./src/apps/auth0Home.ejs', {
+          title: 'Home',
+          accessToken,
+        })
+      })
     await this.#adapter.listen(this.#config.get('http'))
     if (this.#config.get('app.env') === 'local') {
       info(this.#adapter.printRoutes(printRoutesOptions))
