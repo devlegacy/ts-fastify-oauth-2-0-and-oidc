@@ -243,4 +243,37 @@ export default async function (fastify: FastifyInstance) {
         guilds: guilds.map((guild: { name: string }) => guild.name),
       }
     })
+    .get('/authentication/auth0', async function handler(req, res) {
+      const scopes = [
+        'read:sample',
+      ]
+      const options = {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({
+          grant_type: 'password',
+          client_id: config.get('auth0.clientId'),
+          client_secret: config.get('auth0.clientSecret'),
+          scope: scopes.join(' '),
+          audience: config.get('auth0.audience'),
+          username: config.get('auth0.username'),
+          password: config.get('auth0.password'),
+        }).toString(),
+      }
+      const request = await fetch(config.get('auth0.tokenUrl'), options)
+      const resource = await request.json() as { access_token: string, expires_in: number }
+
+      res
+      // .setCookie('access_token', resource.access_token, {
+        .setCookie('auth0_access_token', resource.access_token, {
+          path: '/',
+          httpOnly: true,
+          // expires: new Date(Date.now() + resource.expires_in * ONE_MINUTE_IN_MILLISECONDS),
+          // domain: config.get('app.url'),
+        })
+        .status(HttpStatus.FOUND)
+        .redirect('/home/auth0')
+    })
 }
