@@ -9,11 +9,11 @@
     'user:read:follows',
   ]
 
-  const getAuthenticationState = () => {
-    let state = sessionStorage.getItem('state')
+  const authenticationStateRetriever = (key = 'state') => {
+    let state = sessionStorage.getItem(key)
     if (!state) {
       state = Math.random().toString(36).substring(7)
-      sessionStorage.setItem('state', state)
+      sessionStorage.setItem(key, state)
     }
     return state
   }
@@ -23,7 +23,7 @@
     client_id: "<%= TWITCH_CLIENT_ID %>",
     redirect_uri: "<%= TWITCH_REDIRECT_URI %>",
     scope: twitchScopes.join(' '),
-    state
+    state: authenticationStateRetriever('twitch_state'),
   }
   const queryParams = new URLSearchParams(parameters).toString()
   const url = `<%= TWITCH_AUTHORIZATION_URL %>?${queryParams}`
