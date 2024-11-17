@@ -1,8 +1,8 @@
 import {
   createHash,
-} from 'crypto'
+} from 'node:crypto'
 
-export const generateCodeChallenge = (codeVerifier: string) => {
+export const codeChallengeGenerator = (codeVerifier: string) => {
   const base64CodeChallenge = createHash('sha256')
     .update(codeVerifier)
     .digest('base64')

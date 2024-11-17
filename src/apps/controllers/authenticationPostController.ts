@@ -6,6 +6,7 @@ import type {
   FastifyInstance,
   FastifyRequest,
 } from 'fastify'
+import HttpStatus from 'http-status'
 
 import {
   ONE_MINUTE_IN_MILLISECONDS,
@@ -14,18 +15,17 @@ import {
   accessTokenSigner,
 } from '#@/src/Contexts/Shared/infrastructure/accessTokenSigner.js'
 import {
+  codeChallengeGenerator,
+} from '#@/src/Contexts/Shared/infrastructure/codeChallengeGenerator.js'
+import {
   config,
 } from '#@/src/Contexts/Shared/infrastructure/Config/config.js'
-import {
-  generateCodeChallenge,
-} from '#@/src/Contexts/Shared/infrastructure/generateCodeChallenge.js'
 import {
   getBasicCredentials,
 } from '#@/src/Contexts/Shared/infrastructure/http/getBasicCredentials.js'
 import {
   getUser,
 } from '#@/src/Contexts/Users/infrastructure/getUser.js'
-
 // eslint-disable-next-line max-lines-per-function
 export default async function (fastify: FastifyInstance) {
   fastify
@@ -65,7 +65,7 @@ export default async function (fastify: FastifyInstance) {
         redirect.search = query.toString()
         // Redirect to the Spotify Accounts service (Concern request UI)
         res
-          .status(302)
+          .status(HttpStatus.FOUND)
           .redirect(redirect.toString())
         // Then if the user do the authorize grant is redirected to callback URL
       },
@@ -105,7 +105,7 @@ export default async function (fastify: FastifyInstance) {
             expires: new Date(Date.now() + resource.expires_in * ONE_MINUTE_IN_MILLISECONDS),
             // domain: config.get('app.url'),
           })
-          .status(302)
+          .status(HttpStatus.FOUND)
           .redirect('/home/spotify')
       },
     )
@@ -119,7 +119,7 @@ export default async function (fastify: FastifyInstance) {
         const state = randomBytes(16).toString('base64')
         // proof key for code exchange (PKCE)
         const codeVerifier = randomBytes(128).toString('base64')
-        const codeChallenge = generateCodeChallenge(codeVerifier)
+        const codeChallenge = codeChallengeGenerator(codeVerifier)
         const query = new URLSearchParams({
           response_type: 'code',
           client_id: config.get('twitter.clientId'),
@@ -133,27 +133,29 @@ export default async function (fastify: FastifyInstance) {
         redirect.search = query.toString()
 
         res
-          .setCookie('verifier', codeVerifier, {
+          // .setCookie('verifier', codeVerifier, {
+          .setCookie('twitter_verifier', codeVerifier, {
             path: '/',
             httpOnly: true,
           })
-          .setCookie('state', state, {
+          // .setCookie('state', state, {
+          .setCookie('twitter_state', state, {
             path: '/',
             httpOnly: true,
           })
-          .status(302)
+          .status(HttpStatus.FOUND)
           .redirect(redirect.toString())
       },
     )
     .get(
       '/authentication/twitter/callback',
       async function handler(req: FastifyRequest<{ Querystring: { state: string, code: string } }>, res) {
-        const state = req.cookies['state'] ?? ''
+        const state = req.cookies['state'] ?? req.cookies['twitter_state'] ?? ''
         if (state !== req.query.state) {
-          res.status(302).redirect('/home/twitter/#?error=ERROR_STATE_MISMATCH')
+          res.status(HttpStatus.FOUND).redirect('/home/twitter/#?error=ERROR_STATE_MISMATCH')
         }
 
-        const verifier = req.cookies['verifier'] ?? ''
+        const verifier = req.cookies['verifier'] ?? req.cookies['twitter_verifier'] ?? ''
         const options = {
           method: 'POST',
           headers: {
@@ -168,13 +170,20 @@ export default async function (fastify: FastifyInstance) {
           }).toString(),
         }
         const response = await fetch(config.get('twitter.tokenUrl'), options)
-        const json = await response.json() as { access_token: string }
+        type TwitterTokenResponse = {
+          token_type: string
+          expires_in: number
+          access_token: string
+          scope: string
+        }
+        const json = await response.json() as TwitterTokenResponse
         res
-          .setCookie('access_token', json.access_token, {
+          // .setCookie('access_token', json.access_token, {
+          .setCookie('twitter_access_token', json.access_token, {
             path: '/',
             httpOnly: true,
           })
-          .status(302)
+          .status(HttpStatus.FOUND)
           .redirect('/home/twitter')
       },
     )
