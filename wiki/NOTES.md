@@ -1,5 +1,25 @@
 # Notes
 
+> [!NOTE]
+> This is a useful note
+> ...
+
+> [!IMPORTANT]
+> This is an important note
+> ...
+
+> [!WARNING]
+> This is a warning
+> ...
+
+> [!TIP]
+> This is a tip
+> ...
+
+> [!CAUTION]
+> This is a caution
+> ...
+
 ## Tools
 
 - [Welcome to swimlanes.io](https://swimlanes.io/)
