@@ -35,7 +35,6 @@
 - `username`:`password`
 
 > [!CAUTION]
-> This is a caution   
 > `authenticate !== authorize`   
 
 ## Authorization
