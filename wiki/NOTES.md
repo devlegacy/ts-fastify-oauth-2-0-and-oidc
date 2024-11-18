@@ -30,9 +30,13 @@
 - Process of verifying the identity of a user or process to ensure that the user or process is who it claims to be with the help of a password, token, or biometric data, etc.
 - Ex.
 
-- **Authentication**: The process of verifying who you are.
+- **Authentication**: the process of verifying who you are.
 - peephole
 - `username`:`password`
+
+> [!CAUTION]
+> This is a caution   
+> `authenticate !== authorize`   
 
 ## Authorization
 
