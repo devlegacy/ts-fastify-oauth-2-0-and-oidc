@@ -1,24 +1,24 @@
 # Notes
 
 > [!NOTE]
-> This is a useful note
-> ...
+> This is a useful note   
+> ...   
 
 > [!IMPORTANT]
-> This is an important note
-> ...
+> This is an important note   
+> ...   
 
-> [!WARNING]
-> This is a warning
-> ...
+> [!WARNING]   
+> This is a warning   
+> ...   
 
 > [!TIP]
-> This is a tip
-> ...
+> This is a tip   
+> ...   
 
 > [!CAUTION]
-> This is a caution
-> ...
+> This is a caution   
+> ...   
 
 ## Tools
 
