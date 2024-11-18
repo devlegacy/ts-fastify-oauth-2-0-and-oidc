@@ -1,1 +1,51 @@
 <h1><%= accessToken %></h1>
+
+<code id="accessToken"></code>
+<code id="idToken"></code>
+<script type="module">
+  const hashParamParser = (queryKey = 'state') => {
+    const hashParams = window.location.hash.replace('#', '')?.split('&')
+
+    if (queryKey) {
+      return hashParams
+        ?.find((param) => param.startsWith(queryKey))
+        ?.split('=')[1]
+    }
+
+    return hashParams
+  }
+  const cleanUrlHash = () => {
+    history.replaceState({}, document.title, window.location.href.split('#')[0])
+  }
+
+  const queryAccessToken = hashParamParser('access_token')
+  const queryIdToken = hashParamParser('id_token')
+
+  const queryState = hashParamParser('state')
+  const sessionState = sessionStorage.getItem('auth0_state')
+
+  const queryNonce = hashParamParser('nonce')
+  const sessionNonce = sessionStorage.getItem('auth0_nonce')
+
+  if (queryIdToken && queryAccessToken && queryState !== sessionState) {
+    console.error(new Error('ERROR_STATE_MISMATCH'));
+    cleanUrlHash();
+    // return setTokens(null);
+  }
+  if (queryIdToken && queryAccessToken && queryNonce !== sessionNonce) {
+    console.error(new Error('ERROR_NONCE_MISMATCH'));
+    cleanUrlHash();
+    // return setTokens(null);
+  }
+
+  if (queryAccessToken && queryIdToken) {
+    cleanUrlHash();
+    // set tokens to store
+    // setTokens({ accessToken: queryAccessToken, idToken: queryIdToken });
+    document.getElementById('accessToken').textContent = queryAccessToken;
+    document.getElementById('idToken').textContent = queryIdToken;
+  }
+
+  // Remove nonce from session storage
+  // useNonceRemoval(tokens);     sessionStorage.removeItem("nonce");
+</script>

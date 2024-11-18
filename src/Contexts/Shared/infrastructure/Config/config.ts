@@ -231,6 +231,24 @@ const config = convict(
         default: '',
         env: 'AUTH0_TOKEN_URL',
       },
+      redirectUri: {
+        doc: 'The Auth0 redirect uri.',
+        format: 'url',
+        default: '',
+        env: 'AUTH0_REDIRECT_URI',
+      },
+      authorizationUrl: {
+        doc: 'The Auth0 authorization url.',
+        format: 'url',
+        default: '',
+        env: 'AUTH0_AUTHORIZATION_URL',
+      },
+      jwksUri: {
+        doc: 'The Auth0 jwks uri.',
+        format: 'url',
+        default: '',
+        env: 'AUTH0_JWKS_URI',
+      },
       audience: {
         doc: 'The Auth0 audience.',
         format: 'url',
