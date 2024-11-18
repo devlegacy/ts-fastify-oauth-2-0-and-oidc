@@ -52,7 +52,7 @@
 
 ## OAuth 2.0
 
-> [!IMPORTANT title="OAuth !== auth0"]   
+> [!IMPORTANT "OAuth !== auth0"]   
 > OAuth: Open Authorization Standard   
 > OAuth0: Business that provides OAuth as a service
 
