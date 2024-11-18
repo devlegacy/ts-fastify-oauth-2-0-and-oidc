@@ -52,9 +52,9 @@
 
 ## OAuth 2.0
 
-OAuth !== auth0
-OAuth: Open Authorization Standard
-OAuth0: Business that provides OAuth as a service
+> [!IMPORTANT title="OAuth !== auth0"]   
+> OAuth: Open Authorization Standard   
+> OAuth0: Business that provides OAuth as a service
 
 OIDC: OpenID Connect (OIDC) is an authentication layer on top of OAuth 2.0, an authorization framework.
 
