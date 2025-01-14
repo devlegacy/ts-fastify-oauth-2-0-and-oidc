@@ -73,6 +73,11 @@ export class AppBackend {
           TWITCH_CLIENT_ID: config.get('twitch.clientId'),
           TWITCH_REDIRECT_URI: config.get('twitch.redirectUri'),
           TWITCH_AUTHORIZATION_URL: config.get('twitch.authorizationUrl'),
+
+          AUTH0_AUTHORIZATION_URL: config.get('auth0.authorizationUrl'),
+          AUTH0_AUDIENCE: config.get('auth0.audience'),
+          AUTH0_CLIENT_ID: config.get('auth0.clientId'),
+          AUTH0_REDIRECT_URI: config.get('auth0.redirectUri'),
         })
       })
       .get('/home/spotify', async (req, res) => {
@@ -141,6 +146,9 @@ export class AppBackend {
   }
 
   async start() {
+    // Register formbody plugin to handle application/x-www-form-urlencoded
+    await this.#adapter.register(import('@fastify/formbody'))
+    await this.#adapter.register(import('@fastify/multipart'))
     await this.#startHttpServer()
   }
 

@@ -228,13 +228,31 @@ const config = convict(
       tokenUrl: {
         doc: 'The Auth0 token url.',
         format: 'url',
-        default: '',
+        default: 'https://dev-1111.auth0.com/oauth/token',
         env: 'AUTH0_TOKEN_URL',
+      },
+      redirectUri: {
+        doc: 'The Auth0 redirect uri.',
+        format: 'url',
+        default: 'http://localhost:8080',
+        env: 'AUTH0_REDIRECT_URI',
+      },
+      authorizationUrl: {
+        doc: 'The Auth0 authorization url.',
+        format: 'url',
+        default: 'https://dev-1111.auth0.com/authorize',
+        env: 'AUTH0_AUTHORIZATION_URL',
+      },
+      jwksUri: {
+        doc: 'The Auth0 jwks uri.',
+        format: 'url',
+        default: 'https://dev-1111.auth0.com/.well-known/jwks.json',
+        env: 'AUTH0_JWKS_URI',
       },
       audience: {
         doc: 'The Auth0 audience.',
         format: 'url',
-        default: '',
+        default: 'http://localhost:8080',
         env: 'AUTH0_AUDIENCE',
       },
       username: {
