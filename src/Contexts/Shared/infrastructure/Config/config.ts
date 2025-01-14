@@ -228,31 +228,31 @@ const config = convict(
       tokenUrl: {
         doc: 'The Auth0 token url.',
         format: 'url',
-        default: '',
+        default: 'https://dev-1111.auth0.com/oauth/token',
         env: 'AUTH0_TOKEN_URL',
       },
       redirectUri: {
         doc: 'The Auth0 redirect uri.',
         format: 'url',
-        default: '',
+        default: 'http://localhost:8080',
         env: 'AUTH0_REDIRECT_URI',
       },
       authorizationUrl: {
         doc: 'The Auth0 authorization url.',
         format: 'url',
-        default: '',
+        default: 'https://dev-1111.auth0.com/authorize',
         env: 'AUTH0_AUTHORIZATION_URL',
       },
       jwksUri: {
         doc: 'The Auth0 jwks uri.',
         format: 'url',
-        default: '',
+        default: 'https://dev-1111.auth0.com/.well-known/jwks.json',
         env: 'AUTH0_JWKS_URI',
       },
       audience: {
         doc: 'The Auth0 audience.',
         format: 'url',
-        default: '',
+        default: 'http://localhost:8080',
         env: 'AUTH0_AUDIENCE',
       },
       username: {
@@ -267,6 +267,44 @@ const config = convict(
         default: '',
         env: 'AUTH0_PASSWORD',
       },
+    },
+    azure: {
+      clientId: {
+        doc: 'The Azure client id.',
+        format: String,
+        default: '',
+        env: 'AZURE_CLIENT_ID',
+      },
+      clientSecret: {
+        doc: 'The Azure client secret.',
+        format: String,
+        default: '',
+        env: 'AZURE_CLIENT_SECRET',
+      },
+      // tokenUrl: {
+      //   doc: 'The Azure token url.',
+      //   format: 'url',
+      //   default: '',
+      //   env: 'AZURE_TOKEN_URL',
+      // },
+      redirectUri: {
+        doc: 'The Azure redirect uri.',
+        format: 'url',
+        default: '',
+        env: 'AZURE_REDIRECT_URI',
+      },
+      // authorizationUrl: {
+      //   doc: 'The Azure authorization url.',
+      //   format: 'url',
+      //   default: '',
+      //   env: 'AZURE_AUTHORIZATION_URL',
+      // },
+      // apiUrl: {
+      //   doc: 'The Azure api url.',
+      //   format: 'url',
+      //   default: '',
+      //   env: 'AZURE_API_URL',
+      // },
     },
   },
 )
