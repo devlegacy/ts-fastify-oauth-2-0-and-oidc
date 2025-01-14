@@ -151,6 +151,14 @@ export default async function (fastify: FastifyInstance) {
       },
     )
     .get(
+      '/authentication/xbox',
+      async function handler(_req, _res) {
+        const _params = new URLSearchParams({
+        })
+        return {}
+      },
+    )
+    .get(
       '/authentication/twitter/callback',
       async function handler(req: FastifyRequest<{ Querystring: { state: string, code: string } }>, res) {
         const state = req.cookies['state'] ?? req.cookies['twitter_state'] ?? ''
