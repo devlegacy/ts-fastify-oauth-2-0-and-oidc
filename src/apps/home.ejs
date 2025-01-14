@@ -1,9 +1,9 @@
 <h1>Login</h1>
 <a href='/api/authentication/spotify'>Connect to Spotify</a>
 <a href='/api/authentication/twitter'>Connect to Twitter</a>
-<a href='' class="twitch">Connect with twitch</a>
-<a href="/api/authentication/auth0">Connect with Auth0</a>
-<a href='' class="auth0">Connect with Auth0</a>
+<a href='' class='twitch'>Connect with twitch</a>
+<a href='/api/authentication/auth0'>Connect with Auth0</a>
+<a href='' title='Connect with Auth0 using implicit flow with form post' class='auth0'>Connect with Auth0</a>
 
 <script>
   const randomString = {
@@ -61,8 +61,8 @@
       state: authenticationStateRetriever('twitch_state'),
     }
     const queryParams = new URLSearchParams(parameters).toString()
-    const url = `<%= TWITCH_AUTHORIZATION_URL %>?${queryParams}`
-    document.querySelector('.twitch').setAttribute('href', url)
+    const url = new URL(`<%= TWITCH_AUTHORIZATION_URL %>?${queryParams}`)
+    document.querySelector('.twitch')?.setAttribute('href', url)
   })();
   (()=>{
     const scopes = ['openid', 'email', 'read:sample'];
@@ -80,7 +80,7 @@
       nonce,
     }
     const queryParams = new URLSearchParams(parameters).toString()
-    const url = `<%= AUTH0_AUTHORIZATION_URL %>?${queryParams}`
-    document.querySelector('.auth0').setAttribute('href', url)
+    const url = new URL(`<%= AUTH0_AUTHORIZATION_URL %>?${queryParams}`)
+    document.querySelector('.auth0')?.setAttribute('href', url)
   })();
 </script>
