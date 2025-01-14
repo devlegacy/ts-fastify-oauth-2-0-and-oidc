@@ -150,14 +150,14 @@ export default async function (fastify: FastifyInstance) {
           .redirect(redirect.toString())
       },
     )
-    .get(
-      '/authentication/xbox',
-      async function handler(_req, _res) {
-        const _params = new URLSearchParams({
-        })
-        return {}
-      },
-    )
+    // .get(
+    //   '/authentication/xbox',
+    //   async function handler(req, res) {
+    //     const params = new URLSearchParams({
+    //     })
+    //     return {}
+    //   },
+    // )
     .get(
       '/authentication/twitter/callback',
       async function handler(req: FastifyRequest<{ Querystring: { state: string, code: string } }>, res) {

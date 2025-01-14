@@ -268,44 +268,44 @@ const config = convict(
         env: 'AUTH0_PASSWORD',
       },
     },
-    azure: {
-      clientId: {
-        doc: 'The Azure client id.',
-        format: String,
-        default: '',
-        env: 'AZURE_CLIENT_ID',
-      },
-      clientSecret: {
-        doc: 'The Azure client secret.',
-        format: String,
-        default: '',
-        env: 'AZURE_CLIENT_SECRET',
-      },
-      // tokenUrl: {
-      //   doc: 'The Azure token url.',
-      //   format: 'url',
-      //   default: '',
-      //   env: 'AZURE_TOKEN_URL',
-      // },
-      redirectUri: {
-        doc: 'The Azure redirect uri.',
-        format: 'url',
-        default: '',
-        env: 'AZURE_REDIRECT_URI',
-      },
-      // authorizationUrl: {
-      //   doc: 'The Azure authorization url.',
-      //   format: 'url',
-      //   default: '',
-      //   env: 'AZURE_AUTHORIZATION_URL',
-      // },
-      // apiUrl: {
-      //   doc: 'The Azure api url.',
-      //   format: 'url',
-      //   default: '',
-      //   env: 'AZURE_API_URL',
-      // },
-    },
+    // azure: {
+    //   clientId: {
+    //     doc: 'The Azure client id.',
+    //     format: String,
+    //     default: '',
+    //     env: 'AZURE_CLIENT_ID',
+    //   },
+    //   clientSecret: {
+    //     doc: 'The Azure client secret.',
+    //     format: String,
+    //     default: '',
+    //     env: 'AZURE_CLIENT_SECRET',
+    //   },
+    //   // tokenUrl: {
+    //   //   doc: 'The Azure token url.',
+    //   //   format: 'url',
+    //   //   default: '',
+    //   //   env: 'AZURE_TOKEN_URL',
+    //   // },
+    //   redirectUri: {
+    //     doc: 'The Azure redirect uri.',
+    //     format: 'url',
+    //     default: '',
+    //     env: 'AZURE_REDIRECT_URI',
+    //   },
+    //   // authorizationUrl: {
+    //   //   doc: 'The Azure authorization url.',
+    //   //   format: 'url',
+    //   //   default: '',
+    //   //   env: 'AZURE_AUTHORIZATION_URL',
+    //   // },
+    //   // apiUrl: {
+    //   //   doc: 'The Azure api url.',
+    //   //   format: 'url',
+    //   //   default: '',
+    //   //   env: 'AZURE_API_URL',
+    //   // },
+    // },
   },
 )
 
