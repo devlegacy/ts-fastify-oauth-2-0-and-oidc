@@ -12,6 +12,9 @@ import {
   ONE_MINUTE_IN_MILLISECONDS,
 } from '#@/src/Contexts/Shared/domain/time.js'
 import {
+  accessTokenJwksValidator,
+} from '#@/src/Contexts/Shared/infrastructure/accessTokenJwksValidator.js'
+import {
   accessTokenSigner,
 } from '#@/src/Contexts/Shared/infrastructure/accessTokenSigner.js'
 import {
@@ -275,5 +278,26 @@ export default async function (fastify: FastifyInstance) {
         })
         .status(HttpStatus.FOUND)
         .redirect('/home/auth0')
+    })
+    .post('/authentication/auth0/callback', async function handler(req: FastifyRequest<{ Body: { access_token: string, id_token: string, state: string } }>, res) {
+      const {
+        access_token,
+        id_token,
+        state,
+      } = req.body
+
+      const {
+        nonce,
+      } = await accessTokenJwksValidator(id_token, config.get('auth0.jwksUri'))
+
+      const parameters = {
+        access_token,
+        id_token,
+        state,
+        nonce,
+      }
+      const query = new URLSearchParams(parameters).toString()
+      // # for single page application (SPA)
+      res.redirect(`/home/auth0#${query}`)
     })
 }

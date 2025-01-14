@@ -4,15 +4,49 @@
 <section id="channels"></section>
 
 <script type="module">
-  const authenticationStateRetriever = (key = 'state') => {
-    let state = sessionStorage.getItem(key)
-    if (!state) {
-      state = Math.random().toString(36).substring(7)
-      sessionStorage.setItem(key, state)
+  const randomString = {
+    generate: (length) => {
+      const characters =
+        'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+      return randomString._generateString(length, characters);
+    },
+
+    generateCrypto: (length) => {
+      const charset =
+        '0123456789ABCDEFGHIJKLMNOPQRSTUVXYZabcdefghijklmnopqrstuvwxyz+/';
+      const randomValues = new Uint8Array(length);
+      window.crypto.getRandomValues(randomValues);
+
+      return Array.from(randomValues)
+        .map((value) => charset[value % charset.length])
+        .join('');
+    },
+
+    _generateString: (length, characters) => {
+      let result = '';
+      const charactersLength = characters.length;
+
+      for (let i = 0; i < length; i++) {
+        result += characters.charAt(Math.floor(Math.random() * charactersLength));
+      }
+
+      return result;
     }
-    return state
   }
-  const hashParamsParser = (queryKey = 'state') => {
+
+  const authenticationStateRetriever = (key = 'state', isCryptographically = false) => {
+    let value = sessionStorage.getItem(key)
+    if (!value) {
+      // value = Math.random().toString(36).substring(7)
+      value = isCryptographically
+        ? randomString.generateCrypto(16)
+        : randomString.generate(16)
+      sessionStorage.setItem(key, value)
+    }
+    return value
+  }
+
+  const hashParamParser = (queryKey = 'state') => {
     const hashParams = window.location.hash.replace('#', '')?.split('&')
 
     if (queryKey) {
@@ -27,8 +61,8 @@
     history.replaceState({}, document.title, window.location.href.split('#')[0])
   }
 
-  const queryAccessToken = hashParamsParser('access_token')
-  const queryState = hashParamsParser('state')
+  const queryAccessToken = hashParamParser('access_token')
+  const queryState = hashParamParser('state')
   const state = authenticationStateRetriever('twitch_state')
   if (queryState !== state) {
     // store React/Vue setAccessToken(null)

@@ -30,11 +30,11 @@ export default async function (fastify: FastifyInstance) {
           // 'Content-Type': 'application/json',
         },
       })
-      const tweetResources = await tweetsRequest.json()
+      const tweetResources = await tweetsRequest.json() as { data: { id: string, text: string, edit_history_tweet_ids: string[] }[], meta: { newest_id: string, next_token: string, oldest_id: string, result_count: number } }
 
       return {
         me: meResource,
-        tweets: tweetsRequest.ok ? tweetResources : [],
+        tweets: tweetsRequest.ok ? tweetResources?.data : [],
       }
     },
   )
