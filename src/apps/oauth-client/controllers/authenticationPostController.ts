@@ -202,7 +202,7 @@ export default async function (fastify: FastifyInstance) {
       // single page application (SPA) callback
       '/authentication/twitch/callback',
       async function handler(req: FastifyRequest<{ Querystring: { state: string, code: string } }>, res) {
-        return res.viewAsync('./src/apps/twitchHome.ejs', {
+        return res.viewAsync('./src/apps/oauth-client/twitchHome.ejs', {
           title: 'Home',
           TWITCH_API_URL: config.get('twitch.apiUrl'),
           TWITCH_CLIENT_ID: config.get('twitch.clientId'),

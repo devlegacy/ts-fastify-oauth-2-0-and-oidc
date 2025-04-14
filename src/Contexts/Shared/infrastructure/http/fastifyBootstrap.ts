@@ -23,13 +23,16 @@ import {
   config,
 } from '#@/src/Contexts/Shared/infrastructure/Config/config.js'
 
-export const fastifyBootstrap = (
+export const fastifyBootstrap = async (
   fastify: FastifyInstance,
   options: {
     autoload: AutoloadPluginOptions
     cors?: FastifyCorsOptions
   },
 ) => {
+  // Register formbody plugin to handle application/x-www-form-urlencoded
+  await fastify.register(import('@fastify/formbody'))
+  await fastify.register(import('@fastify/multipart'))
   fastify
     .register(import('@fastify/autoload'), {
       forceESM: true,
@@ -47,6 +50,14 @@ export const fastifyBootstrap = (
     .register(import('@fastify/cors'), options.cors || {})
     .register(import('@fastify/compress'))
     .register(import('@fastify/cookie'))
+    .register(import('@fastify/view'), {
+      engine: {
+        ejs: import('ejs'),
+      },
+      layout: `./src/Contexts/Shared/infrastructure/layout.ejs`,
+      includeViewExtension: true,
+      viewExt: 'ejs',
+    })
     // eslint-disable-next-line complexity
     .setErrorHandler((err: FastifyError, req: FastifyRequest, res: FastifyReply) => {
       // Capture error

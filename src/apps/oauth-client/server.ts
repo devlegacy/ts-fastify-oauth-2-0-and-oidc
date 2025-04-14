@@ -13,6 +13,9 @@ import Fastify, {
   type FastifyBaseLogger,
   type PrintRoutesOptions,
 } from 'fastify'
+import {
+  request,
+} from 'undici'
 
 import {
   type Config,
@@ -53,45 +56,46 @@ export class AppBackend {
   // eslint-disable-next-line max-lines-per-function
   async #startHttpServer() {
     const dir = resolve(__dirname, './controllers')
-    fastifyBootstrap(this.#adapter, {
+    await fastifyBootstrap(this.#adapter, {
       autoload: {
         dir,
       },
     })
     this.#adapter
-      .register(import('@fastify/view'), {
-        engine: {
-          ejs: import('ejs'),
-        },
-        layout: './src/apps/layout.ejs',
-        includeViewExtension: true,
-        viewExt: 'ejs',
-      })
       .get('/', async (req, res) => {
-        return res.viewAsync('./src/apps/home.ejs', {
-          title: 'Home',
+        const twitch = {
           TWITCH_CLIENT_ID: config.get('twitch.clientId'),
           TWITCH_REDIRECT_URI: config.get('twitch.redirectUri'),
           TWITCH_AUTHORIZATION_URL: config.get('twitch.authorizationUrl'),
-
+        }
+        const auth0 = {
           AUTH0_AUTHORIZATION_URL: config.get('auth0.authorizationUrl'),
           AUTH0_AUDIENCE: config.get('auth0.audience'),
           AUTH0_CLIENT_ID: config.get('auth0.clientId'),
           AUTH0_REDIRECT_URI: config.get('auth0.redirectUri'),
-        })
+        }
+        const data = {
+          title: 'Home',
+          ...twitch,
+          ...auth0,
+        }
+        return res.viewAsync('./src/apps/oauth-client/home.ejs', data)
       })
       .get('/home/spotify', async (req, res) => {
-        const accessToken = req.cookies['access_token'] ?? req.cookies['spotify_access_token'] ?? ''
+        const accessToken = req.cookies['spotify_access_token'] ?? req.cookies['access_token'] ?? ''
         const headers = new Headers()
         headers.append('Authorization', `Bearer ${accessToken}`)
-        const meRequest = await fetch(`${config.get('spotify.apiUrl')}/me`, {
+        const meUrl = new URL(`${config.get('spotify.apiUrl')}/me`)
+        const meRequest = await request(meUrl, {
           headers,
         })
-        const meResource = await meRequest.json() as { id: string }
-        const playlistsRequest = await fetch(`${config.get('spotify.apiUrl')}/users/${meResource.id}/playlists`, {
+        const meResource = await meRequest.body.json() as { id: string }
+
+        const playlistsUrl = new URL(`${config.get('spotify.apiUrl')}/users/${meResource.id}/playlists`)
+        const playlistsRequest = await request(playlistsUrl, {
           headers,
         })
-        const playlistResources = await playlistsRequest.json()
+        const playlistResources = await playlistsRequest.body.json()
         // const headers = new Headers()
         // headers.append('Authorization', 'Bearer <%= accessToken %>')
         // const meRequest = await fetch('<%= spotifyApiUrl %>/me', {
@@ -103,16 +107,17 @@ export class AppBackend {
         // })
         // const playlists = await playlistsRequest.json()
 
-        return res.viewAsync('./src/apps/spotifyHome.ejs', {
+        const data = {
           title: 'Home Spotify 🎧',
           // accessToken,
           meResource,
           playlistResources,
           spotifyApiUrl: config.get('spotify.apiUrl'),
-        })
+        }
+        return res.viewAsync('./src/apps/oauth-client/spotifyHome.ejs', data)
       })
       .get('/home/twitter', async (req, res) => {
-        const accessToken = req.cookies['access_token'] ?? req.cookies['twitter_access_token'] ?? ''
+        const accessToken = req.cookies['twitter_access_token'] ?? req.cookies['access_token'] ?? ''
         const response = await fetch(`${config.get('app.url')}/api/twitter/bypass`, {
           headers: {
             Authorization: accessToken,
@@ -124,7 +129,7 @@ export class AppBackend {
           me,
           tweets,
         } = await response.json() as { me: { id: string }, tweets: unknown[] }
-        return res.viewAsync('./src/apps/twitterHome.ejs', {
+        return res.viewAsync('./src/apps/oauth-client/twitterHome.ejs', {
           title: 'Home',
           accessToken,
           me,
@@ -134,7 +139,7 @@ export class AppBackend {
       })
       .get('/home/auth0', async (req, res) => {
         const accessToken = req.cookies['access_token'] ?? req.cookies['auth0_access_token'] ?? ''
-        return res.viewAsync('./src/apps/auth0Home.ejs', {
+        return res.viewAsync('./src/apps/oauth-client/auth0Home.ejs', {
           title: 'Home',
           accessToken,
         })
@@ -146,9 +151,6 @@ export class AppBackend {
   }
 
   async start() {
-    // Register formbody plugin to handle application/x-www-form-urlencoded
-    await this.#adapter.register(import('@fastify/formbody'))
-    await this.#adapter.register(import('@fastify/multipart'))
     await this.#startHttpServer()
   }
 
