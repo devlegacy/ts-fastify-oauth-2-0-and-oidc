@@ -15,7 +15,7 @@ import type TestAgent from 'supertest/lib/agent.js'
 
 import {
   AppBackend,
-} from '#@/src/apps/server.js'
+} from '#@/src/apps/oauth-client/server.js'
 import {
   ONE_SECOND_IN_MILLISECONDS,
 } from '#@/src/Contexts/Shared/domain/time.js'
