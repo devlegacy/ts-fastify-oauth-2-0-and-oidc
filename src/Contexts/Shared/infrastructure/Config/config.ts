@@ -121,11 +121,13 @@ const config = convict(
         default: 'https://api.spotify.com/v1',
         env: 'SPOTIFY_API_URL',
       },
-      accessTokenCookieName: {
-        doc: 'The name of the cookie to store the access token.',
-        format: String,
-        default: 'spotify_access_token',
-        env: 'SPOTIFY_COOKIE_NAME',
+      cookie: {
+        accessToken: {
+          doc: 'The name of the cookie to store the access token.',
+          format: String,
+          default: 'spotify_access_token',
+          env: 'SPOTIFY_ACCESS_TOKEN_COOKIE',
+        },
       },
     },
     twitter: {

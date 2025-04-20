@@ -92,7 +92,7 @@ export class AppBackend {
         const {
           cookies,
         } = req
-        const accessToken = cookies[config.get('spotify.accessTokenCookieName')] ?? cookies['access_token'] ?? ''
+        const accessToken = cookies[config.get('spotify.cookie.accessToken')] ?? cookies['access_token'] ?? ''
 
         const headers = new Headers()
         headers.append('Authorization', `Bearer ${accessToken}`)

@@ -111,7 +111,7 @@ export default async function (fastify: FastifyInstance) {
         res
           // .setCookie('access_token', resource.access_token, {
           .setCookie(
-            config.get('spotify.accessTokenCookieName'),
+            config.get('spotify.cookie.accessToken'),
             tokenResource.access_token,
             {
               path: '/',
