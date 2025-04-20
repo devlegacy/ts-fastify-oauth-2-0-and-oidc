@@ -89,7 +89,11 @@ export class AppBackend {
       })
       // eslint-disable-next-line max-lines-per-function
       .get('/home/spotify', async (req, res) => {
-        const accessToken = req.cookies['spotify_access_token'] ?? req.cookies['access_token'] ?? ''
+        const {
+          cookies,
+        } = req
+        const accessToken = cookies[config.get('spotify.accessTokenCookieName')] ?? cookies['access_token'] ?? ''
+
         const headers = new Headers()
         headers.append('Authorization', `Bearer ${accessToken}`)
 
