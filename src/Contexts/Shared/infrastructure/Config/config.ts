@@ -167,6 +167,26 @@ const config = convict(
         default: 'https://api.twitter.com/2',
         env: 'TWITTER_API_URL',
       },
+      cookie: {
+        accessToken: {
+          doc: 'The name of the cookie to store the access token.',
+          format: String,
+          default: 'twitter_access_token',
+          env: 'TWITTER_ACCESS_TOKEN_COOKIE',
+        },
+        oauthCodeVerifier: {
+          doc: 'The name of the cookie to store the verifier.',
+          format: String,
+          default: 'oauth_twitter_code_verifier',
+          env: 'TWITTER_OAUTH_CODE_VERIFIER_COOKIE',
+        },
+        oauthState: {
+          doc: 'The name of the cookie to store the state.',
+          format: String,
+          default: 'oauth_twitter_state',
+          env: 'TWITTER_OAUTH_STATE_COOKIE',
+        },
+      },
     },
     twitch: {
       clientId: {

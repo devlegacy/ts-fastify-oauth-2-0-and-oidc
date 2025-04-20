@@ -191,8 +191,9 @@ export class AppBackend {
         return res.viewAsync('./src/apps/oauth-client/spotifyHome.ejs', data)
       })
       .get('/home/twitter', async (req, res) => {
-        const accessToken = req.cookies['twitter_access_token'] ?? req.cookies['access_token'] ?? ''
-        const response = await fetch(`${config.get('app.url')}/api/twitter/bypass`, {
+        const accessToken = req.cookies[config.get('twitter.cookie.accessToken')] ?? req.cookies['access_token'] ?? ''
+        // twitter use cors
+        const response = await request(`${config.get('app.url')}/api/twitter/bypass`, {
           headers: {
             Authorization: accessToken,
             ...req.headers,
@@ -202,7 +203,7 @@ export class AppBackend {
         const {
           me,
           tweets,
-        } = await response.json() as { me: { id: string }, tweets: unknown[] }
+        } = await response.body.json() as { me: { id: string }, tweets: unknown[] }
         return res.viewAsync('./src/apps/oauth-client/twitterHome.ejs', {
           title: 'Home',
           accessToken,

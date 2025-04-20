@@ -96,7 +96,7 @@ export default async function (fastify: FastifyInstance) {
             redirect_uri: config.get('spotify.redirectUri'),
           }).toString(),
         } satisfies RequestInit
-        const tokenRequest = await request(config.get('spotify.tokenUrl') ?? '', options)
+        const oauthRequest = await request(config.get('spotify.tokenUrl') ?? '', options)
         type SpotifyTokenResponse = {
           access_token: string
           /**
@@ -107,16 +107,16 @@ export default async function (fastify: FastifyInstance) {
           scope: string
           token_type: string
         }
-        const tokenResource = await tokenRequest.body.json() as SpotifyTokenResponse
+        const oauthResource = await oauthRequest.body.json() as SpotifyTokenResponse
         res
           // .setCookie('access_token', resource.access_token, {
           .setCookie(
             config.get('spotify.cookie.accessToken'),
-            tokenResource.access_token,
+            oauthResource.access_token,
             {
               path: '/',
               httpOnly: true,
-              expires: new Date(Date.now() + tokenResource.expires_in * ONE_MINUTE_IN_MILLISECONDS),
+              expires: new Date(Date.now() + oauthResource.expires_in * ONE_MINUTE_IN_MILLISECONDS),
             // domain: config.get('app.url'),
             },
           )
@@ -144,22 +144,31 @@ export default async function (fastify: FastifyInstance) {
           code_challenge: codeChallenge,
           code_challenge_method: 'S256', // SHA-256
         })
-        const redirect = new URL(config.get('twitter.authorizationUrl'))
-        redirect.search = query.toString()
+        const authorizationUrl = new URL(config.get('twitter.authorizationUrl'))
+        authorizationUrl.search = query.toString()
 
+        // Redirect to the Twitter Accounts service (Concern request UI)
         res
           // .setCookie('verifier', codeVerifier, {
-          .setCookie('twitter_verifier', codeVerifier, {
-            path: '/',
-            httpOnly: true,
-          })
+          .setCookie(
+            config.get('twitter.cookie.oauthCodeVerifier'),
+            codeVerifier,
+            {
+              path: '/',
+              httpOnly: true,
+            },
+          )
           // .setCookie('state', state, {
-          .setCookie('twitter_state', state, {
-            path: '/',
-            httpOnly: true,
-          })
+          .setCookie(
+            config.get('twitter.cookie.oauthState'),
+            state,
+            {
+              path: '/',
+              httpOnly: true,
+            },
+          )
           .status(HttpStatus.FOUND)
-          .redirect(redirect.toString())
+          .redirect(authorizationUrl.toString())
       },
     )
     // .get(
@@ -173,12 +182,15 @@ export default async function (fastify: FastifyInstance) {
     .get(
       '/authentication/twitter/callback',
       async function handler(req: FastifyRequest<{ Querystring: { state: string, code: string } }>, res) {
-        const state = req.cookies['state'] ?? req.cookies['twitter_state'] ?? ''
+        const {
+          cookies,
+        } = req
+        const state = cookies[config.get('twitter.cookie.oauthState')] ?? cookies['state'] ?? ''
         if (state !== req.query.state) {
           res.status(HttpStatus.FOUND).redirect('/home/twitter/#?error=ERROR_STATE_MISMATCH')
         }
 
-        const verifier = req.cookies['verifier'] ?? req.cookies['twitter_verifier'] ?? ''
+        const codeVerifier = cookies[config.get('twitter.cookie.oauthCodeVerifier')] ?? cookies['verifier'] ?? ''
         const options = {
           method: 'POST',
           headers: {
@@ -189,23 +201,27 @@ export default async function (fastify: FastifyInstance) {
             grant_type: 'authorization_code',
             redirect_uri: config.get('twitter.redirectUri'),
             client_id: config.get('twitter.clientId'),
-            code_verifier: verifier,
+            code_verifier: codeVerifier,
           }).toString(),
-        }
-        const response = await fetch(config.get('twitter.tokenUrl'), options)
+        } satisfies RequestInit
+        const oauthRequest = await request(config.get('twitter.tokenUrl'), options)
         type TwitterTokenResponse = {
           token_type: string
           expires_in: number
           access_token: string
           scope: string
         }
-        const json = await response.json() as TwitterTokenResponse
+        const oauthResource = await oauthRequest.body.json() as TwitterTokenResponse
         res
           // .setCookie('access_token', json.access_token, {
-          .setCookie('twitter_access_token', json.access_token, {
-            path: '/',
-            httpOnly: true,
-          })
+          .setCookie(
+            config.get('twitter.cookie.accessToken'),
+            oauthResource.access_token,
+            {
+              path: '/',
+              httpOnly: true,
+            },
+          )
           .status(HttpStatus.FOUND)
           .redirect('/home/twitter')
       },
