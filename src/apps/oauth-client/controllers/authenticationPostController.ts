@@ -257,24 +257,24 @@ export default async function (fastify: FastifyInstance) {
           scope: scopes.join(' '),
           client_secret: config.get('discord.clientSecret'),
         }).toString(),
-      }
-      const response = await fetch(config.get('discord.tokenUrl'), options)
-      const json = await response.json() as { access_token: string }
+      } satisfies RequestInit
+      const oauthRequest = await request(config.get('discord.tokenUrl'), options)
+      const oauthResource = await oauthRequest.body.json() as { access_token: string }
       const headers = new Headers()
-      headers.append('Authorization', `Bearer ${json.access_token}`)
+      headers.append('Authorization', `Bearer ${oauthResource.access_token}`)
 
       const [
         user,
         guilds,
       ] = await Promise.all([
-        fetch(`${config.get('discord.apiUrl')}/users/@me`, {
+        request(`${config.get('discord.apiUrl')}/users/@me`, {
           headers,
         })
-          .then((response) => response.json() as Promise<{ id: string, username: string, discriminator: string }>),
-        fetch(`${config.get('discord.apiUrl')}/users/@me/guilds`, {
+          .then((response) => response.body.json() as Promise<{ id: string, username: string, discriminator: string }>),
+        request(`${config.get('discord.apiUrl')}/users/@me/guilds`, {
           headers,
         })
-          .then((response) => response.json() as Promise<{ name: string }[]>),
+          .then((response) => response.body.json() as Promise<{ name: string }[]>),
       ])
       return {
         user: `${user.username}`,
