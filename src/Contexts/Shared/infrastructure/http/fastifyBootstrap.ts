@@ -4,6 +4,9 @@ import {
 import type {
   FastifyCorsOptions,
 } from '@fastify/cors'
+import type {
+  FastifyStaticOptions,
+} from '@fastify/static'
 import {
   TokenError,
 } from 'fast-jwt'
@@ -23,11 +26,13 @@ import {
   config,
 } from '#@/src/Contexts/Shared/infrastructure/Config/config.js'
 
+// eslint-disable-next-line max-lines-per-function
 export const fastifyBootstrap = async (
   fastify: FastifyInstance,
   options: {
     autoload: AutoloadPluginOptions
     cors?: FastifyCorsOptions
+    static?: FastifyStaticOptions
   },
 ) => {
   // Register formbody plugin to handle application/x-www-form-urlencoded
@@ -50,6 +55,11 @@ export const fastifyBootstrap = async (
     .register(import('@fastify/cors'), options.cors || {})
     .register(import('@fastify/compress'))
     .register(import('@fastify/cookie'))
+    .register(import('@fastify/static'), {
+      prefix: '/',
+      root: './public',
+      ...options?.static,
+    })
     .register(import('@fastify/view'), {
       engine: {
         ejs: import('ejs'),

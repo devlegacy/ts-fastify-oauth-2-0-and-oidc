@@ -1,12 +1,19 @@
 import {
   randomBytes,
 } from 'node:crypto'
+import {
+  URL,
+  URLSearchParams,
+} from 'node:url'
 
 import type {
   FastifyInstance,
   FastifyRequest,
 } from 'fastify'
 import HttpStatus from 'http-status'
+import {
+  request,
+} from 'undici'
 
 import {
   ONE_MINUTE_IN_MILLISECONDS,
@@ -76,19 +83,20 @@ export default async function (fastify: FastifyInstance) {
     .get(
       '/authentication/spotify/callback',
       async function handler(req: FastifyRequest<{ Querystring: { code: string } }>, res) {
+        const clientCredentials = Buffer.from(`${config.get('spotify.clientId')}:${config.get('spotify.clientSecret')}`).toString('base64')
+        const headers = new Headers()
+        headers.append('Content-Type', 'application/x-www-form-urlencoded')
+        headers.append('Authorization', `Basic ${clientCredentials}`)
         const options = {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            Authorization: `Basic ${Buffer.from(`${config.get('spotify.clientId')}:${config.get('spotify.clientSecret')}`).toString('base64')}`,
-          },
+          headers,
           body: new URLSearchParams({
             grant_type: 'authorization_code',
             code: req.query.code,
             redirect_uri: config.get('spotify.redirectUri'),
           }).toString(),
-        }
-        const response = await fetch(config.get('spotify.tokenUrl') ?? '', options)
+        } satisfies RequestInit
+        const tokenRequest = await request(config.get('spotify.tokenUrl') ?? '', options)
         type SpotifyTokenResponse = {
           access_token: string
           /**
@@ -99,13 +107,13 @@ export default async function (fastify: FastifyInstance) {
           scope: string
           token_type: string
         }
-        const resource = await response.json() as SpotifyTokenResponse
+        const tokenResource = await tokenRequest.body.json() as SpotifyTokenResponse
         res
           // .setCookie('access_token', resource.access_token, {
-          .setCookie('spotify_access_token', resource.access_token, {
+          .setCookie('spotify_access_token', tokenResource.access_token, {
             path: '/',
             httpOnly: true,
-            expires: new Date(Date.now() + resource.expires_in * ONE_MINUTE_IN_MILLISECONDS),
+            expires: new Date(Date.now() + tokenResource.expires_in * ONE_MINUTE_IN_MILLISECONDS),
             // domain: config.get('app.url'),
           })
           .status(HttpStatus.FOUND)

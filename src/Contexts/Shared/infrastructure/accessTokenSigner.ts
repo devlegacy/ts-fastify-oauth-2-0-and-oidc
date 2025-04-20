@@ -19,7 +19,8 @@ type SignerOptionsType = SignerOptions & Record<string, string | number>
 // jwtAccessTokenSigner
 // libraryAccessTokenSigner
 export const accessTokenSigner = (user: { id: string, fullName: string }) => {
-  const expiresIn = config.get('accessToken.expirationTime') * ONE_SECOND_IN_MILLISECONDS
+  const expirationTimeInMilliseconds = config.get('accessToken.expirationTime') * ONE_SECOND_IN_MILLISECONDS
+  const expiresIn = expirationTimeInMilliseconds
   // const expiresIn = Date.now() + expiresIn
   // const expiresIn = Date.now() + ONE_MINUTE_IN_MILLISECONDS
 
@@ -28,9 +29,9 @@ export const accessTokenSigner = (user: { id: string, fullName: string }) => {
    * [JSON Web Token Claims](https://auth0.com/docs/secure/tokens/json-web-tokens/json-web-token-claims#registered-claims)
    */
   const registeredClaims: SignerOptionsType = {
-    // iss: config.get('app.url'), // token issuer, authorization server
+    // iss: config.get('app.url'), // token issuer, authorization server, who emits the token
     sub: user.id, // user id
-    // aud: 'urn:fast-jwt:aud', // audience, who the token is intended for
+    // aud: 'urn:fast-jwt:aud', // audience, who the token is intended for, api, client web
     expiresIn, // exp
     // notBefore: 0,
     jti: uuid(),

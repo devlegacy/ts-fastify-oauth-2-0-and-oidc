@@ -26,7 +26,8 @@ import {
 type SignerOptionsType = SignerOptions & Record<string, string | number>
 
 export const accessTokenAsymmetricSigner = (user: { id: string, fullName: string }) => {
-  const expiresIn = config.get('accessToken.expirationTime') * ONE_SECOND_IN_MILLISECONDS
+  const expirationTimeInMilliseconds = config.get('accessToken.expirationTime') * ONE_SECOND_IN_MILLISECONDS
+  const expiresIn = expirationTimeInMilliseconds
   /**
    * [JSON Web Token (JWT)](https://www.iana.org/assignments/jwt/jwt.xhtml)
    * [JSON Web Token Claims](https://auth0.com/docs/secure/tokens/json-web-tokens/json-web-token-claims#registered-claims)

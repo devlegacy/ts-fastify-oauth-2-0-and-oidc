@@ -1,40 +1,25 @@
-<h1>Login</h1>
-<a href='/api/authentication/spotify'>Connect to Spotify</a>
-<a href='/api/authentication/twitter'>Connect to Twitter</a>
-<a href='' class='twitch' rel="noopener noreferrer">Connect with twitch</a> <!--  target="_blank"  -->
-<a href='/api/authentication/auth0'>Connect with Auth0</a>
-<a href='' title='Connect with Auth0 using implicit flow with form post' class='auth0'>Connect with Auth0</a>
+<h1>OAuth</h1>
 
-<script>
-  const randomString = {
-    generate: (length) => {
-      const characters =
-        'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-      return randomString._generateString(length, characters);
-    },
+<ul>
+  <li>
+    <a href='/api/authentication/spotify' title="Authorization Code Flow">Connect to Spotify</a>
+  </li>
+  <li>
+    <a href='/api/authentication/twitter'>Connect to Twitter</a>
+  </li>
+  <li>
+    <a href='' class='twitch' rel="noopener noreferrer">Connect with twitch</a> <!--  target="_blank"  -->
+  </li>
+  <li>
+    <a href='/api/authentication/auth0'>Connect with Auth0</a>
+  </li>
+  <li>
+    <a href='' title='Connect with Auth0 using implicit flow with form post' class='auth0'>Connect with Auth0</a>
+  </li>
+</ul>
 
-    generateCrypto: (length) => {
-      const charset =
-        '0123456789ABCDEFGHIJKLMNOPQRSTUVXYZabcdefghijklmnopqrstuvwxyz+/';
-      const randomValues = new Uint8Array(length);
-      window.crypto.getRandomValues(randomValues);
-
-      return Array.from(randomValues)
-        .map((value) => charset[value % charset.length])
-        .join('');
-    },
-
-    _generateString: (length, characters) => {
-      let result = '';
-      const charactersLength = characters.length;
-
-      for (let i = 0; i < length; i++) {
-        result += characters.charAt(Math.floor(Math.random() * charactersLength));
-      }
-
-      return result;
-    }
-  }
+<script type="module">
+  import { randomString } from '/randomString.js'
 
   const authenticationStateRetriever = (key = 'state', isCryptographically = false) => {
     let value = sessionStorage.getItem(key)
@@ -48,7 +33,7 @@
     return value
   }
 
-  (()=>{
+  (() => {
     const twitchScopes = [
       'user:read:email',
       'user:read:follows',
@@ -64,7 +49,7 @@
     const url = new URL(`<%= TWITCH_AUTHORIZATION_URL %>?${queryParams}`)
     document.querySelector('.twitch')?.setAttribute('href', url)
   })();
-  (()=>{
+  (() => {
     const scopes = ['openid', 'email', 'read:sample'];
     const state = authenticationStateRetriever('auth0_state')
     // for the nonce, para el momento presente
@@ -82,40 +67,5 @@
     const queryParams = new URLSearchParams(parameters).toString()
     const url = new URL(`<%= AUTH0_AUTHORIZATION_URL %>?${queryParams}`)
     document.querySelector('.auth0')?.setAttribute('href', url)
-    // document.querySelector('.twitch')?.addEventListener('click', e => {
-    //   e.preventDefault();
-    //   // window.open(e.target.href, '_blank');
-    //   // Telegram.WebApp.openTelegramLink(e.target.href);
-    //   const twitchOauthWindow = window.open(e.target.href, '_blank', 'width=600,height=600');
-    //   if (!twitchOauthWindow || twitchOauthWindow.closed || typeof twitchOauthWindow.closed === 'undefined') {
-    //     console.log('Popup was blocked');
-    //     return;
-    //   }
-    //   const checkAuth = setInterval(() => {
-    //     try {
-    //       if (twitchOauthWindow.location.href.includes('<%= TWITCH_REDIRECT_URI %>')) {
-    //           clearInterval(checkAuth);
-
-    //           const newUrl = twitchOauthWindow.location.href;
-    //           twitchOauthWindow.close();
-
-    //           console.log(newUrl);
-    //           // // Extract token from URL fragment
-    //           // if (newUrl.includes('#access_token=')) {
-    //           //     const fragmentPart = newUrl.split('#')[1];
-    //           //     const params = new URLSearchParams(fragmentPart);
-
-    //           //     authToken = params.get('access_token');
-    //           //     localStorage.setItem('twitch_auth_token', authToken);
-
-    //           //     fetchUserData();
-    //           // }
-    //       }
-    //     } catch (e) {
-    //       // This will throw an error due to cross-origin restrictions
-    //       // That's normal and expected when the user is still on the Twitch domain
-    //     }
-    //   }, 500);
-    // });
   })();
 </script>

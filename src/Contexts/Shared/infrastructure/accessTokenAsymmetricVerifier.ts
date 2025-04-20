@@ -19,7 +19,7 @@ import {
   config,
 } from '#@/src/Contexts/Shared/infrastructure/Config/config.js'
 
-export const accessTokenAsymmetricVerifier = (access_token: string) => {
+export const accessTokenAsymmetricVerifier = (accessToken: string) => {
   const publicKey = readFileSync(resolve(cwd(), config.get('accessToken.publicKeyPath')), 'utf8')
   const verifySync = createVerifier({
     key: publicKey,
@@ -27,8 +27,9 @@ export const accessTokenAsymmetricVerifier = (access_token: string) => {
     ignoreExpiration: false,
   })
 
-  const payload = verifySync(access_token)
-  if (Date.now() > payload.exp * ONE_SECOND_IN_MILLISECONDS) {
+  const payload = verifySync(accessToken)
+  const isAccessTokenExpired = Date.now() > payload.exp * ONE_SECOND_IN_MILLISECONDS
+  if (isAccessTokenExpired) {
     throw new Error('Access token expired')
   }
   return payload
