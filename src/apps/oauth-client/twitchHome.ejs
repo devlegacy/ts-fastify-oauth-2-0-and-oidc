@@ -4,114 +4,57 @@
 <section id="channels"></section>
 
 <script type="module">
+  import { randomState } from '/randomState.js'
+  import { hashParams } from '/hashParams.js'
 
-  const randomString = {
-    generate: (length) => {
-      const characters =
-        'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-      return randomString._generateString(length, characters);
-    },
-
-    generateCrypto: (length) => {
-      const charset =
-        '0123456789ABCDEFGHIJKLMNOPQRSTUVXYZabcdefghijklmnopqrstuvwxyz+/';
-      const randomValues = new Uint8Array(length);
-      window.crypto.getRandomValues(randomValues);
-
-      return Array.from(randomValues)
-        .map((value) => charset[value % charset.length])
-        .join('');
-    },
-
-    _generateString: (length, characters) => {
-      let result = '';
-      const charactersLength = characters.length;
-
-      for (let i = 0; i < length; i++) {
-        result += characters.charAt(Math.floor(Math.random() * charactersLength));
-      }
-
-      return result;
-    }
-  }
-
-  const authenticationStateRetriever = (key = 'state', isCryptographically = false) => {
-    let value = sessionStorage.getItem(key)
-    if (!value) {
-      // value = Math.random().toString(36).substring(7)
-      value = isCryptographically
-        ? randomString.generateCrypto(16)
-        : randomString.generate(16)
-      sessionStorage.setItem(key, value)
-    }
-    return value
-  }
-
-  const hashParamParser = (queryKey = 'state') => {
-    const hashParams = window.location.hash.replace('#', '')?.split('&')
-
-    if (queryKey) {
-      return hashParams
-        ?.find((param) => param.startsWith(queryKey))
-        ?.split('=')[1]
-    }
-
-    return hashParams
-  }
-  const cleanUrlHash = () => {
-    history.replaceState({}, document.title, window.location.href.split('#')[0])
-  }
-
-  const queryAccessToken = hashParamParser('access_token')
-  const queryState = hashParamParser('state')
-  const state = authenticationStateRetriever('twitch_state')
+  const accessToken = hashParams.parser('access_token')
+  const queryState = hashParams.parser('state')
+  const state = randomState.find('twitch_oauth_state')
   if (queryState !== state) {
     // store React/Vue setAccessToken(null)
     console.error(new Error('ERRO_STATE_MISMATCH'))
   }
-  if (queryAccessToken) {
-    // store React/Vue setAccessToken(queryAccessToken)
-    cleanUrlHash()
+  if (accessToken) {
+    // store React/Vue setAccessToken(accessToken)
+    hashParams.clearUrl()
   }
 
   const userProfileRequest = await fetch('<%= TWITCH_API_URL %>/users', {
     headers: {
-      Authorization: `Bearer ${queryAccessToken}`,
+      Authorization: `Bearer ${accessToken}`,
       'Client-Id': '<%= TWITCH_CLIENT_ID %>',
       'Content-Type': 'application/json',
     },
   })
-  const userProfile = await userProfileRequest.json()
-  console.log(userProfile)
+  const userProfileResource = await userProfileRequest.json()
   document.getElementById('user').innerHTML = `
-    <strong>${userProfile.data[0].display_name}</strong>
-    <p>${userProfile.data[0].email}</p>
-    <img src="${userProfile.data[0].profile_image_url}" alt="${userProfile.data[0].display_name}" />
+    <strong>${userProfileResource?.data?.[0]?.display_name || ''}</strong>
+    <p>${userProfileResource?.data?.[0]?.email || ''}</p>
+    <img src="${userProfileResource?.data?.[0]?.profile_image_url || ''}" alt="${userProfileResource?.data?.[0]?.display_name || ''}" />
   `
   const userChannelRequest = await fetch(
-    `<%= TWITCH_API_URL %>/channels/followed?user_id=${userProfile.data[0].id}`,
+    `<%= TWITCH_API_URL %>/channels/followed?user_id=${userProfileResource.data?.[0]?.id}`,
     {
       headers: {
-        Authorization: `Bearer ${queryAccessToken}`,
+        Authorization: `Bearer ${accessToken}`,
         'Client-Id': '<%= TWITCH_CLIENT_ID %>',
         'Content-Type': 'application/json',
       },
     }
   )
-  const userChannel = await userChannelRequest.json()
-  console.log(userChannel)
+  const userChannelResource = await userChannelRequest.json()
   document.getElementById('channels').innerHTML = `
     <h2>Channels</h2>
     <ul>
-      ${userChannel.data
-        .map(
-          (channel) => `
+      ${userChannelResource?.data
+      ?.map(
+        (channel) => `
           <li>
             <p>${channel.broadcaster_name}</p>
           </li>
         `
-        )
-        .join('')}
+      )
+      ?.join('') || ''}
     </ul>
   `
 </script>

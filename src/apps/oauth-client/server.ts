@@ -15,6 +15,7 @@ import Fastify, {
   type PrintRoutesOptions,
 } from 'fastify'
 import {
+  Headers,
   request,
 } from 'undici'
 

@@ -12,6 +12,7 @@ import type {
 } from 'fastify'
 import HttpStatus from 'http-status'
 import {
+  Headers,
   request,
 } from 'undici'
 
@@ -231,7 +232,7 @@ export default async function (fastify: FastifyInstance) {
       '/authentication/twitch/callback',
       async function handler(req: FastifyRequest<{ Querystring: { state: string, code: string } }>, res) {
         return res.viewAsync('./src/apps/oauth-client/twitchHome.ejs', {
-          title: 'Home',
+          title: 'Home Twitch 🎮',
           TWITCH_API_URL: config.get('twitch.apiUrl'),
           TWITCH_CLIENT_ID: config.get('twitch.clientId'),
         })
