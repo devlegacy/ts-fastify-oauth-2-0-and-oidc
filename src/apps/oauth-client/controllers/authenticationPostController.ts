@@ -65,18 +65,18 @@ export default async function (fastify: FastifyInstance) {
           'user-read-email',
           'playlist-read-private',
         ]
-        const query = new URLSearchParams({
+        const authorizationSearchParams = new URLSearchParams({
           response_type: 'code',
           client_id: config.get('spotify.clientId'),
           scope: scopes.join(' '),
           redirect_uri: config.get('spotify.redirectUri'),
         })
-        const redirect = new URL(config.get('spotify.authorizationUrl'))
-        redirect.search = query.toString()
+        const authorizationUrl = new URL(config.get('spotify.authorizationUrl'))
+        authorizationUrl.search = authorizationSearchParams.toString()
         // Redirect to the Spotify Accounts service (Concern request UI)
         res
           .status(HttpStatus.FOUND)
-          .redirect(redirect.toString())
+          .redirect(authorizationUrl.toString())
         // Then if the user do the authorize grant is redirected to callback URL
       },
     )
@@ -110,12 +110,16 @@ export default async function (fastify: FastifyInstance) {
         const tokenResource = await tokenRequest.body.json() as SpotifyTokenResponse
         res
           // .setCookie('access_token', resource.access_token, {
-          .setCookie('spotify_access_token', tokenResource.access_token, {
-            path: '/',
-            httpOnly: true,
-            expires: new Date(Date.now() + tokenResource.expires_in * ONE_MINUTE_IN_MILLISECONDS),
+          .setCookie(
+            config.get('spotify.accessTokenCookieName'),
+            tokenResource.access_token,
+            {
+              path: '/',
+              httpOnly: true,
+              expires: new Date(Date.now() + tokenResource.expires_in * ONE_MINUTE_IN_MILLISECONDS),
             // domain: config.get('app.url'),
-          })
+            },
+          )
           .status(HttpStatus.FOUND)
           .redirect('/home/spotify')
       },

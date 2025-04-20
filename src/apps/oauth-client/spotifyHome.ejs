@@ -7,6 +7,6 @@
   const meResource = JSON.parse('<%- JSON.stringify(meResource) %>')
   const playlistResources = JSON.parse('<%- JSON.stringify(playlistResources) %>')
 
-  document.querySelector('.username').textContent = meResource.display_name
-  document.querySelector('.playlists').innerHTML = '<strong>Playlist:</strong>' + playlistResources.items.map((playlist) => playlist.name).join(', ')
+  document.querySelector('.username').textContent = meResource?.display_name || ''
+  document.querySelector('.playlists').innerHTML = `<strong>Playlist:</strong>${playlistResources?.items?.map((playlist) => playlist.name)?.join(', ') || ''}`
 </script>
