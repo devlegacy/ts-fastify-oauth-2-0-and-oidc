@@ -256,3 +256,23 @@ By enforcing the correct audience for each token type, the system maintains a se
 
 - JSON Object Signing and Encryption (JOSE) is a framework that defines a way to securely transmit information as a JSON object. It includes specifications for signing and encrypting JSON data structures, allowing for secure communication between parties.
 
+## Good practices
+
+- JWT
+  - Avoid sensible data in the payload.
+  - Keep the payload small.
+  - Use short-lived access tokens.
+  - Use JWT as opaque tokens, validate in backend.
+  - Concerns
+    - Storage in a secure place (http cookie).
+    - Block/Ban JWT filtered (jti with blocklist or deny list).
+    - Refresh token rotation (implement refresh strategy, redirect to login on error or implement silent authentication).
+    - Rotate signing keys (add all not expired tokens to a blocklist and have a mechanism or strategy to rotate keys easily).
+- OAuth 2.0
+  - Use just the necessary scopes.
+  - Never expose or use the `client_secret` in the frontend.
+  - User environment variables to store sensitive data like the `client_secret` and never hardcode it in the source code or upload to a hub.- Create a Client properly with a description and data useful for the user.
+  - Ensure that the Client is ready for production
+  - Store tokens in a secure place (http cookie).
+  - Use HTTPS.
+  - Implement proper error handling and logging for better debugging when a token is expired or invalid for any reason.
