@@ -5,19 +5,11 @@ import {
   fileURLToPath,
 } from 'node:url'
 
-// backward compatibility ⚠️
-import {
-  fixupPluginRules,
-} from '@eslint/compat'
-// backward compatibility ⚠️
-import {
-  FlatCompat,
-} from '@eslint/eslintrc'
 import eslint from '@eslint/js'
 // https://github.com/eslint-stylistic/eslint-stylistic
 import stylistic from '@stylistic/eslint-plugin'
 // https://github.com/import-js/eslint-plugin-import/issues/2948 🔴
-// import eslintImport from 'eslint-plugin-import'
+import eslintImport from 'eslint-plugin-import'
 // https://github.com/eslint-community/eslint-plugin-security
 import security from 'eslint-plugin-security'
 // https://github.com/lydell/eslint-plugin-simple-import-sort
@@ -32,24 +24,6 @@ import tseslint from 'typescript-eslint'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
-
-// backward compatibility ⚠️
-const compat = new FlatCompat()
-/**
- * backward compatibility ⚠️
- * @param {string} name the plugin name
- * @param {string} alias the plugin alias
- * @returns {import("eslint").ESLint.Plugin}
- */
-function legacyPlugin(name, alias = name) {
-  const plugin = compat.plugins(name)[0]?.plugins?.[alias]
-
-  if (!plugin) {
-    throw new Error(`Unable to resolve plugin ${name} and/or alias ${alias}`)
-  }
-
-  return fixupPluginRules(plugin)
-}
 
 /**
  * Read more on: https://eslint.org/docs/latest/rules/
@@ -297,10 +271,7 @@ const simpleImportConfig = {
 
 const importConfig = {
   plugins: {
-    import: legacyPlugin(
-      'eslint-plugin-import',
-      'import',
-    ),
+    import: eslintImport,
   },
   rules: {
     'import/first': 'error',
