@@ -1,45 +1,34 @@
-<h1><%= accessToken %></h1>
+<h1>
+  <%= accessToken %>
+</h1>
 
 <code id="accessToken"></code>
 <code id="idToken"></code>
 <script type="module">
-  const hashParamParser = (queryKey = 'state') => {
-    const hashParams = window.location.hash.replace('#', '')?.split('&')
+  import { hashParams } from '/hashParams.js'
 
-    if (queryKey) {
-      return hashParams
-        ?.find((param) => param.startsWith(queryKey))
-        ?.split('=')[1]
-    }
+  const queryAccessToken = hashParams.parser('access_token')
+  const queryIdToken = hashParams.parser('id_token')
 
-    return hashParams
-  }
-  const cleanUrlHash = () => {
-    history.replaceState({}, document.title, window.location.href.split('#')[0])
-  }
+  const queryState = hashParams.parser('state')
+  const sessionState = sessionStorage.getItem('oauth_auth0_state')
 
-  const queryAccessToken = hashParamParser('access_token')
-  const queryIdToken = hashParamParser('id_token')
-
-  const queryState = hashParamParser('state')
-  const sessionState = sessionStorage.getItem('auth0_state')
-
-  const queryNonce = hashParamParser('nonce')
-  const sessionNonce = sessionStorage.getItem('auth0_nonce')
+  const queryNonce = hashParams.parser('nonce')
+  const sessionNonce = sessionStorage.getItem('oauth_auth0_nonce')
 
   if (queryIdToken && queryAccessToken && queryState !== sessionState) {
     console.error(new Error('ERROR_STATE_MISMATCH'));
-    cleanUrlHash();
+    hashParams.clearUrl();
     // return setTokens(null);
   }
   if (queryIdToken && queryAccessToken && queryNonce !== sessionNonce) {
     console.error(new Error('ERROR_NONCE_MISMATCH'));
-    cleanUrlHash();
+    hashParams.clearUrl();
     // return setTokens(null);
   }
 
   if (queryAccessToken && queryIdToken) {
-    cleanUrlHash();
+    hashParams.clearUrl();
     // set tokens to store
     // setTokens({ accessToken: queryAccessToken, idToken: queryIdToken });
     document.getElementById('accessToken').textContent = queryAccessToken;

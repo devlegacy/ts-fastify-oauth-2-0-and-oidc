@@ -301,13 +301,13 @@ export default async function (fastify: FastifyInstance) {
           username: config.get('auth0.username'),
           password: config.get('auth0.password'),
         }).toString(),
-      }
-      const request = await fetch(config.get('auth0.tokenUrl'), options)
-      const resource = await request.json() as { access_token: string, expires_in: number }
+      } satisfies RequestInit
+      const oauthRequest = await request(config.get('auth0.tokenUrl'), options)
+      const oauthResource = await oauthRequest.body.json() as { access_token: string, expires_in: number }
 
       res
       // .setCookie('access_token', resource.access_token, {
-        .setCookie('auth0_access_token', resource.access_token, {
+        .setCookie(config.get('auth0.cookie.accessToken'), oauthResource.access_token, {
           path: '/',
           httpOnly: true,
           // expires: new Date(Date.now() + resource.expires_in * ONE_MINUTE_IN_MILLISECONDS),
@@ -316,6 +316,7 @@ export default async function (fastify: FastifyInstance) {
         .status(HttpStatus.FOUND)
         .redirect('/home/auth0')
     })
+    // Connect with Auth0 using Implicit Flow With Form Post
     .post('/authentication/auth0/callback', async function handler(req: FastifyRequest<{ Body: { access_token: string, id_token: string, state: string } }>, res) {
       const {
         access_token,

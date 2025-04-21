@@ -295,6 +295,14 @@ const config = convict(
         default: '',
         env: 'AUTH0_PASSWORD',
       },
+      cookie: {
+        accessToken: {
+          doc: 'The name of the cookie to store the access token.',
+          format: String,
+          default: 'auth0_access_token',
+          env: 'AUTH0_ACCESS_TOKEN_COOKIE',
+        },
+      },
     },
     // azure: {
     //   clientId: {

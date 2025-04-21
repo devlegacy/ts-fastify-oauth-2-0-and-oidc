@@ -214,7 +214,10 @@ export class AppBackend {
         })
       })
       .get('/home/auth0', async (req, res) => {
-        const accessToken = req.cookies['access_token'] ?? req.cookies['auth0_access_token'] ?? ''
+        const {
+          cookies,
+        } = req
+        const accessToken = cookies[config.get('auth0.cookie.accessToken')] ?? cookies['access_token'] ?? ''
         return res.viewAsync('./src/apps/oauth-client/auth0Home.ejs', {
           title: 'Home',
           accessToken,
