@@ -18,7 +18,7 @@
     "paths": {
       "#@/*": ["${configDir}/*"]
     },
-    "typeRoots": ["${configDir}/node_modules/@types"],
+    "typeRoots": ["${configDir}/node_modules/@types", "${configDir}/types"],
     "types": ["node"],
     // "resolvePackageJsonExports": true,                /* Use the package.json 'exports' field when resolving package imports. */
     // "resolvePackageJsonImports": true,                /* Use the package.json 'imports' field when resolving imports. */

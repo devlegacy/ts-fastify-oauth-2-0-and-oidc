@@ -9,16 +9,15 @@
     "prebuild": "node --run build:clean",
     "build": "swc ./src/ --config-file ./.swcrc.build --out-dir ./dist/ --strip-leading-paths && rsync -avm --include='*.ejs' --include='*/' --exclude='*' ./src/ ./dist/ && ./.bin/replace-import-paths",
     "build:clean": "rm -Rf ./dist; exit 0",
-    "start:client": "node --env-file=.env ./dist/apps/oauth-client/main.js",
-    "start:server": "node --env-file=.env ./dist/apps/oauth-server/main.js",
-    "start:client:debug": "node --env-file=.env --import @swc-node/register/esm-register --watch --inspect=0.0.0.0:0 ./src/apps/oauth-client/main.ts",
-    "start:server:debug": "node --env-file=.env --import @swc-node/register/esm-register --watch --inspect=0.0.0.0:0 ./src/apps/oauth-server/main.ts",
+    "start": "node ./dist/apps/oauth-client/main.js",
+    "start:client:debug": "node --import @swc-node/register/esm-register --watch --inspect=0.0.0.0:0 ./src/apps/oauth-client/main.ts",
+    "start:server:debug": "node --import @swc-node/register/esm-register --watch --inspect=0.0.0.0:0 ./src/apps/oauth-server/main.ts",
     "lint": "eslint --color \"./src/**/*.ts\"",
     "lint:fix": "node --run lint -- --fix",
     "test": "node --run test:unit && node --run test:features",
     "test:coverage": "c8 node --run test:unit && node --run test:features",
     "test:features": "node --import @swc-node/register/esm-register ./node_modules/@cucumber/cucumber/bin/cucumber-js --config ./cucumber.js -p oauth_client",
-    "test:unit": "node --env-file=.env --import @swc-node/register/esm-register --test ./tests/**/*.test.ts"
+    "test:unit": "node --import @swc-node/register/esm-register --test ./tests/**/*.test.ts"
   },
   "imports": {
     "#@/*": "./*"

@@ -14,3 +14,4 @@
     <a href="https://swc.rs/" target="_blank"><img src="https://img.shields.io/badge/swc-compiler-F8C457.svg?logo=swc&label=&labelColor=282e33" alt="swc"/></a>
     <a href="https://x.com/intent/follow?original_referer=https://developer.x.com/&ref_src=twsrc^tfw|twcamp^buttonembed|twterm^follow|twgr^jstsamuel_&region=follow_link&screen_name=jstsamuel_" target="_blank"><img alt="X (formerly Twitter) URL" src="https://img.shields.io/twitter/url?url=https://x.com/jstsamuel_&style=social&label=follow"/></a>
 </p>
+https://account.live.com/Consent/Update?mkt=EN-US&uiflavor=web&id=295513&ru=https://login.live.com/oauth20_authorize.srf%3fclient_flight%3dcmmenbvo5zj%26uaid%3dbf50ff4edb63498597883be5c5b19ab8%26client_id%3d0000000040223D00%26opid%3d8CA2BD7A949D3441%26mkt%3dEN-US%26opidt%3d1731983874
