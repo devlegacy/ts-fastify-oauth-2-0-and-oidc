@@ -9,17 +9,15 @@ import {
 import {
   ONE_SECOND_IN_MILLISECONDS,
 } from '#@/src/Contexts/Shared/domain/time.js'
-import {
-  config,
-} from '#@/src/Contexts/Shared/infrastructure/Config/config.js'
 
 type SignerOptionsType = SignerOptions & Record<string, string | number>
 
 // fastJwtAccessTokenSigner
 // jwtAccessTokenSigner
 // libraryAccessTokenSigner
-export const accessTokenSigner = (user: { id: string, fullName: string }) => {
-  const expiresIn = config.get('accessToken.expirationTime') * ONE_SECOND_IN_MILLISECONDS
+export const accessTokenSigner = (user: { id: string, fullName: string }, config: { expirationTime: number, secret: string }) => {
+  const expirationTimeInMilliseconds = config.expirationTime * ONE_SECOND_IN_MILLISECONDS
+  const expiresIn = expirationTimeInMilliseconds
   // const expiresIn = Date.now() + expiresIn
   // const expiresIn = Date.now() + ONE_MINUTE_IN_MILLISECONDS
 
@@ -28,9 +26,9 @@ export const accessTokenSigner = (user: { id: string, fullName: string }) => {
    * [JSON Web Token Claims](https://auth0.com/docs/secure/tokens/json-web-tokens/json-web-token-claims#registered-claims)
    */
   const registeredClaims: SignerOptionsType = {
-    // iss: config.get('app.url'), // token issuer, authorization server
+    // iss: config.get('app.url'), // token issuer, authorization server, who emits the token
     sub: user.id, // user id
-    // aud: 'urn:fast-jwt:aud', // audience, who the token is intended for
+    // aud: 'urn:fast-jwt:aud', // audience, who the token is intended for, api, client web
     expiresIn, // exp
     // notBefore: 0,
     jti: uuid(),
@@ -52,7 +50,7 @@ export const accessTokenSigner = (user: { id: string, fullName: string }) => {
   }
 
   const signSync = createSigner({
-    key: config.get('accessToken.secret'),
+    key: config.secret,
     algorithm: 'HS256', // symmetric algorithm
     ...registeredClaims,
     ...publicClaims,

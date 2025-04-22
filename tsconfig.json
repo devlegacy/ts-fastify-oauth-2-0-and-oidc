@@ -6,7 +6,7 @@
     "composite": true,
     /* Language and Environment */
     "target": "ESNext",
-    "lib": ["ESNext"],
+    "lib": ["ESNext", "DOM"],
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "useDefineForClassFields": true,
@@ -24,7 +24,7 @@
     // "resolvePackageJsonImports": true,                /* Use the package.json 'imports' field when resolving imports. */
     "resolveJsonModule": true,
     /* JavaScript Support */
-    "allowJs": false,
+    "allowJs": true,
     /* Emit */
     "declaration": true,
     "declarationMap": true,

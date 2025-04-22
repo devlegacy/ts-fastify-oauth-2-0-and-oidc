@@ -1,0 +1,60 @@
+<h1>Home Spa Twitch</h1>
+
+<section id="user"></section>
+<section id="channels"></section>
+
+<script type="module">
+  import { randomState } from '/randomState.js'
+  import { hashParams } from '/hashParams.js'
+
+  const accessToken = hashParams.parser('access_token')
+  const queryState = hashParams.parser('state')
+  const state = randomState.find('twitch_oauth_state')
+  if (queryState !== state) {
+    // store React/Vue setAccessToken(null)
+    console.error(new Error('ERRO_STATE_MISMATCH'))
+  }
+  if (accessToken) {
+    // store React/Vue setAccessToken(accessToken)
+    hashParams.clearUrl()
+  }
+
+  const userProfileRequest = await fetch('<%= TWITCH_API_URL %>/users', {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      'Client-Id': '<%= TWITCH_CLIENT_ID %>',
+      'Content-Type': 'application/json',
+    },
+  })
+  const userProfileResource = await userProfileRequest.json()
+  document.getElementById('user').innerHTML = `
+    <strong>${userProfileResource?.data?.[0]?.display_name || ''}</strong>
+    <p>${userProfileResource?.data?.[0]?.email || ''}</p>
+    <img src="${userProfileResource?.data?.[0]?.profile_image_url || ''}" alt="${userProfileResource?.data?.[0]?.display_name || ''}" />
+  `
+  const userChannelRequest = await fetch(
+    `<%= TWITCH_API_URL %>/channels/followed?user_id=${userProfileResource.data?.[0]?.id}`,
+    {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        'Client-Id': '<%= TWITCH_CLIENT_ID %>',
+        'Content-Type': 'application/json',
+      },
+    }
+  )
+  const userChannelResource = await userChannelRequest.json()
+  document.getElementById('channels').innerHTML = `
+    <h2>Channels</h2>
+    <ul>
+      ${userChannelResource?.data
+      ?.map(
+        (channel) => `
+          <li>
+            <p>${channel.broadcaster_name}</p>
+          </li>
+        `
+      )
+      ?.join('') || ''}
+    </ul>
+  `
+</script>

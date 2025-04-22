@@ -10,18 +10,17 @@ import {
 import {
   ONE_SECOND_IN_MILLISECONDS,
 } from '#@/src/Contexts/Shared/domain/time.js'
-import {
-  config,
-} from '#@/src/Contexts/Shared/infrastructure/Config/config.js'
 
+// this is an accessTokenVerifier and accessTokenExpirationVerifier
 // fastJwtAccessTokenVerifier
 // jwtAccessTokenVerifier
 // libraryAccessTokenVerifier
-export const accessTokenVerifier = (access_token: string) => {
+export const accessTokenVerifier = (accessToken: string, config: { secret: string }) => {
   const verifySync = createVerifier({
-    key: config.get('accessToken.secret'),
+    key: config.secret,
     cache: true,
     ignoreExpiration: false,
+
   })
 
   const payload: {
@@ -30,9 +29,12 @@ export const accessTokenVerifier = (access_token: string) => {
     jti: string
     name: string
     sub: string
-  } = verifySync(access_token)
-  if (Date.now() > payload.exp * ONE_SECOND_IN_MILLISECONDS) {
+  } = verifySync(accessToken)
+
+  const isAccessTokenExpired = Date.now() > payload.exp * ONE_SECOND_IN_MILLISECONDS
+  if (isAccessTokenExpired) {
     throw new UnauthorizedError('Access token expired')
   }
+
   return payload
 }

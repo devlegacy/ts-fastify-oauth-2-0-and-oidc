@@ -39,12 +39,12 @@ console.log(styleText(
 // '--format progress-bar',
 const common = []
 
-export const app_backend = [
+export const oauth_client = [
   ...common,
-  'tests/apps/features/**/*.feature',
-  '--import tests/apps/features/step_definitions/*.steps.ts',
+  'tests/apps/oauth-client/features/**/*.feature',
+  '--import tests/apps/oauth-client/features/step_definitions/*.steps.ts',
 ].join(' ')
 
 export default {
-  app_backend,
+  oauth_client,
 }

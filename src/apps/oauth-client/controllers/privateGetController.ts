@@ -3,6 +3,9 @@ import type {
 } from 'fastify'
 
 import {
+  config,
+} from '#@/src/Contexts/OauthClient/Shared/infrastructure/Config/config.js'
+import {
   accessTokenVerifier,
 } from '#@/src/Contexts/Shared/infrastructure/accessTokenVerifier.js'
 import {
@@ -14,7 +17,12 @@ export default async function (fastify: FastifyInstance) {
     '/private',
     async function handler(req) {
       const access_token = getAccessToken(req)
-      accessTokenVerifier(access_token)
+      accessTokenVerifier(
+        access_token,
+        {
+          secret: config.get('accessToken.secret'),
+        },
+      )
       return {}
     },
   )
