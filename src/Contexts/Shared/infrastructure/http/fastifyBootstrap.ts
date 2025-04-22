@@ -20,11 +20,11 @@ import {
 import HttpStatus from 'http-status'
 
 import {
+  config,
+} from '#@/src/Contexts/OauthClient/Shared/infrastructure/Config/config.js'
+import {
   UnauthorizedError,
 } from '#@/src/Contexts/Shared/domain/errors/UnauthorizedError.js'
-import {
-  config,
-} from '#@/src/Contexts/Shared/infrastructure/Config/config.js'
 
 // eslint-disable-next-line max-lines-per-function
 export const fastifyBootstrap = async (
@@ -38,6 +38,12 @@ export const fastifyBootstrap = async (
   // Register formbody plugin to handle application/x-www-form-urlencoded
   await fastify.register(import('@fastify/formbody'))
   await fastify.register(import('@fastify/multipart'))
+  if (options.static) {
+    fastify.register(import('@fastify/static'), {
+      prefix: '/',
+      ...options?.static,
+    })
+  }
   fastify
     .register(import('@fastify/autoload'), {
       forceESM: true,
@@ -55,11 +61,7 @@ export const fastifyBootstrap = async (
     .register(import('@fastify/cors'), options.cors || {})
     .register(import('@fastify/compress'))
     .register(import('@fastify/cookie'))
-    .register(import('@fastify/static'), {
-      prefix: '/',
-      root: './public',
-      ...options?.static,
-    })
+
     .register(import('@fastify/view'), {
       engine: {
         ejs: import('ejs'),
