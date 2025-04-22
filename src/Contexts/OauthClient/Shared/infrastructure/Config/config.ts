@@ -18,7 +18,7 @@ const path = existsSync(filePath) ? filePath : `${cwd()}/.env`
 
 try {
   loadEnvFile(path)
-} finally {
+} catch {
   expand({
     // @ts-expect-error - we are not using the error property
     parsed: env,
