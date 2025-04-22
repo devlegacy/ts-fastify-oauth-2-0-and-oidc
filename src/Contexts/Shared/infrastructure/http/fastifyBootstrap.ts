@@ -4,6 +4,9 @@ import {
 import type {
   FastifyCorsOptions,
 } from '@fastify/cors'
+import type {
+  FastifyStaticOptions,
+} from '@fastify/static'
 import {
   TokenError,
 } from 'fast-jwt'
@@ -17,19 +20,30 @@ import {
 import HttpStatus from 'http-status'
 
 import {
+  config,
+} from '#@/src/Contexts/OauthClient/Shared/infrastructure/Config/config.js'
+import {
   UnauthorizedError,
 } from '#@/src/Contexts/Shared/domain/errors/UnauthorizedError.js'
-import {
-  config,
-} from '#@/src/Contexts/Shared/infrastructure/Config/config.js'
 
-export const fastifyBootstrap = (
+// eslint-disable-next-line max-lines-per-function
+export const fastifyBootstrap = async (
   fastify: FastifyInstance,
   options: {
     autoload: AutoloadPluginOptions
     cors?: FastifyCorsOptions
+    static?: FastifyStaticOptions
   },
 ) => {
+  // Register formbody plugin to handle application/x-www-form-urlencoded
+  await fastify.register(import('@fastify/formbody'))
+  await fastify.register(import('@fastify/multipart'))
+  if (options.static) {
+    fastify.register(import('@fastify/static'), {
+      prefix: '/',
+      ...options?.static,
+    })
+  }
   fastify
     .register(import('@fastify/autoload'), {
       forceESM: true,
@@ -47,6 +61,15 @@ export const fastifyBootstrap = (
     .register(import('@fastify/cors'), options.cors || {})
     .register(import('@fastify/compress'))
     .register(import('@fastify/cookie'))
+
+    .register(import('@fastify/view'), {
+      engine: {
+        ejs: import('ejs'),
+      },
+      layout: `./src/Contexts/Shared/infrastructure/layout.ejs`,
+      includeViewExtension: true,
+      viewExt: 'ejs',
+    })
     // eslint-disable-next-line complexity
     .setErrorHandler((err: FastifyError, req: FastifyRequest, res: FastifyReply) => {
       // Capture error

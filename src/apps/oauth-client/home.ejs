@@ -1,0 +1,80 @@
+<h1>OAuth</h1>
+
+<ul>
+  <li>
+    <a href='/api/authentication/spotify' title='Connect with Spotify using Authorization Code Flow'>Connect to
+      Spotify</a>
+  </li>
+  <li>
+    <a href='/api/authentication/twitter'
+      title='Connect with Twitter using Authorization Code Flow With Prof Key for Code Exchange'>
+      Connect to Twitter
+    </a>
+  </li>
+  <li>
+    <a href='' class='twitch' rel='noopener noreferrer' title='Connect with Twitch using Implicit flow'>
+      Connect with Twitch
+    </a>
+  </li>
+  <li>
+    <a href='/api/authentication/discord' title='Connect with Discord using Client Credentials Flow'>
+      Connect with Discord
+    </a>
+  </li>
+  <li>
+    <a href='/api/authentication/auth0' title='Connect with Auth0 using Resource Owner Password Flow'>
+      Connect with Auth0
+    </a>
+  </li>
+  <li>
+    <a href='' title='Connect with Auth0 using Implicit Flow With Form Post' class='auth0'>Connect with Auth0</a>
+  </li>
+  <li>
+    <a href='<%= LOCAL_AUTHORIZATION_URL %>?client_id=<%= LOCAL_CLIENT_ID %>&redirect_uri=<%= LOCAL_REDIRECT_URI %>&response_type=code'
+      title='Connect with Github using Client Credentials Flow'>
+      Connect with local Oauth Server
+    </a>
+  </li>
+</ul>
+
+<script type="module">
+  import { randomState } from '/randomState.js'
+
+  (() => {
+    const twitchScopes = [
+      'user:read:email',
+      'user:read:follows',
+    ]
+    const parameters = {
+      response_type: 'token',
+      client_id: "<%= TWITCH_CLIENT_ID %>",
+      redirect_uri: "<%= TWITCH_REDIRECT_URI %>",
+      scope: twitchScopes.join(' '),
+      state: randomState.find('oauth_twitch_state'),
+    }
+    const queryParams = new URLSearchParams(parameters).toString()
+    const url = new URL(`<%= TWITCH_AUTHORIZATION_URL %>?${queryParams}`)
+    document.querySelector('.twitch')?.setAttribute('href', url)
+  })();
+  (() => {
+    const scopes = ['openid', 'email', 'read:sample'];
+    // el state es un valor aleatorio que se genera para cada solicitud y garantiza que la sesión sea única entre el cliente y el servidor
+    const state = randomState.find('oauth_auth0_state') // random string
+    // garantiza que los id tokens son únicos y no se pueden reutilizar
+    // for the nonce, para el momento presente
+    // nonce, un valor que se usa solo una vez
+    const nonce = randomState.find('oauth_auth0_nonce', true) // random crypto string
+    const parameters = {
+      response_type: 'id_token token',
+      response_mode: 'form_post',
+      client_id: "<%= AUTH0_CLIENT_ID %>",
+      redirect_uri: "<%= AUTH0_REDIRECT_URI %>",
+      scope: scopes.join(' '),
+      state,
+      nonce,
+    }
+    const queryParams = new URLSearchParams(parameters).toString()
+    const url = new URL(`<%= AUTH0_AUTHORIZATION_URL %>?${queryParams}`)
+    document.querySelector('.auth0')?.setAttribute('href', url)
+  })();
+</script>

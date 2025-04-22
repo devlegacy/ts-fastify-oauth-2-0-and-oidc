@@ -4,11 +4,13 @@ import {
 } from 'fast-jwt'
 import jwksClient from 'jwks-rsa'
 
+// 1. Receives the incoming access token (JWT).
 export const accessTokenJwksValidator = async (accessToken: string, jwksUri: string) => {
   const client = jwksClient({
     jwksUri,
   })
 
+  // 2. Extracts the kid from the JWT header.
   const decodedHeader = createDecoder({
     complete: true,
   })(accessToken) as { header: { kid: string } }
@@ -32,9 +34,13 @@ export const accessTokenJwksValidator = async (accessToken: string, jwksUri: str
       })
     })
   }
+  // 3. Uses the jwks-rsa client to get the public key corresponding to the kid from the JWKS endpoint.
   const key = await getKey(decodedHeader.header.kid)
   const verifyToken = createVerifier({
     key,
   })
-  return verifyToken(accessToken)
+  // 4. Calls jose.jwtVerify, passing the token, the fetched public key, and validation options (issuer, audience).
+  const tokenDecoded = verifyToken(accessToken) as { nonce: string }
+  // 5. If jose.jwtVerify succeeds, the token is valid, and the function might return the decoded payload.
+  return tokenDecoded
 }

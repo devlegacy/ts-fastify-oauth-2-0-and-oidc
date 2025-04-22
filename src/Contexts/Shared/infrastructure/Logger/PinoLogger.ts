@@ -4,7 +4,9 @@ import {
 
 import pino,
 {
+  type Level,
   type LoggerOptions,
+  type StreamEntry,
 } from 'pino'
 import {
   default as PinoPretty,
@@ -12,20 +14,22 @@ import {
 
 const MESSAGE_KEY = 'message'
 
-// @ts-expect-error - This is a valid configuration
 const stream = PinoPretty({
   colorize: true, // colorizes the log
+  colorizeObjects: true,
   destination: 1,
   ignore: 'pid,hostname',
   levelFirst: true,
   translateTime: 'yyyy-dd-mm, h:MM:ss TT',
   messageKey: MESSAGE_KEY,
+
 })
-const streams = [
-  {
-    stream,
-  },
-]
+const streams = (level: Level = 'info'): StreamEntry[] => [
+  stream,
+].map((stream) => ({
+  stream,
+  level,
+}))
 
 /**
  * Read more on: https://getpino.io/#/
@@ -36,7 +40,7 @@ const logger = (options: LoggerOptions = {}) => pino.pino(
     messageKey: MESSAGE_KEY,
     base: null,
   },
-  pino.multistream(streams),
+  pino.multistream(streams((options.level || 'info') as Level)),
 )
 
 const deepLog = <T = unknown>(data: T) =>

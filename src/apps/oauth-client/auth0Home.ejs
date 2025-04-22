@@ -1,0 +1,40 @@
+<h1>
+  <%= accessToken %>
+</h1>
+
+<code id="accessToken"></code>
+<code id="idToken"></code>
+<script type="module">
+  import { hashParams } from '/hashParams.js'
+
+  const queryAccessToken = hashParams.parser('access_token')
+  const queryIdToken = hashParams.parser('id_token')
+
+  const queryState = hashParams.parser('state')
+  const sessionState = sessionStorage.getItem('oauth_auth0_state')
+
+  const queryNonce = hashParams.parser('nonce')
+  const sessionNonce = sessionStorage.getItem('oauth_auth0_nonce')
+
+  if (queryIdToken && queryAccessToken && queryState !== sessionState) {
+    console.error(new Error('ERROR_STATE_MISMATCH'));
+    hashParams.clearUrl();
+    // return setTokens(null);
+  }
+  if (queryIdToken && queryAccessToken && queryNonce !== sessionNonce) {
+    console.error(new Error('ERROR_NONCE_MISMATCH'));
+    hashParams.clearUrl();
+    // return setTokens(null);
+  }
+
+  if (queryAccessToken && queryIdToken) {
+    hashParams.clearUrl();
+    // set tokens to store
+    // setTokens({ accessToken: queryAccessToken, idToken: queryIdToken });
+    document.getElementById('accessToken').textContent = queryAccessToken;
+    document.getElementById('idToken').textContent = queryIdToken;
+  }
+
+  // Remove nonce from session storage
+  // useNonceRemoval(tokens);     sessionStorage.removeItem("nonce");
+</script>

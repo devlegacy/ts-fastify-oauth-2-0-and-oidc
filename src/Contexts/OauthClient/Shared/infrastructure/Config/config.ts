@@ -34,13 +34,13 @@ const config = convict(
           'production',
         ],
         default: 'local' as 'local' | 'development' | 'test' | 'staging' | 'production',
-        env: 'APP_ENV',
+        env: 'OAUT_CLIENT_APP_ENV',
       },
       url: {
         doc: 'The application url.',
         format: 'url',
         default: 'http://localhost:8080',
-        env: 'APP_URL',
+        env: 'OAUT_CLIENT_APP_URL',
       },
     },
     http: {
@@ -48,13 +48,13 @@ const config = convict(
         doc: 'The IP address to bind.',
         format: 'ipaddress',
         default: '0.0.0.0',
-        env: 'HTTP_HOST',
+        env: 'OAUT_CLIENT_HTTP_HOST',
       },
       port: {
         doc: 'The port to bind.',
         format: 'port',
         default: 8080,
-        env: 'HTTP_PORT',
+        env: 'OAUT_CLIENT_HTTP_PORT',
         arg: 'port',
       },
     },
@@ -121,6 +121,14 @@ const config = convict(
         default: 'https://api.spotify.com/v1',
         env: 'SPOTIFY_API_URL',
       },
+      cookie: {
+        accessToken: {
+          doc: 'The name of the cookie to store the access token.',
+          format: String,
+          default: 'spotify_access_token',
+          env: 'SPOTIFY_ACCESS_TOKEN_COOKIE',
+        },
+      },
     },
     twitter: {
       clientId: {
@@ -158,6 +166,26 @@ const config = convict(
         format: 'url',
         default: 'https://api.twitter.com/2',
         env: 'TWITTER_API_URL',
+      },
+      cookie: {
+        accessToken: {
+          doc: 'The name of the cookie to store the access token.',
+          format: String,
+          default: 'twitter_access_token',
+          env: 'TWITTER_ACCESS_TOKEN_COOKIE',
+        },
+        oauthCodeVerifier: {
+          doc: 'The name of the cookie to store the verifier.',
+          format: String,
+          default: 'oauth_twitter_code_verifier',
+          env: 'TWITTER_OAUTH_CODE_VERIFIER_COOKIE',
+        },
+        oauthState: {
+          doc: 'The name of the cookie to store the state.',
+          format: String,
+          default: 'oauth_twitter_state',
+          env: 'TWITTER_OAUTH_STATE_COOKIE',
+        },
       },
     },
     twitch: {
@@ -267,7 +295,91 @@ const config = convict(
         default: '',
         env: 'AUTH0_PASSWORD',
       },
+      cookie: {
+        accessToken: {
+          doc: 'The name of the cookie to store the access token.',
+          format: String,
+          default: 'auth0_access_token',
+          env: 'AUTH0_ACCESS_TOKEN_COOKIE',
+        },
+      },
     },
+    local: {
+      clientId: {
+        doc: 'The Local client id.',
+        format: String,
+        default: 'thirdpartyapp',
+        env: 'LOCAL_CLIENT_ID',
+      },
+      clientSecret: {
+        doc: 'The Local client secret.',
+        format: String,
+        default: 'secret',
+        env: 'LOCAL_CLIENT_SECRET',
+      },
+      authorizationUrl: {
+        doc: 'The Local authorization url.',
+        format: 'url',
+        default: 'http://localhost:8081/oauth/authorize',
+        env: 'LOCAL_AUTHORIZATION_URL',
+      },
+      redirectUri: {
+        doc: 'The Local redirect uri.',
+        format: 'url',
+        default: 'http://localhost:8080/api/authentication/local/callback',
+        env: 'LOCAL_REDIRECT_URI',
+      },
+      tokenUrl: {
+        doc: 'The Local token url.',
+        format: 'url',
+        default: 'http://localhost:8081/oauth/token',
+        env: 'LOCAL_TOKEN_URL',
+      },
+      testUrl: {
+        doc: 'The Local test url.',
+        format: 'url',
+        default: 'http://localhost:8081/private',
+        env: 'LOCAL_TEST_URL',
+      },
+    },
+    // azure: {
+    //   clientId: {
+    //     doc: 'The Azure client id.',
+    //     format: String,
+    //     default: '',
+    //     env: 'AZURE_CLIENT_ID',
+    //   },
+    //   clientSecret: {
+    //     doc: 'The Azure client secret.',
+    //     format: String,
+    //     default: '',
+    //     env: 'AZURE_CLIENT_SECRET',
+    //   },
+    //   // tokenUrl: {
+    //   //   doc: 'The Azure token url.',
+    //   //   format: 'url',
+    //   //   default: '',
+    //   //   env: 'AZURE_TOKEN_URL',
+    //   // },
+    //   redirectUri: {
+    //     doc: 'The Azure redirect uri.',
+    //     format: 'url',
+    //     default: '',
+    //     env: 'AZURE_REDIRECT_URI',
+    //   },
+    //   // authorizationUrl: {
+    //   //   doc: 'The Azure authorization url.',
+    //   //   format: 'url',
+    //   //   default: '',
+    //   //   env: 'AZURE_AUTHORIZATION_URL',
+    //   // },
+    //   // apiUrl: {
+    //   //   doc: 'The Azure api url.',
+    //   //   format: 'url',
+    //   //   default: '',
+    //   //   env: 'AZURE_API_URL',
+    //   // },
+    // },
   },
 )
 

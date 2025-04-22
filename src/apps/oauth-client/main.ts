@@ -4,7 +4,7 @@ import process, {
 
 import {
   config,
-} from '#@/src/Contexts/Shared/infrastructure/Config/config.js'
+} from '#@/src/Contexts/OauthClient/Shared/infrastructure/Config/config.js'
 import {
   error,
 } from '#@/src/Contexts/Shared/infrastructure/Logger/PinoLogger.js'

@@ -13,6 +13,10 @@ const users = [
   },
 ]
 
+/**
+ *
+ * This is in infrastructure layer because it is emulating a database call even though the code reflects a domain behavior.
+ */
 export const getUser = (username: string, password: string) => {
   const user = users.find((user) => user.username === username)
 
