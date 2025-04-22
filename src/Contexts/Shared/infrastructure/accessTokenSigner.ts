@@ -9,17 +9,14 @@ import {
 import {
   ONE_SECOND_IN_MILLISECONDS,
 } from '#@/src/Contexts/Shared/domain/time.js'
-import {
-  config,
-} from '#@/src/Contexts/Shared/infrastructure/Config/config.js'
 
 type SignerOptionsType = SignerOptions & Record<string, string | number>
 
 // fastJwtAccessTokenSigner
 // jwtAccessTokenSigner
 // libraryAccessTokenSigner
-export const accessTokenSigner = (user: { id: string, fullName: string }) => {
-  const expirationTimeInMilliseconds = config.get('accessToken.expirationTime') * ONE_SECOND_IN_MILLISECONDS
+export const accessTokenSigner = (user: { id: string, fullName: string }, config: { expirationTime: number, secret: string }) => {
+  const expirationTimeInMilliseconds = config.expirationTime * ONE_SECOND_IN_MILLISECONDS
   const expiresIn = expirationTimeInMilliseconds
   // const expiresIn = Date.now() + expiresIn
   // const expiresIn = Date.now() + ONE_MINUTE_IN_MILLISECONDS
@@ -53,7 +50,7 @@ export const accessTokenSigner = (user: { id: string, fullName: string }) => {
   }
 
   const signSync = createSigner({
-    key: config.get('accessToken.secret'),
+    key: config.secret,
     algorithm: 'HS256', // symmetric algorithm
     ...registeredClaims,
     ...publicClaims,

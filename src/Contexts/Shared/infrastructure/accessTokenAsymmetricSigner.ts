@@ -19,14 +19,14 @@ import {
 import {
   ONE_SECOND_IN_MILLISECONDS,
 } from '#@/src/Contexts/Shared/domain/time.js'
-import {
-  config,
-} from '#@/src/Contexts/Shared/infrastructure/Config/config.js'
 
 type SignerOptionsType = SignerOptions & Record<string, string | number>
 
-export const accessTokenAsymmetricSigner = (user: { id: string, fullName: string }) => {
-  const expirationTimeInMilliseconds = config.get('accessToken.expirationTime') * ONE_SECOND_IN_MILLISECONDS
+export const accessTokenAsymmetricSigner = (
+  user: { id: string, fullName: string },
+  config: { expirationTime: number, privateKeyPath: string },
+) => {
+  const expirationTimeInMilliseconds = config.expirationTime * ONE_SECOND_IN_MILLISECONDS
   const expiresIn = expirationTimeInMilliseconds
   /**
    * [JSON Web Token (JWT)](https://www.iana.org/assignments/jwt/jwt.xhtml)
@@ -56,7 +56,7 @@ export const accessTokenAsymmetricSigner = (user: { id: string, fullName: string
     ref: '',
   }
 
-  const privateKey = readFileSync(resolve(cwd(), config.get('accessToken.privateKeyPath')), 'utf8')
+  const privateKey = readFileSync(resolve(cwd(), config.privateKeyPath), 'utf8')
   const signSync = createSigner({
     key: privateKey,
     algorithm: 'RS256', // asymmetric algorithm

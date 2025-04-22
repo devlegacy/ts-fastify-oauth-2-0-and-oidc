@@ -10,17 +10,14 @@ import {
 import {
   ONE_SECOND_IN_MILLISECONDS,
 } from '#@/src/Contexts/Shared/domain/time.js'
-import {
-  config,
-} from '#@/src/Contexts/Shared/infrastructure/Config/config.js'
 
 // this is an accessTokenVerifier and accessTokenExpirationVerifier
 // fastJwtAccessTokenVerifier
 // jwtAccessTokenVerifier
 // libraryAccessTokenVerifier
-export const accessTokenVerifier = (accessToken: string) => {
+export const accessTokenVerifier = (accessToken: string, config: { secret: string }) => {
   const verifySync = createVerifier({
-    key: config.get('accessToken.secret'),
+    key: config.secret,
     cache: true,
     ignoreExpiration: false,
 

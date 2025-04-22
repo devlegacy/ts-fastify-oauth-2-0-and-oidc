@@ -15,12 +15,9 @@ import {
 import {
   ONE_SECOND_IN_MILLISECONDS,
 } from '#@/src/Contexts/Shared/domain/time.js'
-import {
-  config,
-} from '#@/src/Contexts/Shared/infrastructure/Config/config.js'
 
-export const accessTokenAsymmetricVerifier = (accessToken: string) => {
-  const publicKey = readFileSync(resolve(cwd(), config.get('accessToken.publicKeyPath')), 'utf8')
+export const accessTokenAsymmetricVerifier = (accessToken: string, config: { publicKeyPath: string }) => {
+  const publicKey = readFileSync(resolve(cwd(), config.publicKeyPath), 'utf8')
   const verifySync = createVerifier({
     key: publicKey,
     cache: true,
