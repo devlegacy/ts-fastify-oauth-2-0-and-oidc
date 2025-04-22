@@ -13,16 +13,21 @@ import {
   expand,
 } from 'dotenv-expand'
 
+import {
+  warn,
+} from '#@/src/Contexts/Shared/infrastructure/Logger/PinoLogger.js'
+
 const filePath = `${cwd()}/.${env.APP_ENV}.env`
 const path = existsSync(filePath) ? filePath : `${cwd()}/.env`
 try {
   loadEnvFile(path)
-} catch {
-  expand({
-    // @ts-expect-error - we are not using the error property
-    parsed: env,
-  })
+} catch (error) {
+  warn(`Failed to load environment file from ${path}: ${error instanceof Error ? error.message : ''}`)
 }
+expand({
+  // @ts-expect-error - we are not using the error property
+  parsed: env,
+})
 convict.addFormats(convict_format_with_validator)
 const config = convict(
   {
