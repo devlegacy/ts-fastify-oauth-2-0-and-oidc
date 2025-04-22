@@ -17,6 +17,9 @@ import {
 } from 'undici'
 
 import {
+  config,
+} from '#@/src/Contexts/OauthClient/Shared/infrastructure/Config/config.js'
+import {
   ONE_MINUTE_IN_MILLISECONDS,
 } from '#@/src/Contexts/Shared/domain/time.js'
 import {
@@ -29,14 +32,11 @@ import {
   codeChallengeGenerator,
 } from '#@/src/Contexts/Shared/infrastructure/codeChallengeGenerator.js'
 import {
-  config,
-} from '#@/src/Contexts/Shared/infrastructure/Config/config.js'
-import {
   getBasicCredentials,
 } from '#@/src/Contexts/Shared/infrastructure/http/getBasicCredentials.js'
 import {
   getUser,
-} from '#@/src/Contexts/Users/infrastructure/getUser.js'
+} from '#@/src/Contexts/Shared/infrastructure/Users/getUser.js'
 // eslint-disable-next-line max-lines-per-function
 export default async function (fastify: FastifyInstance) {
   fastify
@@ -49,7 +49,13 @@ export default async function (fastify: FastifyInstance) {
         } = getBasicCredentials(req)
 
         const user = getUser(username, password)
-        const accessToken = accessTokenSigner(user)
+        const accessToken = accessTokenSigner(
+          user,
+          {
+            expirationTime: config.get('accessToken.expirationTime'),
+            secret: config.get('accessToken.secret'),
+          },
+        )
         return {
           access_token: accessToken,
         }
@@ -337,5 +343,37 @@ export default async function (fastify: FastifyInstance) {
       const query = new URLSearchParams(parameters).toString()
       // # for single page application (SPA)
       res.redirect(`/home/auth0#${query}`)
+    })
+    .get('/authentication/local/callback', async function handler(req: FastifyRequest<{ Querystring: { code: string } }>) {
+      const {
+        code,
+      } = req.query
+
+      const options = {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({
+          grant_type: 'authorization_code',
+          code,
+          redirect_uri: config.get('local.redirectUri'),
+          client_id: config.get('local.clientId'),
+          client_secret: config.get('local.clientSecret'),
+        }).toString(),
+      } satisfies RequestInit
+
+      const oauthRequest = await request(config.get('local.tokenUrl'), options)
+      const oauthResource = await oauthRequest.body.json() as { access_token: string, expires_in: number }
+
+      const data = await request(config.get('local.testUrl'), {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${oauthResource.access_token}`,
+          'Content-Type': 'application/json',
+        },
+      } satisfies RequestInit)
+      const json = await data.body.json()
+      return json
     })
 }

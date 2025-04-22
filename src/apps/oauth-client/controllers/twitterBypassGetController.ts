@@ -8,7 +8,7 @@ import {
 
 import {
   config,
-} from '#@/src/Contexts/Shared/infrastructure/Config/config.js'
+} from '#@/src/Contexts/OauthClient/Shared/infrastructure/Config/config.js'
 
 export default async function (fastify: FastifyInstance) {
   fastify.get(

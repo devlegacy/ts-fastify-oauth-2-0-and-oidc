@@ -22,7 +22,7 @@ import {
 import {
   type Config,
   config,
-} from '#@/src/Contexts/Shared/infrastructure/Config/config.js'
+} from '#@/src/Contexts/OauthClient/Shared/infrastructure/Config/config.js'
 import {
   fastifyBootstrap,
 } from '#@/src/Contexts/Shared/infrastructure/http/fastifyBootstrap.js'
@@ -81,10 +81,16 @@ export class AppBackend {
           AUTH0_CLIENT_ID: config.get('auth0.clientId'),
           AUTH0_REDIRECT_URI: config.get('auth0.redirectUri'),
         }
+        const local = {
+          LOCAL_CLIENT_ID: config.get('local.clientId'),
+          LOCAL_AUTHORIZATION_URL: config.get('local.authorizationUrl'),
+          LOCAL_REDIRECT_URI: config.get('local.redirectUri'),
+        }
         const data = {
           title: 'Home',
           ...twitch,
           ...auth0,
+          ...local,
         }
         return res.viewAsync('./src/apps/oauth-client/home.ejs', data)
       })
