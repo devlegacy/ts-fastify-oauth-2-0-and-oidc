@@ -15,11 +15,14 @@ import {
 
 const filePath = `${cwd()}/.${env.APP_ENV}.env`
 const path = existsSync(filePath) ? filePath : `${cwd()}/.env`
-loadEnvFile(path)
-expand({
-  // @ts-expect-error - we are not using the error property
-  parsed: env,
-})
+try {
+  loadEnvFile(path)
+} finally {
+  expand({
+    // @ts-expect-error - we are not using the error property
+    parsed: env,
+  })
+}
 convict.addFormats(convict_format_with_validator)
 const config = convict(
   {
