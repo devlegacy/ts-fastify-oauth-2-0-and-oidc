@@ -11,12 +11,12 @@
     "build:clean": "rm -Rf ./dist; exit 0",
     "start": "node --env-file=.env ./dist/apps/oauth-client/main.js",
     "start:client:debug": "node --env-file=.env --import @swc-node/register/esm-register --watch --inspect=0.0.0.0:0 ./src/apps/oauth-client/main.ts",
-    "start:server:debug": "node --env-file=.env --import @swc-node/register/esm-register --watch --inspect=0.0.0.0:0 ./src/apps/oauth-client/main.ts",
+    "start:server:debug": "node --env-file=.env --import @swc-node/register/esm-register --watch --inspect=0.0.0.0:0 ./src/apps/oauth-server/main.ts",
     "lint": "eslint --color \"./src/**/*.ts\"",
     "lint:fix": "node --run lint -- --fix",
     "test": "node --run test:unit && node --run test:features",
     "test:coverage": "c8 node --run test:unit && node --run test:features",
-    "test:features": "node --import @swc-node/register/esm-register ./node_modules/@cucumber/cucumber/bin/cucumber-js --config ./cucumber.js -p app_backend",
+    "test:features": "node --import @swc-node/register/esm-register ./node_modules/@cucumber/cucumber/bin/cucumber-js --config ./cucumber.js -p oauth_client",
     "test:unit": "node --env-file=.env --import @swc-node/register/esm-register --test ./tests/**/*.test.ts"
   },
   "imports": {
@@ -52,7 +52,7 @@
     "@commitlint/cli": "19.8.0",
     "@commitlint/config-conventional": "19.8.0",
     "@cucumber/cucumber": "11.2.0",
-    "@eslint/js": "9.25.0",
+    "@eslint/js": "9.25.1",
     "@stylistic/eslint-plugin": "4.2.0",
     "@swc-node/register": "1.10.10",
     "@swc/cli": "0.7.3",
@@ -67,7 +67,7 @@
     "@types/uuid": "10.0.0",
     "c8": "10.1.3",
     "cz-git": "1.11.1",
-    "eslint": "9.25.0",
+    "eslint": "9.25.1",
     "eslint-plugin-import": "2.31.0",
     "eslint-plugin-security": "3.0.1",
     "eslint-plugin-simple-import-sort": "12.1.1",
@@ -79,7 +79,7 @@
     "supertest": "7.1.0",
     "ts-node": "10.9.2",
     "typescript": "5.8.3",
-    "typescript-eslint": "8.30.1"
+    "typescript-eslint": "8.31.0"
   },
   "engines": {
     "node": ">=22",
@@ -88,5 +88,5 @@
   },
   "engineStrict": true,
   "private": true,
-  "packageManager": "pnpm@10.8.1+sha512.c50088ba998c67b8ca8c99df8a5e02fd2ae2e2b29aaf238feaa9e124248d3f48f9fb6db2424949ff901cffbb5e0f0cc1ad6aedb602cd29450751d11c35023677"
+  "packageManager": "pnpm@10.9.0+sha512.0486e394640d3c1fb3c9d43d49cf92879ff74f8516959c235308f5a8f62e2e19528a65cdc2a3058f587cde71eba3d5b56327c8c33a97e4c4051ca48a10ca2d5f"
 }

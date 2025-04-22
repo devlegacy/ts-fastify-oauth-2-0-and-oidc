@@ -17,11 +17,11 @@ import {
   AppBackend,
 } from '#@/src/apps/oauth-client/server.js'
 import {
+  config,
+} from '#@/src/Contexts/OauthClient/Shared/infrastructure/Config/config.js'
+import {
   ONE_SECOND_IN_MILLISECONDS,
 } from '#@/src/Contexts/Shared/domain/time.js'
-import {
-  config,
-} from '#@/src/Contexts/Shared/infrastructure/Config/config.js'
 
 const application = new AppBackend(config)
 
