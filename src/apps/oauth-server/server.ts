@@ -9,6 +9,7 @@ import {
   dirname,
   resolve,
 } from 'node:path'
+import process from 'node:process'
 import {
   fileURLToPath,
 } from 'node:url'
@@ -19,9 +20,6 @@ import Fastify, {
   type PrintRoutesOptions,
 } from 'fastify'
 import OAuth2Server from 'oauth2-server'
-import {
-  v7,
-} from 'uuid'
 
 import {
   type Config,
@@ -34,6 +32,9 @@ import {
   info,
   logger,
 } from '#@/src/Contexts/Shared/infrastructure/Logger/PinoLogger.js'
+import {
+  getUser,
+} from '#@/src/Contexts/Shared/infrastructure/Users/getUser.js'
 
 const fastify = Fastify({
   loggerInstance: logger() as FastifyBaseLogger,
@@ -51,15 +52,6 @@ const {
   Response,
 } = OAuth2Server
 
-const users = [
-  {
-    id: v7(),
-    name: 'Samuel R.',
-    username: 'jstsamuel',
-    password: '123456',
-  },
-]
-
 const db = {
   authorizationCode: {
     authorizationCode: '',
@@ -70,15 +62,14 @@ const db = {
   },
   client: {
     id: config.get('local.clientId'),
-    clientId: config.get('local.clientId'),
-    clientSecret: config.get('local.clientSecret'),
     redirectUris: [
       config.get('local.redirectUri'),
     ],
     grants: [
       'authorization_code',
     ],
-  } satisfies OAuth2Server.Client,
+    clientSecret: config.get('local.clientSecret'),
+  },
   token: {
     accessToken: '',
     accessTokenExpiresAt: new Date(),
@@ -90,10 +81,24 @@ const db = {
 const oauth = new OAuth2Server({
   // @ts-expect-error model is not fully typed and implement, the functions have params that we are not using
   model: {
-    async getClient() {
+    async getClient(clientId, clientSecret): Promise<OAuth2Server.Client> {
+      info(
+        {
+          clientId,
+          clientSecret,
+        },
+        'getClient',
+      )
+
       return db.client
     },
-    async saveAuthorizationCode(code: OAuth2Server.AuthorizationCode, client: OAuth2Server.Client, user: OAuth2Server.User) {
+    async saveAuthorizationCode(code, client, user): Promise<OAuth2Server.AuthorizationCode> {
+      info({
+        code,
+        client,
+        user,
+      }, 'saveAuthorizationCode')
+
       db.authorizationCode = {
         authorizationCode: code.authorizationCode,
         expiresAt: code.expiresAt,
@@ -102,12 +107,24 @@ const oauth = new OAuth2Server({
         user,
       }
 
+      return {
+        ...db.authorizationCode,
+        client,
+        user,
+      }
+    },
+    async getAuthorizationCode(authorizationCode) {
+      info({
+        authorizationCode,
+      }, 'getAuthorizationCode')
+
       return db.authorizationCode as OAuth2Server.AuthorizationCode
     },
-    async getAuthorizationCode() {
-      return db.authorizationCode as OAuth2Server.AuthorizationCode
-    },
-    async revokeAuthorizationCode() {
+    async revokeAuthorizationCode(code) {
+      info({
+        code,
+      }, 'revokeAuthorizationCode')
+
       db.authorizationCode = {
         authorizationCode: '',
         expiresAt: new Date(),
@@ -117,22 +134,38 @@ const oauth = new OAuth2Server({
       }
       return true
     },
-    async saveToken(token: OAuth2Server.Token, client: OAuth2Server.Client, user: OAuth2Server.User) {
+    async saveToken(token, client, user) {
+      info({
+        token,
+        client,
+        user,
+      }, 'saveToken')
+
       db.token = {
         accessToken: token.accessToken,
         accessTokenExpiresAt: token.accessTokenExpiresAt as Date,
         client,
         user,
       }
-      return db.token as OAuth2Server.Token
+
+      return {
+        ...db.token,
+        client,
+        user,
+      }
     },
     async getAccessToken(token) {
-      if (token !== db.token.accessToken) {
+      if (!token && token !== db.token.accessToken) {
         throw new Error('Token not found')
       }
       return db.token as OAuth2Server.Token
     },
-    async generateAuthorizationCode() {
+    async generateAuthorizationCode(client, user, scope) {
+      info({
+        client,
+        user,
+        scope,
+      }, 'generateAuthorizationCode')
       const seed = randomBytes(256)
       const code = createHash('sha1').update(seed)
         .digest('hex')
@@ -177,15 +210,15 @@ export class AppBackend {
               <input type="hidden" name="client_id" value="${req?.query?.client_id || ''}" />
               <input type="hidden" name="redirect_uri" value="${req?.query?.redirect_uri || ''}" />
               <input type="hidden" name="response_type" value="code" />
-              <input type="hidden" name="username" value="jstsamuel" />
-              <input type="hidden" name="password" value="123456" />
+              <input type="hidden" name="username" value="${process.env.USER_USERNAME}" />
+              <input type="hidden" name="password" value="${process.env.USER_PASSWORD}" />
 
               <button type="submit">Authorize</button>
             </form>
           `)
       })
       .post('/oauth/authorize', async (req: FastifyRequest<{ Body: { client_id: string, redirect_uri: string, response_type: string, username: string, password: string } }>, res) => {
-        const user = users.find((u) => u.username === req.body.username && u.password === req.body.password)
+        const user = getUser(req.body.username, req.body.password)
         if (!user) {
           throw new Error('User not found')
         }
@@ -208,7 +241,7 @@ export class AppBackend {
             },
           },
         )
-        const clientRedirect = new URL(`${redirect_uri}?code=${code.authorizationCode}&state=1234`)
+        const clientRedirect = new URL(`${redirect_uri}?code=${code.authorizationCode}&state=${randomBytes(16).toString('base64')}`)
         res.redirect(clientRedirect.toString())
       })
       .post('/oauth/token', async (req: FastifyRequest<{ Body: { client_id: string, client_secret: string, code: string, redirect_uri: string, grant_type: string } }>, res) => {
@@ -226,8 +259,12 @@ export class AppBackend {
       .get('/private', async (req: FastifyRequest, res) => {
         const request = new Request(req)
         const response = new Response(res)
-        await oauth.authenticate(request, response)
-        return {}
+        const token = await oauth.authenticate(request, response)
+        return {
+          id: token.user?.id,
+          username: token.user?.username,
+          fullName: token.user?.fullName,
+        }
       })
     await this.#adapter.listen(this.#config.get('http'))
     if (this.#config.get('app.env') === 'local') {
