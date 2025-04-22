@@ -50,9 +50,9 @@
 
 ## Open Authorization (OAuth) & OpenID Connect (OIDC)
 
-- OAuth is an open standard for access delegation, commonly used as a way for Internet users to grant websites or applications access to their information on other websites but without giving them the passwords.
+- OAuth is an open standard `protocol of authorization` for access delegation, commonly used as a way for Internet users to grant websites or applications access to their information on other websites but without giving them the passwords.
 - OIDC is an authentication layer on top of OAuth 2.0, an identity layer that sits on top of the OAuth 2.0 protocol. It allows third-party services to exchange your authentication information without sharing your password.
-
+- protocol !== standard | algorithm | specification
 ## OAuth 2.0
 
 > [!IMPORTANT]
@@ -83,6 +83,7 @@ OAuth permitió la creación de OIDC.
       - Others...
     - Commonly Authorization serve and Resource Server are the same server (We ask to Discord for a token to access the user's data in Discord endpoints).
     - Those can be services like OAuth0, Okta, Amazon Cognito, Keycloak, etc.
+    - Entidades que manejan authentication y authorization de usuarios, obtienen el consentimiento y emiten tokens de acceso en el contexto de Oauth2.0. Guardian que controla el acceso a los recursos del usuario en un servicio.
   - Resource owner 🟧: 👤 User 👨🏾‍💻
   - Resource server 🩷: 🗄️ API Server 🌐 provides endpoints
     - Commonly resource server and Authorization server are the same server. (We access to Discord endpoints with the token that Discord gave us).
