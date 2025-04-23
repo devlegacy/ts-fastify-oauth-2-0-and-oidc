@@ -201,21 +201,20 @@ export class AppBackend {
       },
     })
     this.#adapter
+      .get('/', async (req, res) => {
+        return res.viewAsync('./src/apps/oauth-server/home.ejs', {
+          title: 'Home',
+        })
+      })
       .get('/oauth/authorize', async (req: FastifyRequest<{ Querystring: { client_id: string, redirect_uri: string } }>, res) => {
-        res
-          .type('text/html')
-          .send(`
-            <form method="POST" action="/oauth/authorize">
-              <p>Authorize ${req?.query?.client_id || ''} to access your account?</p>
-              <input type="hidden" name="client_id" value="${req?.query?.client_id || ''}" />
-              <input type="hidden" name="redirect_uri" value="${req?.query?.redirect_uri || ''}" />
-              <input type="hidden" name="response_type" value="code" />
-              <input type="hidden" name="username" value="${process.env.USER_USERNAME}" />
-              <input type="hidden" name="password" value="${process.env.USER_PASSWORD}" />
-
-              <button type="submit">Authorize</button>
-            </form>
-          `)
+        const data = {
+          title: 'Concern Authorization',
+          client_id: req.query.client_id || '',
+          redirect_uri: req.query.redirect_uri || '',
+          USER_USERNAME: process.env.USER_USERNAME || '',
+          USER_PASSWORD: process.env.USER_PASSWORD || '',
+        }
+        return res.viewAsync('./src/apps/oauth-server/authorize.ejs', data)
       })
       .post('/oauth/authorize', async (req: FastifyRequest<{ Body: { client_id: string, redirect_uri: string, response_type: string, username: string, password: string } }>, res) => {
         const user = getUser(req.body.username, req.body.password)
