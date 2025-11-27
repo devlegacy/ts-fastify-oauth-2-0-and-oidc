@@ -236,6 +236,18 @@ const config = convict(
         default: '',
         env: 'DISCORD_CLIENT_SECRET',
       },
+      authorizationUrl: {
+        doc: 'The Discord authorization url.',
+        format: 'url',
+        default: 'https://discord.com/oauth2/authorize',
+        env: 'DISCORD_AUTHORIZATION_URL',
+      },
+      redirectUri: {
+        doc: 'The Discord redirect uri.',
+        format: 'url',
+        default: 'http://localhost:8080/api/authentication/discord-special/callback',
+        env: 'DISCORD_REDIRECT_URI',
+      },
       tokenUrl: {
         doc: 'The Discord token url.',
         format: 'url',
@@ -247,6 +259,20 @@ const config = convict(
         format: 'url',
         default: 'https://discord.com/api/v9',
         env: 'DISCORD_API_URL',
+      },
+      cookie: {
+        accessToken: {
+          doc: 'The Discord cookie access token.',
+          format: String,
+          default: 'discord_access_token',
+          env: 'DISCORD_COOKIE_ACCESS_TOKEN',
+        },
+        oauthState: {
+          doc: 'The Discord cookie oauth state.',
+          format: String,
+          default: 'discord_oauth_state',
+          env: 'DISCORD_COOKIE_OAUTH_STATE',
+        },
       },
     },
     auth0: {
