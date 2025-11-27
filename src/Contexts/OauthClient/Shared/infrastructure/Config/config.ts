@@ -275,6 +275,58 @@ const config = convict(
         },
       },
     },
+    google: {
+      clientId: {
+        doc: 'The Google client id.',
+        format: String,
+        default: '',
+        env: 'GOOGLE_CLIENT_ID',
+      },
+      clientSecret: {
+        doc: 'The Google client secret.',
+        format: String,
+        default: '',
+        env: 'GOOGLE_CLIENT_SECRET',
+      },
+      authorizationUrl: {
+        doc: 'The Google authorization url.',
+        format: 'url',
+        default: 'https://accounts.google.com/o/oauth2/v2/auth',
+        env: 'GOOGLE_AUTHORIZATION_URL',
+      },
+      redirectUri: {
+        doc: 'The Google redirect uri.',
+        format: 'url',
+        default: 'http://localhost:8080/api/authentication/google/callback',
+        env: 'GOOGLE_REDIRECT_URI',
+      },
+      tokenUrl: {
+        doc: 'The Google token url.',
+        format: 'url',
+        default: 'https://oauth2.googleapis.com/token',
+        env: 'GOOGLE_TOKEN_URL',
+      },
+      apiUrl: {
+        doc: 'The Google api url.',
+        format: 'url',
+        default: 'https://www.googleapis.com',
+        env: 'GOOGLE_API_URL',
+      },
+      cookie: {
+        accessToken: {
+          doc: 'The Google cookie access token.',
+          format: String,
+          default: 'google_access_token',
+          env: 'GOOGLE_COOKIE_ACCESS_TOKEN',
+        },
+        oauthState: {
+          doc: 'The Google cookie oauth state.',
+          format: String,
+          default: 'google_oauth_state',
+          env: 'GOOGLE_COOKIE_OAUTH_STATE',
+        },
+      },
+    },
     auth0: {
       clientId: {
         doc: 'The Auth0 client id.',
