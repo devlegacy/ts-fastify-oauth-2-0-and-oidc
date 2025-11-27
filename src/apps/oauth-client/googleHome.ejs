@@ -1,0 +1,22 @@
+<h1>
+  <%= title %>
+</h1>
+<h2 class='username'></h2>
+<article class='user-info'></article>
+<script type='module'>
+  const userInfo = JSON.parse('<%- JSON.stringify(userInfo) %>')
+
+  document.querySelector('.username').textContent = userInfo?.name || ''
+  document.querySelector('.user-info').innerHTML = `
+    <div style="margin-bottom: 20px;">
+      <img src="${userInfo?.picture || ''}" alt="Profile Picture" style="width: 100px; height: 100px; border-radius: 50%;">
+    </div>
+    <strong>User ID:</strong> ${userInfo?.id || ''}<br>
+    <strong>Name:</strong> ${userInfo?.name || ''}<br>
+    <strong>Given Name:</strong> ${userInfo?.given_name || ''}<br>
+    <strong>Family Name:</strong> ${userInfo?.family_name || ''}<br>
+    <strong>Email:</strong> ${userInfo?.email || ''}<br>
+    <strong>Email Verified:</strong> ${userInfo?.verified_email ? 'Yes' : 'No'}<br>
+    <strong>Locale:</strong> ${userInfo?.locale || ''}<br>
+  `
+</script>
