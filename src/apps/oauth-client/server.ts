@@ -229,6 +229,34 @@ export class AppBackend {
           accessToken,
         })
       })
+      .get('/home/google', async (req, res) => {
+        const {
+          cookies,
+        } = req
+        const accessToken = cookies[config.get('google.cookie.accessToken')] ?? cookies['google_access_token'] ?? ''
+
+        const headers = new Headers()
+        headers.append('Authorization', `Bearer ${accessToken}`)
+
+        const userInfo = await request(`${config.get('google.apiUrl')}/oauth2/v2/userinfo`, {
+          headers,
+        })
+          .then((response) => response.body.json() as Promise<{
+            id: string
+            email: string
+            verified_email: boolean
+            name: string
+            given_name: string
+            family_name: string
+            picture: string
+            locale: string
+          }>)
+
+        return res.viewAsync('./src/apps/oauth-client/googleHome.ejs', {
+          title: 'Home Google 🔍',
+          userInfo,
+        })
+      })
     await this.#adapter.listen(this.#config.get('http'))
     if (this.#config.get('app.env') === 'local') {
       info(this.#adapter.printRoutes(printRoutesOptions))
