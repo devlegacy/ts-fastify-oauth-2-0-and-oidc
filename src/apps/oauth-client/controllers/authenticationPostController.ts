@@ -289,6 +289,88 @@ export default async function (fastify: FastifyInstance) {
         guilds: guilds.map((guild: { name: string }) => guild.name),
       }
     })
+    .get('/authentication/google', async function handler(_req, res) {
+      const scopes = [
+        'openid',
+        'https://www.googleapis.com/auth/userinfo.email',
+        'https://www.googleapis.com/auth/userinfo.profile',
+      ]
+      const state = randomBytes(16).toString('base64')
+      const authorizationSearchParams = new URLSearchParams({
+        response_type: 'code',
+        client_id: config.get('google.clientId'),
+        scope: scopes.join(' '),
+        redirect_uri: config.get('google.redirectUri'),
+        state,
+        access_type: 'offline',
+        prompt: 'consent',
+      })
+      const authorizationUrl = new URL(config.get('google.authorizationUrl'))
+      authorizationUrl.search = authorizationSearchParams.toString()
+
+      res
+        .setCookie(
+          config.get('google.cookie.oauthState'),
+          state,
+          {
+            path: '/',
+            httpOnly: true,
+          },
+        )
+        .status(HttpStatus.FOUND)
+        .redirect(authorizationUrl.toString())
+    })
+    .get(
+      '/authentication/google/callback',
+      async function handler(req: FastifyRequest<{ Querystring: { code: string, state: string } }>, res) {
+        const {
+          cookies,
+        } = req
+        const state = cookies[config.get('google.cookie.oauthState')] ?? ''
+        if (state !== req.query.state) {
+          return res.status(HttpStatus.BAD_REQUEST).send({
+            error: 'State mismatch - possible CSRF attack',
+          })
+        }
+
+        const options = {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: new URLSearchParams({
+            grant_type: 'authorization_code',
+            code: req.query.code,
+            redirect_uri: config.get('google.redirectUri'),
+            client_id: config.get('google.clientId'),
+            client_secret: config.get('google.clientSecret'),
+          }).toString(),
+        } satisfies RequestInit
+
+        const oauthRequest = await request(config.get('google.tokenUrl'), options)
+        type GoogleTokenResponse = {
+          access_token: string
+          token_type: string
+          expires_in: number
+          refresh_token?: string
+          scope: string
+        }
+        const oauthResource = await oauthRequest.body.json() as GoogleTokenResponse
+
+        res
+          .setCookie(
+            config.get('google.cookie.accessToken'),
+            oauthResource.access_token,
+            {
+              path: '/',
+              httpOnly: true,
+              expires: new Date(Date.now() + oauthResource.expires_in * ONE_MINUTE_IN_MILLISECONDS),
+            },
+          )
+          .status(HttpStatus.FOUND)
+          .redirect('/home/google')
+      },
+    )
     .get('/authentication/auth0', async function handler(req, res) {
       const scopes = [
         'read:sample',

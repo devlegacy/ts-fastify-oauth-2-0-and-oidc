@@ -20,7 +20,7 @@ jobs:
       # fail-fast: false
       matrix:
         # REVIEW: In node 23 we can't use node --run yet
-        node-version: [22.x, 23.x] # current versions + next versions o prepare future migrations
+        node-version: [24.x, 25.x] # current versions + next versions o prepare future migrations
         # node-version: [22.x] # current versions + next versions o prepare future migrations
     steps:
       ## Setup workspace
@@ -47,7 +47,7 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           # cache: npm
-          cache: 'pnpm'
+          cache: "pnpm"
       - name: Cache dependencies 🔒
         id: cache-pnpm-store
         uses: actions/cache@v4
@@ -62,12 +62,12 @@ jobs:
         # npm ci vs npm install
         run: |
           pnpm install --frozen-lockfile
-      - name: pnpm run lint 🧹
+      - name: node --run lint 🧹
         run: |
-          pnpm run lint
+          node --run lint
       - name: pnpm test 🧪
         run: |
-          pnpm run test
-      - name: pnpm run build 🏗️
+          node --run test
+      - name: node --run build 🏗️
         run: |
-          pnpm run build
+          node --run build
