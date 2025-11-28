@@ -1,0 +1,22 @@
+<h1>
+  <%= title %>
+</h1>
+<h2 class='username'></h2>
+<article class='user-info'></article>
+<script type='module'>
+  const userInfo = JSON.parse('<%- JSON.stringify(userInfo) %>')
+
+  document.querySelector('.username').textContent = userInfo?.displayName || ''
+  document.querySelector('.user-info').innerHTML = `
+    <strong>User ID:</strong> ${userInfo?.id || ''}<br>
+    <strong>Display Name:</strong> ${userInfo?.displayName || ''}<br>
+    <strong>Given Name:</strong> ${userInfo?.givenName || ''}<br>
+    <strong>Surname:</strong> ${userInfo?.surname || ''}<br>
+    <strong>User Principal Name:</strong> ${userInfo?.userPrincipalName || ''}<br>
+    <strong>Email:</strong> ${userInfo?.mail || 'N/A'}<br>
+    <strong>Job Title:</strong> ${userInfo?.jobTitle || 'N/A'}<br>
+    <strong>Office Location:</strong> ${userInfo?.officeLocation || 'N/A'}<br>
+    <strong>Mobile Phone:</strong> ${userInfo?.mobilePhone || 'N/A'}<br>
+    <strong>Business Phones:</strong> ${userInfo?.businessPhones?.join(', ') || 'N/A'}<br>
+  `
+</script>

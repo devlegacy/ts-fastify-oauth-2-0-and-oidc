@@ -371,6 +371,186 @@ export default async function (fastify: FastifyInstance) {
           .redirect('/home/google')
       },
     )
+    .get('/authentication/microsoft', async function handler(_req, res) {
+      const scopes = [
+        'openid',
+        'profile',
+        'email',
+        'User.Read',
+      ]
+      const state = randomBytes(16).toString('base64')
+      const authorizationSearchParams = new URLSearchParams({
+        response_type: 'code',
+        client_id: config.get('microsoft.clientId'),
+        scope: scopes.join(' '),
+        redirect_uri: config.get('microsoft.redirectUri'),
+        state,
+        response_mode: 'query',
+      })
+      const authorizationUrl = new URL(config.get('microsoft.authorizationUrl'))
+      authorizationUrl.search = authorizationSearchParams.toString()
+
+      res
+        .setCookie(
+          config.get('microsoft.cookie.oauthState'),
+          state,
+          {
+            path: '/',
+            httpOnly: true,
+          },
+        )
+        .status(HttpStatus.FOUND)
+        .redirect(authorizationUrl.toString())
+    })
+    .get(
+      '/authentication/microsoft/callback',
+      async function handler(req: FastifyRequest<{ Querystring: { code: string, state: string } }>, res) {
+        const {
+          cookies,
+        } = req
+        const state = cookies[config.get('microsoft.cookie.oauthState')] ?? ''
+        if (state !== req.query.state) {
+          return res.status(HttpStatus.BAD_REQUEST).send({
+            error: 'State mismatch - possible CSRF attack',
+          })
+        }
+
+        const tokenParams = new URLSearchParams({
+          grant_type: 'authorization_code',
+          code: req.query.code,
+          redirect_uri: config.get('microsoft.redirectUri'),
+          client_id: config.get('microsoft.clientId'),
+          client_secret: config.get('microsoft.clientSecret'),
+        })
+
+        const options = {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: tokenParams.toString(),
+        } satisfies RequestInit
+
+        const oauthRequest = await request(config.get('microsoft.tokenUrl'), options)
+        const oauthResource = await oauthRequest.body.json() as {
+          access_token?: string
+          token_type?: string
+          expires_in?: number
+          refresh_token?: string
+          scope?: string
+          error?: string
+          error_description?: string
+          error_codes?: number[]
+        }
+
+        if (oauthResource.error) {
+          return res.status(HttpStatus.BAD_REQUEST).send({
+            error: oauthResource.error,
+            error_description: oauthResource.error_description,
+            error_codes: oauthResource.error_codes,
+          })
+        }
+
+        if (!oauthResource.access_token || !oauthResource.expires_in) {
+          return res.status(HttpStatus.BAD_REQUEST).send({
+            error: 'No access token received',
+          })
+        }
+
+        res
+          .setCookie(
+            config.get('microsoft.cookie.accessToken'),
+            oauthResource.access_token,
+            {
+              path: '/',
+              httpOnly: true,
+              expires: new Date(Date.now() + oauthResource.expires_in * ONE_MINUTE_IN_MILLISECONDS),
+            },
+          )
+          .status(HttpStatus.FOUND)
+          .redirect('/home/microsoft')
+      },
+    )
+    .get('/authentication/xbox', async function handler(_req, res) {
+      const scopes = [
+        'Xboxlive.signin',
+        'Xboxlive.offline_access',
+      ]
+      const state = randomBytes(16).toString('base64')
+      const authorizationSearchParams = new URLSearchParams({
+        response_type: 'code',
+        client_id: config.get('xbox.clientId'),
+        scope: scopes.join(' '),
+        redirect_uri: config.get('xbox.redirectUri'),
+        state,
+        response_mode: 'query',
+      })
+      const authorizationUrl = new URL(config.get('xbox.authorizationUrl'))
+      authorizationUrl.search = authorizationSearchParams.toString()
+
+      res
+        .setCookie(
+          config.get('xbox.cookie.oauthState'),
+          state,
+          {
+            path: '/',
+            httpOnly: true,
+          },
+        )
+        .status(HttpStatus.FOUND)
+        .redirect(authorizationUrl.toString())
+    })
+    .get(
+      '/authentication/xbox/callback',
+      async function handler(req: FastifyRequest<{ Querystring: { code: string, state: string } }>, res) {
+        const {
+          cookies,
+        } = req
+        const state = cookies[config.get('xbox.cookie.oauthState')] ?? ''
+        if (state !== req.query.state) {
+          return res.status(HttpStatus.BAD_REQUEST).send({
+            error: 'State mismatch - possible CSRF attack',
+          })
+        }
+
+        const options = {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: new URLSearchParams({
+            grant_type: 'authorization_code',
+            code: req.query.code,
+            redirect_uri: config.get('xbox.redirectUri'),
+            client_id: config.get('xbox.clientId'),
+            client_secret: config.get('xbox.clientSecret'),
+          }).toString(),
+        } satisfies RequestInit
+
+        const oauthRequest = await request(config.get('xbox.tokenUrl'), options)
+        type XboxTokenResponse = {
+          access_token: string
+          token_type: string
+          expires_in: number
+          refresh_token?: string
+          scope: string
+        }
+        const oauthResource = await oauthRequest.body.json() as XboxTokenResponse
+
+        res
+          .setCookie(
+            config.get('xbox.cookie.accessToken'),
+            oauthResource.access_token,
+            {
+              path: '/',
+              httpOnly: true,
+              expires: new Date(Date.now() + oauthResource.expires_in * ONE_MINUTE_IN_MILLISECONDS),
+            },
+          )
+          .status(HttpStatus.FOUND)
+          .redirect('/home/xbox')
+      },
+    )
     .get('/authentication/auth0', async function handler(req, res) {
       const scopes = [
         'read:sample',

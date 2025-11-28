@@ -327,6 +327,140 @@ const config = convict(
         },
       },
     },
+    microsoft: {
+      clientId: {
+        doc: 'The Microsoft client id.',
+        format: String,
+        default: '',
+        env: 'MICROSOFT_CLIENT_ID',
+      },
+      clientSecret: {
+        doc: 'The Microsoft client secret.',
+        format: String,
+        default: '',
+        env: 'MICROSOFT_CLIENT_SECRET',
+      },
+      tenantId: {
+        doc: 'The Microsoft tenant id.',
+        format: String,
+        default: 'consumers',
+        env: 'MICROSOFT_TENANT_ID',
+      },
+      authorizationUrl: {
+        doc: 'The Microsoft authorization url.',
+        format: 'url',
+        default: 'https://login.microsoftonline.com/consumers/oauth2/v2.0/authorize',
+        env: 'MICROSOFT_AUTHORIZATION_URL',
+      },
+      redirectUri: {
+        doc: 'The Microsoft redirect uri.',
+        format: 'url',
+        default: 'http://localhost:8080/api/authentication/microsoft/callback',
+        env: 'MICROSOFT_REDIRECT_URI',
+      },
+      tokenUrl: {
+        doc: 'The Microsoft token url.',
+        format: 'url',
+        default: 'https://login.microsoftonline.com/consumers/oauth2/v2.0/token',
+        env: 'MICROSOFT_TOKEN_URL',
+      },
+      apiUrl: {
+        doc: 'The Microsoft Graph api url.',
+        format: 'url',
+        default: 'https://graph.microsoft.com/v1.0',
+        env: 'MICROSOFT_API_URL',
+      },
+      cookie: {
+        accessToken: {
+          doc: 'The Microsoft cookie access token.',
+          format: String,
+          default: 'microsoft_access_token',
+          env: 'MICROSOFT_COOKIE_ACCESS_TOKEN',
+        },
+        oauthState: {
+          doc: 'The Microsoft cookie oauth state.',
+          format: String,
+          default: 'microsoft_oauth_state',
+          env: 'MICROSOFT_COOKIE_OAUTH_STATE',
+        },
+      },
+    },
+    xbox: {
+      clientId: {
+        doc: 'The Xbox client id (same as Microsoft).',
+        format: String,
+        default: '',
+        env: 'XBOX_CLIENT_ID',
+      },
+      clientSecret: {
+        doc: 'The Xbox client secret (same as Microsoft).',
+        format: String,
+        default: '',
+        env: 'XBOX_CLIENT_SECRET',
+      },
+      tenantId: {
+        doc: 'The Xbox tenant id.',
+        format: String,
+        default: 'consumers',
+        env: 'XBOX_TENANT_ID',
+      },
+      authorizationUrl: {
+        doc: 'The Xbox authorization url.',
+        format: 'url',
+        default: 'https://login.microsoftonline.com/consumers/oauth2/v2.0/authorize',
+        env: 'XBOX_AUTHORIZATION_URL',
+      },
+      redirectUri: {
+        doc: 'The Xbox redirect uri.',
+        format: 'url',
+        default: 'http://localhost:8080/api/authentication/xbox/callback',
+        env: 'XBOX_REDIRECT_URI',
+      },
+      tokenUrl: {
+        doc: 'The Xbox token url.',
+        format: 'url',
+        default: 'https://login.microsoftonline.com/consumers/oauth2/v2.0/token',
+        env: 'XBOX_TOKEN_URL',
+      },
+      xboxLiveAuthUrl: {
+        doc: 'The Xbox Live authentication url.',
+        format: 'url',
+        default: 'https://user.auth.xboxlive.com/user/authenticate',
+        env: 'XBOX_LIVE_AUTH_URL',
+      },
+      xboxLiveXstsUrl: {
+        doc: 'The Xbox Live XSTS url.',
+        format: 'url',
+        default: 'https://xsts.auth.xboxlive.com/xsts/authorize',
+        env: 'XBOX_LIVE_XSTS_URL',
+      },
+      xboxApiUrl: {
+        doc: 'The Xbox api url.',
+        format: 'url',
+        default: 'https://profile.xboxlive.com',
+        env: 'XBOX_API_URL',
+      },
+      cookie: {
+        accessToken: {
+          doc: 'The Xbox cookie access token.',
+          format: String,
+          default: 'xbox_access_token',
+          env: 'XBOX_COOKIE_ACCESS_TOKEN',
+        },
+        oauthState: {
+          doc: 'The Xbox cookie oauth state.',
+          format: String,
+          default: 'xbox_oauth_state',
+          env: 'XBOX_COOKIE_OAUTH_STATE',
+        },
+        xboxToken: {
+          doc: 'The Xbox cookie xbox token.',
+          format: String,
+          default: 'xbox_token',
+          env: 'XBOX_COOKIE_XBOX_TOKEN',
+        },
+      },
+    },
     auth0: {
       clientId: {
         doc: 'The Auth0 client id.',

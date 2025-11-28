@@ -14,6 +14,7 @@ import Fastify, {
   type FastifyBaseLogger,
   type PrintRoutesOptions,
 } from 'fastify'
+import HttpStatus from 'http-status'
 import {
   Headers,
   request,
@@ -229,6 +230,61 @@ export class AppBackend {
           accessToken,
         })
       })
+      .get('/home/discord', async (req, res) => {
+        const {
+          cookies,
+        } = req
+        const accessToken = cookies[config.get('discord.cookie.accessToken')] ?? cookies['discord_access_token'] ?? ''
+
+        const headers = new Headers()
+        headers.append('Authorization', `Bearer ${accessToken}`)
+
+        const [
+          user,
+          guilds,
+          dmChannels,
+        ] = await Promise.all([
+          request(`${config.get('discord.apiUrl')}/users/@me`, {
+            headers,
+          })
+            .then((response) => response.body.json() as Promise<{
+              id: string
+              username: string
+              discriminator: string
+              avatar: string
+              global_name: string
+            }>),
+          request(`${config.get('discord.apiUrl')}/users/@me/guilds`, {
+            headers,
+          })
+            .then((response) => response.body.json() as Promise<{
+              id: string
+              name: string
+              icon: string
+              owner: boolean
+            }[]>),
+          request(`${config.get('discord.apiUrl')}/users/@me/channels`, {
+            headers,
+          })
+            .then((response) => response.body.json() as Promise<{
+              id: string
+              type: number
+              recipients: {
+                id: string
+                username: string
+                discriminator: string
+                avatar: string
+              }[]
+            }[]>),
+        ])
+
+        return res.viewAsync('./src/apps/oauth-client/discordSpecialHome.ejs', {
+          title: 'Home Discord 🎮',
+          user,
+          guilds,
+          dmChannels,
+        })
+      })
       .get('/home/google', async (req, res) => {
         const {
           cookies,
@@ -255,6 +311,142 @@ export class AppBackend {
         return res.viewAsync('./src/apps/oauth-client/googleHome.ejs', {
           title: 'Home Google 🔍',
           userInfo,
+        })
+      })
+      .get('/home/microsoft', async (req, res) => {
+        const {
+          cookies,
+        } = req
+        const accessToken = cookies[config.get('microsoft.cookie.accessToken')] ?? cookies['microsoft_access_token'] ?? ''
+
+        const headers = new Headers()
+        headers.append('Authorization', `Bearer ${accessToken}`)
+
+        const userInfo = await request(`${config.get('microsoft.apiUrl')}/me`, {
+          headers,
+        })
+          .then((response) => response.body.json() as Promise<{
+            id: string
+            displayName: string
+            givenName: string
+            surname: string
+            userPrincipalName: string
+            mail: string
+            jobTitle: string
+            officeLocation: string
+            mobilePhone: string
+            businessPhones: string[]
+          }>)
+
+        return res.viewAsync('./src/apps/oauth-client/microsoftHome.ejs', {
+          title: 'Home Microsoft 🪟',
+          userInfo,
+        })
+      })
+      .get('/home/xbox', async (req, res) => {
+        const {
+          cookies,
+        } = req
+        const accessToken = cookies[config.get('xbox.cookie.accessToken')] ?? cookies['xbox_access_token'] ?? ''
+
+        const headers = new Headers()
+        headers.append('Content-Type', 'application/json')
+        headers.append('Accept', 'application/json')
+
+        // Step 1: Get Xbox Live token
+        const xblAuthResponse = await request(config.get('xbox.xboxLiveAuthUrl'), {
+          method: 'POST',
+          headers,
+          body: JSON.stringify({
+            Properties: {
+              AuthMethod: 'RPS',
+              SiteName: 'user.auth.xboxlive.com',
+              RpsTicket: `d=${accessToken}`,
+            },
+            RelyingParty: 'http://auth.xboxlive.com',
+            TokenType: 'JWT',
+          }),
+        })
+
+        const xblAuth = await xblAuthResponse.body.json() as {
+          Token: string
+          DisplayClaims: {
+            xui: {
+              uhs: string
+            }[]
+          }
+        }
+
+        // Step 2: Get XSTS token
+        const xstsHeaders = new Headers()
+        xstsHeaders.append('Content-Type', 'application/json')
+        xstsHeaders.append('Accept', 'application/json')
+
+        const xstsResponse = await request(config.get('xbox.xboxLiveXstsUrl'), {
+          method: 'POST',
+          headers: xstsHeaders,
+          body: JSON.stringify({
+            Properties: {
+              SandboxId: 'RETAIL',
+              UserTokens: [
+                xblAuth.Token,
+              ],
+            },
+            RelyingParty: 'http://xboxlive.com',
+            TokenType: 'JWT',
+          }),
+        })
+
+        const xsts = await xstsResponse.body.json() as {
+          Token: string
+          DisplayClaims: {
+            xui: {
+              gtg: string
+              xid: string
+              uhs: string
+              agg: string
+              usr: string
+              utr: string
+              prv: string
+            }[]
+          }
+        }
+
+        const xuiData = xsts.DisplayClaims.xui?.[0]
+        if (!xuiData) {
+          return res.status(HttpStatus.BAD_REQUEST).send({
+            error: 'Failed to get Xbox user data',
+          })
+        }
+
+        // Step 3: Get profile using XSTS token
+        const profileHeaders = new Headers()
+        profileHeaders.append('Authorization', `XBL3.0 x=${xuiData.uhs};${xsts.Token}`)
+        profileHeaders.append('Accept-Language', 'en-US')
+        profileHeaders.append('x-xbl-contract-version', '3')
+
+        const xuid = xuiData.xid
+        const settingsQuery = 'Gamertag,GameDisplayName,Gamerscore,ModernGamertag,ModernGamertagSuffix,UniqueModernGamertag'
+        const profileResponse = await request(`${config.get('xbox.xboxApiUrl')}/users/xuid(${xuid})/profile/settings?settings=${settingsQuery}`, {
+          headers: profileHeaders,
+        })
+
+        const profile = await profileResponse.body.json() as {
+          profileUsers: {
+            id: string
+            hostId: string
+            settings: {
+              id: string
+              value: string
+            }[]
+          }[]
+        }
+
+        return res.viewAsync('./src/apps/oauth-client/xboxHome.ejs', {
+          title: 'Home Xbox 🎮',
+          profile,
+          gamertag: xuiData.gtg,
+          xuid,
         })
       })
     await this.#adapter.listen(this.#config.get('http'))

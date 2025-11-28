@@ -1,0 +1,37 @@
+<h1>
+  <%= title %>
+</h1>
+<h2 class='gamertag'></h2>
+<article class='user-info'></article>
+<article class='profile-settings'></article>
+<script type='module'>
+  const profile = JSON.parse('<%- JSON.stringify(profile) %>')
+  const gamertag = '<%- gamertag %>'
+  const xuid = '<%- xuid %>'
+
+  document.querySelector('.gamertag').textContent = gamertag || 'Xbox Player'
+
+  document.querySelector('.user-info').innerHTML = `
+    <strong>Gamertag:</strong> ${gamertag || 'N/A'}<br>
+    <strong>XUID:</strong> ${xuid || 'N/A'}<br>
+  `
+
+  if (profile?.profileUsers?.[0]?.settings) {
+    const settings = profile.profileUsers[0].settings
+    const settingsMap = {}
+    settings.forEach(setting => {
+      settingsMap[setting.id] = setting.value
+    })
+
+    document.querySelector('.profile-settings').innerHTML = `
+      <h3>Profile Information</h3>
+      <strong>Gamertag:</strong> ${settingsMap['Gamertag'] || 'N/A'}<br>
+      <strong>Modern Gamertag:</strong> ${settingsMap['ModernGamertag'] || 'N/A'}${settingsMap['ModernGamertagSuffix'] ? '#' + settingsMap['ModernGamertagSuffix'] : ''}<br>
+      <strong>Unique Modern Gamertag:</strong> ${settingsMap['UniqueModernGamertag'] || 'N/A'}<br>
+      <strong>Game Display Name:</strong> ${settingsMap['GameDisplayName'] || 'N/A'}<br>
+      <strong>Gamerscore:</strong> ${settingsMap['Gamerscore'] || '0'}<br>
+    `
+  } else {
+    document.querySelector('.profile-settings').innerHTML = '<p>No profile settings available</p>'
+  }
+</script>
