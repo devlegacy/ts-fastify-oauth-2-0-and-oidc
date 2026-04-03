@@ -405,7 +405,7 @@ const config = convict(
         env: 'XBOX_TENANT_ID',
       },
       authorizationUrl: {
-        doc: 'The Xbox authorization url.',
+        doc: 'The Xbox authorization url. Derived from tenantId when XBOX_AUTHORIZATION_URL is not set.',
         format: 'url',
         default: 'https://login.microsoftonline.com/consumers/oauth2/v2.0/authorize',
         env: 'XBOX_AUTHORIZATION_URL',
@@ -417,7 +417,7 @@ const config = convict(
         env: 'XBOX_REDIRECT_URI',
       },
       tokenUrl: {
-        doc: 'The Xbox token url.',
+        doc: 'The Xbox token url. Derived from tenantId when XBOX_TOKEN_URL is not set.',
         format: 'url',
         default: 'https://login.microsoftonline.com/consumers/oauth2/v2.0/token',
         env: 'XBOX_TOKEN_URL',
@@ -650,6 +650,15 @@ if (!env.MICROSOFT_AUTHORIZATION_URL) {
 }
 if (!env.MICROSOFT_TOKEN_URL) {
   config.set('microsoft.tokenUrl', `https://login.microsoftonline.com/${microsoftTenantId}/oauth2/v2.0/token`)
+}
+
+// Derive Xbox OAuth URLs from tenantId unless explicitly overridden via env
+const xboxTenantId = config.get('xbox.tenantId')
+if (!env.XBOX_AUTHORIZATION_URL) {
+  config.set('xbox.authorizationUrl', `https://login.microsoftonline.com/${xboxTenantId}/oauth2/v2.0/authorize`)
+}
+if (!env.XBOX_TOKEN_URL) {
+  config.set('xbox.tokenUrl', `https://login.microsoftonline.com/${xboxTenantId}/oauth2/v2.0/token`)
 }
 
 // const _schema = config.getSchema()

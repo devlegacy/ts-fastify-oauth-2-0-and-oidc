@@ -123,6 +123,8 @@ export default async function (fastify: FastifyInstance) {
             {
               path: '/',
               httpOnly: true,
+              sameSite: 'lax',
+              secure: config.get('app.env') !== 'local',
               expires: new Date(Date.now() + oauthResource.expires_in * ONE_SECOND_IN_MILLISECONDS),
             // domain: config.get('app.url'),
             },
@@ -409,6 +411,7 @@ export default async function (fastify: FastifyInstance) {
             path: '/',
             httpOnly: true,
             sameSite: 'lax',
+            secure: config.get('app.env') !== 'local',
           },
         )
         .status(HttpStatus.FOUND)
@@ -776,7 +779,7 @@ export default async function (fastify: FastifyInstance) {
             {
               path: '/',
               httpOnly: true,
-              secure: req.protocol === 'https',
+              secure: config.get('app.env') !== 'local',
               sameSite: 'lax',
               expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
             },

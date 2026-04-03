@@ -71,18 +71,19 @@ async function fetchXboxLiveAuth(accessToken: string): Promise<{ xstsToken: stri
       TokenType: 'JWT',
     }),
   })
+  if (xblAuthResponse.statusCode < 200 || xblAuthResponse.statusCode >= 300) {
+    const body = await xblAuthResponse.body.text()
+    throw new Error(`Xbox Live auth failed with status ${xblAuthResponse.statusCode}: ${body}`)
+  }
   const xblAuth = await xblAuthResponse.body.json() as {
     Token: string
     DisplayClaims: { xui: { uhs: string }[] }
   }
-
-  const xstsHeaders = new Headers()
-  xstsHeaders.append('Content-Type', 'application/json')
-  xstsHeaders.append('Accept', 'application/json')
+  if (!xblAuth.Token) throw new Error('Xbox Live auth response missing Token')
 
   const xstsResponse = await request(config.get('xbox.xboxLiveXstsUrl'), {
     method: 'POST',
-    headers: xstsHeaders,
+    headers: jsonHeaders,
     body: JSON.stringify({
       Properties: {
         SandboxId: 'RETAIL',
@@ -94,11 +95,16 @@ async function fetchXboxLiveAuth(accessToken: string): Promise<{ xstsToken: stri
       TokenType: 'JWT',
     }),
   })
+  if (xstsResponse.statusCode < 200 || xstsResponse.statusCode >= 300) {
+    const body = await xstsResponse.body.text()
+    throw new Error(`XSTS auth failed with status ${xstsResponse.statusCode}: ${body}`)
+  }
   const xsts = await xstsResponse.body.json() as {
     Token: string
     NotAfter: string
     DisplayClaims: { xui: XuiClaims[] }
   }
+  if (!xsts.Token) throw new Error('XSTS response missing Token')
 
   const xuiData = xsts.DisplayClaims.xui?.[0]
   if (!xuiData) throw new Error('No XUI data in XSTS response')
@@ -430,7 +436,7 @@ export class AppBackend {
           try {
             xblResult = await fetchXboxLiveAuth(accessToken)
           } catch (err) {
-            fastify.log.error({
+            req.log.error({
               err,
             }, 'Failed to obtain Xbox Live or XSTS token')
             return res.status(HttpStatus.BAD_GATEWAY).send({
