@@ -42,7 +42,18 @@
     },
     "editor.defaultFormatter": "dbaeumer.vscode-eslint"
   },
+  "github.copilot.chat.commitMessageGeneration.instructions": [
+    { "text": "Format: type(scope): emoji description — conventional commits spec." },
+    { "text": "Allowed types: feat, fix, docs, style, refactor, perf, test, build, ci, chore, revert, wip." },
+    { "text": "Use imperative mood: 'add' not 'added', 'fix' not 'fixed'." },
+    { "text": "Subject line: max 72 characters, no period at end." },
+    { "text": "Scope is optional but recommended: e.g. (auth), (api), (config), (client), (server)." },
+    { "text": "Place emoji after the colon and space: feat(auth): ✨ add OAuth flow. Emoji per type: feat=✨, fix=🐛, docs=📝, refactor=♻️, perf=⚡️, test=✅, chore=🔧, ci=👷, wip=🚧, revert=⏪, style=💄, build=📦." },
+    { "text": "Body: wrap at 200 characters per line, use bullet points (* item) for multiple changes." },
+    { "text": "Breaking changes: add 'BREAKING CHANGE: description' in the footer." }
+  ],
   "eslint.format.enable": true,
   "eslint.useFlatConfig": true,
-  "eslint.validate": ["typescript", "javascript"]
+  "eslint.validate": ["typescript", "javascript"],
+  "js/ts.suggest.completeJSDocs": true
 }
