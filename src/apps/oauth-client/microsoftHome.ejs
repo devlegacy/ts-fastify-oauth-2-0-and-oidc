@@ -7,16 +7,25 @@
   const userInfo = <%- JSON.stringify(userInfo) %>
 
   document.querySelector('.username').textContent = userInfo?.displayName || ''
-  document.querySelector('.user-info').innerHTML = `
-    <strong>User ID:</strong> ${userInfo?.id || ''}<br>
-    <strong>Display Name:</strong> ${userInfo?.displayName || ''}<br>
-    <strong>Given Name:</strong> ${userInfo?.givenName || ''}<br>
-    <strong>Surname:</strong> ${userInfo?.surname || ''}<br>
-    <strong>User Principal Name:</strong> ${userInfo?.userPrincipalName || ''}<br>
-    <strong>Email:</strong> ${userInfo?.mail || 'N/A'}<br>
-    <strong>Job Title:</strong> ${userInfo?.jobTitle || 'N/A'}<br>
-    <strong>Office Location:</strong> ${userInfo?.officeLocation || 'N/A'}<br>
-    <strong>Mobile Phone:</strong> ${userInfo?.mobilePhone || 'N/A'}<br>
-    <strong>Business Phones:</strong> ${userInfo?.businessPhones?.join(', ') || 'N/A'}<br>
-  `
+
+  const appendRow = (container, label, value) => {
+    const div = document.createElement('div')
+    const strong = document.createElement('strong')
+    strong.textContent = label
+    div.appendChild(strong)
+    div.appendChild(document.createTextNode(' ' + value))
+    container.appendChild(div)
+  }
+
+  const userInfoEl = document.querySelector('.user-info')
+  appendRow(userInfoEl, 'User ID:', userInfo?.id || '')
+  appendRow(userInfoEl, 'Display Name:', userInfo?.displayName || '')
+  appendRow(userInfoEl, 'Given Name:', userInfo?.givenName || '')
+  appendRow(userInfoEl, 'Surname:', userInfo?.surname || '')
+  appendRow(userInfoEl, 'User Principal Name:', userInfo?.userPrincipalName || '')
+  appendRow(userInfoEl, 'Email:', userInfo?.mail || 'N/A')
+  appendRow(userInfoEl, 'Job Title:', userInfo?.jobTitle || 'N/A')
+  appendRow(userInfoEl, 'Office Location:', userInfo?.officeLocation || 'N/A')
+  appendRow(userInfoEl, 'Mobile Phone:', userInfo?.mobilePhone || 'N/A')
+  appendRow(userInfoEl, 'Business Phones:', userInfo?.businessPhones?.join(', ') || 'N/A')
 </script>

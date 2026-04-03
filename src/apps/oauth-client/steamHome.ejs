@@ -5,26 +5,66 @@
 <article class='player-info'></article>
 <article class='aliases'></article>
 <script type='module'>
-  const player = JSON.parse('<%- JSON.stringify(player) %>')
-  const aliases = JSON.parse('<%- JSON.stringify(aliases) %>')
+  const player = <%- JSON.stringify(player) %>
+  const aliases = <%- JSON.stringify(aliases) %>
 
   document.querySelector('.username').textContent = player?.personaname || ''
-  document.querySelector('.player-info').innerHTML = `
-    <img src="${player?.avatarfull || ''}" alt="Steam Avatar" style="border-radius: 4px;" /><br>
-    <strong>Steam ID:</strong> ${player?.steamid || ''}<br>
-    <strong>Username:</strong> ${player?.personaname || ''}<br>
-    ${player?.realname ? `<strong>Real Name:</strong> ${player.realname}<br>` : ''}
-    ${player?.loccountrycode ? `<strong>Country:</strong> ${player.loccountrycode}<br>` : ''}
-    <strong>Profile:</strong> <a href="${player?.profileurl || ''}" target="_blank" rel="noopener noreferrer">View on Steam</a>
-  `
-  document.querySelector('.aliases').innerHTML = aliases?.length
-    ? `
-      <strong>Also played as (${aliases.length}):</strong><br>
-      ${aliases.map((alias) => `
-        <div style="margin: 5px 0;">
-          ${alias.newname} <span style="color: gray; font-size: 0.85em;">(${alias.timechanged})</span>
-        </div>
-      `).join('')}
-    `
-    : ''
+
+  const appendRow = (container, label, value) => {
+    const div = document.createElement('div')
+    const strong = document.createElement('strong')
+    strong.textContent = label
+    div.appendChild(strong)
+    div.appendChild(document.createTextNode(' ' + value))
+    container.appendChild(div)
+  }
+
+  const playerInfoEl = document.querySelector('.player-info')
+
+  if (player?.avatarfull) {
+    const img = document.createElement('img')
+    img.src = player.avatarfull
+    img.alt = 'Steam Avatar'
+    img.style.borderRadius = '4px'
+    playerInfoEl.appendChild(img)
+    playerInfoEl.appendChild(document.createElement('br'))
+  }
+
+  appendRow(playerInfoEl, 'Steam ID:', player?.steamid || '')
+  appendRow(playerInfoEl, 'Username:', player?.personaname || '')
+  if (player?.realname) appendRow(playerInfoEl, 'Real Name:', player.realname)
+  if (player?.loccountrycode) appendRow(playerInfoEl, 'Country:', player.loccountrycode)
+
+  if (player?.profileurl) {
+    const div = document.createElement('div')
+    const strong = document.createElement('strong')
+    strong.textContent = 'Profile:'
+    const link = document.createElement('a')
+    link.href = player.profileurl
+    link.target = '_blank'
+    link.rel = 'noopener noreferrer'
+    link.textContent = 'View on Steam'
+    div.appendChild(strong)
+    div.appendChild(document.createTextNode(' '))
+    div.appendChild(link)
+    playerInfoEl.appendChild(div)
+  }
+
+  const aliasesEl = document.querySelector('.aliases')
+  if (aliases?.length) {
+    const label = document.createElement('strong')
+    label.textContent = `Also played as (${aliases.length}):`
+    aliasesEl.appendChild(label)
+    aliases.forEach((alias) => {
+      const div = document.createElement('div')
+      div.style.margin = '5px 0'
+      div.textContent = alias.newname
+      const span = document.createElement('span')
+      span.style.color = 'gray'
+      span.style.fontSize = '0.85em'
+      span.textContent = ` (${alias.timechanged})`
+      div.appendChild(span)
+      aliasesEl.appendChild(div)
+    })
+  }
 </script>

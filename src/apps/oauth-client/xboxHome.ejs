@@ -11,10 +11,18 @@
 
   document.querySelector('.gamertag').textContent = gamertag || 'Xbox Player'
 
-  document.querySelector('.user-info').innerHTML = `
-    <strong>Gamertag:</strong> ${gamertag || 'N/A'}<br>
-    <strong>XUID:</strong> ${xuid || 'N/A'}<br>
-  `
+  const appendRow = (container, label, value) => {
+    const div = document.createElement('div')
+    const strong = document.createElement('strong')
+    strong.textContent = label
+    div.appendChild(strong)
+    div.appendChild(document.createTextNode(' ' + value))
+    container.appendChild(div)
+  }
+
+  const userInfoEl = document.querySelector('.user-info')
+  appendRow(userInfoEl, 'Gamertag:', gamertag || 'N/A')
+  appendRow(userInfoEl, 'XUID:', xuid || 'N/A')
 
   if (profile?.profileUsers?.[0]?.settings) {
     const settings = profile.profileUsers[0].settings
@@ -23,15 +31,18 @@
       settingsMap[setting.id] = setting.value
     })
 
-    document.querySelector('.profile-settings').innerHTML = `
-      <h3>Profile Information</h3>
-      <strong>Gamertag:</strong> ${settingsMap['Gamertag'] || 'N/A'}<br>
-      <strong>Modern Gamertag:</strong> ${settingsMap['ModernGamertag'] || 'N/A'}${settingsMap['ModernGamertagSuffix'] ? '#' + settingsMap['ModernGamertagSuffix'] : ''}<br>
-      <strong>Unique Modern Gamertag:</strong> ${settingsMap['UniqueModernGamertag'] || 'N/A'}<br>
-      <strong>Game Display Name:</strong> ${settingsMap['GameDisplayName'] || 'N/A'}<br>
-      <strong>Gamerscore:</strong> ${settingsMap['Gamerscore'] || '0'}<br>
-    `
+    const profileEl = document.querySelector('.profile-settings')
+    const heading = document.createElement('h3')
+    heading.textContent = 'Profile Information'
+    profileEl.appendChild(heading)
+
+    const suffix = settingsMap['ModernGamertagSuffix'] ? '#' + settingsMap['ModernGamertagSuffix'] : ''
+    appendRow(profileEl, 'Gamertag:', settingsMap['Gamertag'] || 'N/A')
+    appendRow(profileEl, 'Modern Gamertag:', (settingsMap['ModernGamertag'] || 'N/A') + suffix)
+    appendRow(profileEl, 'Unique Modern Gamertag:', settingsMap['UniqueModernGamertag'] || 'N/A')
+    appendRow(profileEl, 'Game Display Name:', settingsMap['GameDisplayName'] || 'N/A')
+    appendRow(profileEl, 'Gamerscore:', settingsMap['Gamerscore'] || '0')
   } else {
-    document.querySelector('.profile-settings').innerHTML = '<p>No profile settings available</p>'
+    document.querySelector('.profile-settings').textContent = 'No profile settings available'
   }
 </script>

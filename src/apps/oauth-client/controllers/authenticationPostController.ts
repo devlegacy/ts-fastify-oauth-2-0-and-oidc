@@ -299,8 +299,8 @@ export default async function (fastify: FastifyInstance) {
       const scopes = [
         'identify',
         'guilds',
+        'dm_channels.read',
         // 'messages.read',
-        // 'dm_channels.read',
         // 'dm_channels.messages.read',
       ]
       const state = randomBytes(16).toString('base64')
@@ -323,6 +323,7 @@ export default async function (fastify: FastifyInstance) {
             path: '/',
             httpOnly: true,
             sameSite: 'lax',
+            secure: config.get('app.env') !== 'local',
           },
         )
         .status(HttpStatus.FOUND)
@@ -493,6 +494,7 @@ export default async function (fastify: FastifyInstance) {
             path: '/',
             httpOnly: true,
             sameSite: 'lax',
+            secure: config.get('app.env') !== 'local',
           },
         )
         .status(HttpStatus.FOUND)
@@ -589,6 +591,7 @@ export default async function (fastify: FastifyInstance) {
             path: '/',
             httpOnly: true,
             sameSite: 'lax',
+            secure: config.get('app.env') !== 'local',
           },
         )
         .status(HttpStatus.FOUND)
@@ -773,6 +776,8 @@ export default async function (fastify: FastifyInstance) {
             {
               path: '/',
               httpOnly: true,
+              secure: req.protocol === 'https',
+              sameSite: 'lax',
               expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
             },
           )

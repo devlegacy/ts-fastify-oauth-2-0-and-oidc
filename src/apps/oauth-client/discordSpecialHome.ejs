@@ -6,30 +6,74 @@
 <article class='guilds'></article>
 <article class='dm-channels'></article>
 <script type='module'>
-  const user = JSON.parse('<%- JSON.stringify(user) %>')
-  const guilds = JSON.parse('<%- JSON.stringify(guilds) %>')
-  const dmChannels = JSON.parse('<%- JSON.stringify(dmChannels) %>')
+  const user = <%- JSON.stringify(user) %>
+  const guilds = <%- JSON.stringify(guilds) %>
+  const dmChannels = <%- JSON.stringify(dmChannels) %>
 
   document.querySelector('.username').textContent = user?.global_name || user?.username || ''
-  document.querySelector('.user-info').innerHTML = `
-    <strong>User ID:</strong> ${user?.id || ''}<br>
-    <strong>Username:</strong> ${user?.username || ''}#${user?.discriminator || '0'}<br>
-    <strong>Profile:</strong> <a href="https://discord.com/users/${user?.id || ''}" target="_blank">View on Discord</a>
-  `
-  document.querySelector('.guilds').innerHTML = `
-    <strong>Guilds (${guilds?.length || 0}):</strong><br>
-    ${guilds?.map((guild) => `
-      <div style="margin: 5px 0;">
-        ${guild.name}${guild.owner ? ' <span style="color: gold;">(Owner)</span>' : ''}
-      </div>
-    `).join('') || 'No guilds found'}
-  `
-  document.querySelector('.dm-channels').innerHTML = `
-    <strong>DM Channels (${dmChannels?.length || 0}):</strong><br>
-    ${dmChannels?.map((channel) => `
-      <div style="margin: 5px 0;">
-        ${channel.recipients?.map(r => `${r.username}#${r.discriminator}`).join(', ') || 'Unknown'}
-      </div>
-    `).join('') || 'No DM channels found'}
-  `
+
+  const appendRow = (container, label, value) => {
+    const div = document.createElement('div')
+    const strong = document.createElement('strong')
+    strong.textContent = label
+    div.appendChild(strong)
+    div.appendChild(document.createTextNode(' ' + value))
+    container.appendChild(div)
+  }
+
+  const userInfoEl = document.querySelector('.user-info')
+  appendRow(userInfoEl, 'User ID:', user?.id || '')
+  appendRow(userInfoEl, 'Username:', `${user?.username || ''}#${user?.discriminator || '0'}`)
+
+  if (user?.id) {
+    const div = document.createElement('div')
+    const strong = document.createElement('strong')
+    strong.textContent = 'Profile:'
+    const link = document.createElement('a')
+    link.href = `https://discord.com/users/${user.id}`
+    link.target = '_blank'
+    link.rel = 'noopener noreferrer'
+    link.textContent = 'View on Discord'
+    div.appendChild(strong)
+    div.appendChild(document.createTextNode(' '))
+    div.appendChild(link)
+    userInfoEl.appendChild(div)
+  }
+
+  const guildsEl = document.querySelector('.guilds')
+  const guildsLabel = document.createElement('strong')
+  guildsLabel.textContent = `Guilds (${guilds?.length || 0}):`
+  guildsEl.appendChild(guildsLabel)
+  if (guilds?.length) {
+    guilds.forEach((guild) => {
+      const div = document.createElement('div')
+      div.style.margin = '5px 0'
+      div.textContent = guild.name
+      if (guild.owner) {
+        const span = document.createElement('span')
+        span.style.color = 'gold'
+        span.textContent = ' (Owner)'
+        div.appendChild(span)
+      }
+      guildsEl.appendChild(div)
+    })
+  } else {
+    guildsEl.appendChild(document.createTextNode(' No guilds found'))
+  }
+
+  const dmEl = document.querySelector('.dm-channels')
+  const dmLabel = document.createElement('strong')
+  dmLabel.textContent = `DM Channels (${dmChannels?.length || 0}):`
+  dmEl.appendChild(dmLabel)
+  if (dmChannels?.length) {
+    dmChannels.forEach((channel) => {
+      const div = document.createElement('div')
+      div.style.margin = '5px 0'
+      const names = channel.recipients?.map(r => `${r.username}#${r.discriminator}`).join(', ') || 'Unknown'
+      div.textContent = names
+      dmEl.appendChild(div)
+    })
+  } else {
+    dmEl.appendChild(document.createTextNode(' No DM channels found'))
+  }
 </script>

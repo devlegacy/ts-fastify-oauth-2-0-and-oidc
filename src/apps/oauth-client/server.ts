@@ -506,6 +506,12 @@ export class AppBackend {
           player,
         ] = playerData.response.players
 
+        if (!player) {
+          return res.status(HttpStatus.BAD_GATEWAY).send({
+            error: 'Unable to retrieve Steam player data',
+          })
+        }
+
         return res.viewAsync('./src/apps/oauth-client/steamHome.ejs', {
           title: 'Home Steam 🎮',
           player,

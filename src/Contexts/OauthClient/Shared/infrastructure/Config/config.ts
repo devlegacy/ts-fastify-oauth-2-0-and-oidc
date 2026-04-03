@@ -453,12 +453,6 @@ const config = convict(
           default: 'xbox_oauth_state',
           env: 'XBOX_COOKIE_OAUTH_STATE',
         },
-        xboxToken: {
-          doc: 'The Xbox cookie xbox token.',
-          format: String,
-          default: 'xbox_token',
-          env: 'XBOX_COOKIE_XBOX_TOKEN',
-        },
       },
     },
     auth0: {
