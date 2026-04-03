@@ -9,7 +9,9 @@ import {
   dirname,
   resolve,
 } from 'node:path'
-import process from 'node:process'
+import {
+  env,
+} from 'node:process'
 import {
   fileURLToPath,
 } from 'node:url'
@@ -211,8 +213,8 @@ export class AppBackend {
           title: 'Concern Authorization',
           client_id: req.query.client_id || '',
           redirect_uri: req.query.redirect_uri || '',
-          USER_USERNAME: process.env.USER_USERNAME || '',
-          USER_PASSWORD: process.env.USER_PASSWORD || '',
+          USER_USERNAME: env.USER_USERNAME || '',
+          USER_PASSWORD: env.USER_PASSWORD || '',
         }
         return res.viewAsync('./src/apps/oauth-server/authorize.ejs', data)
       })

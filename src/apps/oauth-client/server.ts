@@ -53,7 +53,7 @@ type XuiClaims = {
   prv: string
 }
 
-async function fetchXboxLiveAuth(accessToken: string): Promise<{ xstsToken: string, xuiData: XuiClaims }> {
+async function fetchXboxLiveAuth(accessToken: string): Promise<{ xstsToken: string, xuiData: XuiClaims, notAfter: string }> {
   const jsonHeaders = new Headers()
   jsonHeaders.append('Content-Type', 'application/json')
   jsonHeaders.append('Accept', 'application/json')
@@ -96,6 +96,7 @@ async function fetchXboxLiveAuth(accessToken: string): Promise<{ xstsToken: stri
   })
   const xsts = await xstsResponse.body.json() as {
     Token: string
+    NotAfter: string
     DisplayClaims: { xui: XuiClaims[] }
   }
 
@@ -104,6 +105,7 @@ async function fetchXboxLiveAuth(accessToken: string): Promise<{ xstsToken: stri
 
   return {
     xstsToken: xsts.Token,
+    notAfter: xsts.NotAfter,
     xuiData,
   }
 }
@@ -418,15 +420,30 @@ export class AppBackend {
         const accessToken = req.cookies[config.get('xbox.cookie.accessToken')] ?? req.cookies.xbox_access_token ?? ''
         if (!accessToken) return res.status(HttpStatus.FOUND).redirect('/')
 
-        let xblResult!: Awaited<ReturnType<typeof fetchXboxLiveAuth>>
-        try {
-          xblResult = await fetchXboxLiveAuth(accessToken)
-        } catch (err) {
-          fastify.log.error({
-            err,
-          }, 'Failed to obtain Xbox Live or XSTS token')
-          return res.status(HttpStatus.BAD_GATEWAY).send({
-            error: 'Failed to obtain Xbox Live or XSTS token',
+        type CachedXboxToken = Awaited<ReturnType<typeof fetchXboxLiveAuth>>
+        let xblResult!: CachedXboxToken
+
+        const cachedXboxToken = req.cookies[config.get('xbox.cookie.xboxToken')] ?? ''
+        if (cachedXboxToken) {
+          xblResult = JSON.parse(cachedXboxToken) as CachedXboxToken
+        } else {
+          try {
+            xblResult = await fetchXboxLiveAuth(accessToken)
+          } catch (err) {
+            fastify.log.error({
+              err,
+            }, 'Failed to obtain Xbox Live or XSTS token')
+            return res.status(HttpStatus.BAD_GATEWAY).send({
+              error: 'Failed to obtain Xbox Live or XSTS token',
+            })
+          }
+          const maxAge = Math.floor((new Date(xblResult.notAfter).getTime() - Date.now()) / 1000)
+          res.setCookie(config.get('xbox.cookie.xboxToken'), JSON.stringify(xblResult), {
+            path: '/',
+            httpOnly: true,
+            sameSite: 'lax',
+            secure: config.get('app.env') !== 'local',
+            maxAge,
           })
         }
 

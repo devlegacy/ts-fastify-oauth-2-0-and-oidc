@@ -1,4 +1,6 @@
-import process from 'node:process'
+import {
+  env,
+} from 'node:process'
 
 import {
   UnauthorizedError,
@@ -6,10 +8,10 @@ import {
 
 const users = [
   {
-    id: process.env.USER_ID ?? '',
-    username: process.env.USER_USERNAME ?? '',
-    password: process.env.USER_PASSWORD ?? '',
-    fullName: process.env.USER_FULL_NAME ?? '',
+    id: env.USER_ID ?? '',
+    username: env.USER_USERNAME ?? '',
+    password: env.USER_PASSWORD ?? '',
+    fullName: env.USER_FULL_NAME ?? '',
   },
 ]
 

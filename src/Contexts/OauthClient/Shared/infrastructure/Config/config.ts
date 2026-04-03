@@ -347,7 +347,7 @@ const config = convict(
         env: 'MICROSOFT_TENANT_ID',
       },
       authorizationUrl: {
-        doc: 'The Microsoft authorization url.',
+        doc: 'The Microsoft authorization url. Derived from tenantId when MICROSOFT_AUTHORIZATION_URL is not set.',
         format: 'url',
         default: 'https://login.microsoftonline.com/consumers/oauth2/v2.0/authorize',
         env: 'MICROSOFT_AUTHORIZATION_URL',
@@ -359,7 +359,7 @@ const config = convict(
         env: 'MICROSOFT_REDIRECT_URI',
       },
       tokenUrl: {
-        doc: 'The Microsoft token url.',
+        doc: 'The Microsoft token url. Derived from tenantId when MICROSOFT_TOKEN_URL is not set.',
         format: 'url',
         default: 'https://login.microsoftonline.com/consumers/oauth2/v2.0/token',
         env: 'MICROSOFT_TOKEN_URL',
@@ -452,6 +452,12 @@ const config = convict(
           format: String,
           default: 'xbox_oauth_state',
           env: 'XBOX_COOKIE_OAUTH_STATE',
+        },
+        xboxToken: {
+          doc: 'The Xbox cookie xbox token (cached XSTS auth payload).',
+          format: String,
+          default: 'xbox_token',
+          env: 'XBOX_COOKIE_XBOX_TOKEN',
         },
       },
     },
@@ -636,6 +642,15 @@ const filePaths: string[] = []
 config.loadFile(filePaths).validate({
   allowed: 'strict',
 })
+
+// Derive Microsoft OAuth URLs from tenantId unless explicitly overridden via env
+const microsoftTenantId = config.get('microsoft.tenantId')
+if (!env.MICROSOFT_AUTHORIZATION_URL) {
+  config.set('microsoft.authorizationUrl', `https://login.microsoftonline.com/${microsoftTenantId}/oauth2/v2.0/authorize`)
+}
+if (!env.MICROSOFT_TOKEN_URL) {
+  config.set('microsoft.tokenUrl', `https://login.microsoftonline.com/${microsoftTenantId}/oauth2/v2.0/token`)
+}
 
 // const _schema = config.getSchema()
 export type Config = typeof config
