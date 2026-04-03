@@ -64,7 +64,7 @@ export const fastifyBootstrap = async (
 
     .register(import('@fastify/view'), {
       engine: {
-        ejs: import('ejs'),
+        ejs: (await import('ejs')).default,
       },
       layout: `./src/Contexts/Shared/infrastructure/layout.ejs`,
       includeViewExtension: true,

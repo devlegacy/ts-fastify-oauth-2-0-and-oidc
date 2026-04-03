@@ -1,0 +1,30 @@
+<h1>
+  <%= title %>
+</h1>
+<h2 class='username'></h2>
+<article class='player-info'></article>
+<article class='aliases'></article>
+<script type='module'>
+  const player = JSON.parse('<%- JSON.stringify(player) %>')
+  const aliases = JSON.parse('<%- JSON.stringify(aliases) %>')
+
+  document.querySelector('.username').textContent = player?.personaname || ''
+  document.querySelector('.player-info').innerHTML = `
+    <img src="${player?.avatarfull || ''}" alt="Steam Avatar" style="border-radius: 4px;" /><br>
+    <strong>Steam ID:</strong> ${player?.steamid || ''}<br>
+    <strong>Username:</strong> ${player?.personaname || ''}<br>
+    ${player?.realname ? `<strong>Real Name:</strong> ${player.realname}<br>` : ''}
+    ${player?.loccountrycode ? `<strong>Country:</strong> ${player.loccountrycode}<br>` : ''}
+    <strong>Profile:</strong> <a href="${player?.profileurl || ''}" target="_blank" rel="noopener noreferrer">View on Steam</a>
+  `
+  document.querySelector('.aliases').innerHTML = aliases?.length
+    ? `
+      <strong>Also played as (${aliases.length}):</strong><br>
+      ${aliases.map((alias) => `
+        <div style="margin: 5px 0;">
+          ${alias.newname} <span style="color: gray; font-size: 0.85em;">(${alias.timechanged})</span>
+        </div>
+      `).join('')}
+    `
+    : ''
+</script>

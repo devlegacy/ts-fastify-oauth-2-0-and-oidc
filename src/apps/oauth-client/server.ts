@@ -449,6 +449,53 @@ export class AppBackend {
           xuid,
         })
       })
+      .get('/home/steam', async (req, res) => {
+        const steamId = req.cookies[config.get('steam.cookie.steamId')] ?? ''
+
+        const apiUrl = new URL(`${config.get('steam.apiUrl')}/ISteamUser/GetPlayerSummaries/v0002/`)
+        apiUrl.searchParams.set('key', config.get('steam.webApiKey'))
+        apiUrl.searchParams.set('steamids', steamId)
+
+        type SteamPlayerSummary = {
+          steamid: string
+          personaname: string
+          profileurl: string
+          avatar: string
+          avatarmedium: string
+          avatarfull: string
+          personastate: number
+          communityvisibilitystate: number
+          realname?: string
+          loccountrycode?: string
+        }
+        type SteamAlias = {
+          newname: string
+          timechanged: string
+        }
+        const [
+          playerData,
+          aliases,
+        ] = await Promise.all([
+          request(apiUrl.toString())
+            .then((response) => response.body.json() as Promise<{
+              response: {
+                players: SteamPlayerSummary[]
+              }
+            }>),
+          request(`https://steamcommunity.com/profiles/${steamId}/ajaxaliases/`)
+            .then((response) => response.body.json() as Promise<SteamAlias[]>),
+        ])
+
+        const [
+          player,
+        ] = playerData.response.players
+
+        return res.viewAsync('./src/apps/oauth-client/steamHome.ejs', {
+          title: 'Home Steam 🎮',
+          player,
+          aliases,
+        })
+      })
     await this.#adapter.listen(this.#config.get('http'))
     if (this.#config.get('app.env') === 'local') {
       info(this.#adapter.printRoutes(printRoutesOptions))

@@ -563,6 +563,40 @@ const config = convict(
         env: 'LOCAL_TEST_URL',
       },
     },
+    steam: {
+      webApiKey: {
+        doc: 'The Steam Web API key.',
+        format: String,
+        default: '',
+        env: 'STEAM_WEB_API_KEY',
+      },
+      authorizationUrl: {
+        doc: 'The Steam OpenID 2.0 authorization url.',
+        format: 'url',
+        default: 'https://steamcommunity.com/openid/login',
+        env: 'STEAM_AUTHORIZATION_URL',
+      },
+      apiUrl: {
+        doc: 'The Steam Web API url.',
+        format: 'url',
+        default: 'https://api.steampowered.com',
+        env: 'STEAM_API_URL',
+      },
+      redirectUri: {
+        doc: 'The Steam redirect uri.',
+        format: 'url',
+        default: 'http://localhost:8080/api/authentication/steam/callback',
+        env: 'STEAM_REDIRECT_URI',
+      },
+      cookie: {
+        steamId: {
+          doc: 'The name of the cookie to store the Steam ID.',
+          format: String,
+          default: 'steam_id',
+          env: 'STEAM_COOKIE_STEAM_ID',
+        },
+      },
+    },
     // azure: {
     //   clientId: {
     //     doc: 'The Azure client id.',

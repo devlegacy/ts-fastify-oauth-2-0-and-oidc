@@ -247,10 +247,11 @@ export default async function (fastify: FastifyInstance) {
     // bot and testing
     // no resource owner
     // machine-to-machine (M2M) authentication
+    // Note: Client Credentials only supports 'identify' scope
     .get('/authentication/discord', async function handler() {
       const scopes = [
         'identify',
-        'guilds',
+        // 'guilds',
       ]
       const options = {
         method: 'POST',
@@ -289,6 +290,94 @@ export default async function (fastify: FastifyInstance) {
         guilds: guilds.map((guild: { name: string }) => guild.name),
       }
     })
+  // Discord with Authorization Code Flow (for user-specific scopes like dm_channels.read)
+    .get('/authentication/discord-special', async function handler(_req, res) {
+      /**
+       * Discord OAuth2 Scopes
+       * @see https://discord.com/developers/docs/topics/oauth2#shared-resources-oauth2-scopes
+       */
+      const scopes = [
+        'identify',
+        'guilds',
+        // 'messages.read',
+        // 'dm_channels.read',
+        // 'dm_channels.messages.read',
+      ]
+      const state = randomBytes(16).toString('base64')
+      const authorizationSearchParams = new URLSearchParams({
+        response_type: 'code',
+        client_id: config.get('discord.clientId'),
+        scope: scopes.join(' '),
+        redirect_uri: config.get('discord.redirectUri'),
+        state,
+      })
+      const authorizationUrl = new URL(config.get('discord.authorizationUrl'))
+      authorizationUrl.search = authorizationSearchParams.toString()
+
+      // Store state in cookie for CSRF protection
+      res
+        .setCookie(
+          config.get('discord.cookie.oauthState'),
+          state,
+          {
+            path: '/',
+            httpOnly: true,
+          },
+        )
+        .status(HttpStatus.FOUND)
+        .redirect(`https://discord.com/oauth2/authorize?client_id=1261333300505608307&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A8080%2Fapi%2Fauthentication%2Fdiscord-special%2Fcallback&scope=identify+guilds+dm_channels.messages.read+dm_channels.read+messages.read&state=${state}`)
+    })
+    .get(
+      '/authentication/discord-special/callback',
+      async function handler(req: FastifyRequest<{ Querystring: { code: string, state: string } }>, res) {
+        const {
+          cookies,
+        } = req
+        const state = cookies[config.get('discord.cookie.oauthState')] ?? ''
+        if (state !== req.query.state) {
+          return res.status(HttpStatus.BAD_REQUEST).send({
+            error: 'State mismatch - possible CSRF attack',
+          })
+        }
+
+        const options = {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: new URLSearchParams({
+            grant_type: 'authorization_code',
+            code: req.query.code,
+            redirect_uri: config.get('discord.redirectUri'),
+            client_id: config.get('discord.clientId'),
+            client_secret: config.get('discord.clientSecret'),
+          }).toString(),
+        } satisfies RequestInit
+
+        const oauthRequest = await request(config.get('discord.tokenUrl'), options)
+        type DiscordTokenResponse = {
+          access_token: string
+          token_type: string
+          expires_in: number
+          refresh_token: string
+          scope: string
+        }
+        const oauthResource = await oauthRequest.body.json() as DiscordTokenResponse
+
+        res
+          .setCookie(
+            config.get('discord.cookie.accessToken'),
+            oauthResource.access_token,
+            {
+              path: '/',
+              httpOnly: true,
+              expires: new Date(Date.now() + oauthResource.expires_in * ONE_MINUTE_IN_MILLISECONDS),
+            },
+          )
+          .status(HttpStatus.FOUND)
+          .redirect('/home/discord')
+      },
+    )
     .get('/authentication/google', async function handler(_req, res) {
       const scopes = [
         'openid',
@@ -606,6 +695,69 @@ export default async function (fastify: FastifyInstance) {
       // # for single page application (SPA)
       res.redirect(`/home/auth0#${query}`)
     })
+    // Steam OpenID 2.0 Authentication
+    // Steam does not use OAuth 2.0 but OpenID 2.0 — the API key is used for Web API calls after authentication
+    .get('/authentication/steam', async function handler(_req, res) {
+      const authorizationSearchParams = new URLSearchParams({
+        'openid.ns': 'http://specs.openid.net/auth/2.0',
+        'openid.mode': 'checkid_setup',
+        'openid.return_to': config.get('steam.redirectUri'),
+        'openid.realm': config.get('app.url'),
+        'openid.identity': 'http://specs.openid.net/auth/2.0/identifier_select',
+        'openid.claimed_id': 'http://specs.openid.net/auth/2.0/identifier_select',
+      })
+      const authorizationUrl = new URL(config.get('steam.authorizationUrl'))
+      authorizationUrl.search = authorizationSearchParams.toString()
+      res.status(HttpStatus.FOUND).redirect(authorizationUrl.toString())
+    })
+    .get(
+      '/authentication/steam/callback',
+      async function handler(req: FastifyRequest<{ Querystring: Record<string, string> }>, res) {
+        // Verify the OpenID assertion with Steam
+        const verifyParams = new URLSearchParams(req.query)
+        verifyParams.set('openid.mode', 'check_authentication')
+
+        const verifyRequest = await request(config.get('steam.authorizationUrl'), {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: verifyParams.toString(),
+        } satisfies RequestInit)
+        const verifyBody = await verifyRequest.body.text()
+
+        if (!verifyBody.includes('is_valid:true')) {
+          return res.status(HttpStatus.BAD_REQUEST).send({
+            error: 'Steam OpenID verification failed',
+          })
+        }
+
+        // Extract Steam ID64 from claimed_id: https://steamcommunity.com/openid/id/<steamid64>
+        const claimedId = req.query['openid.claimed_id'] ?? ''
+        const [
+          ,
+          steamId,
+        ] = claimedId.match(/\/openid\/id\/(\d+)/) ?? []
+        if (!steamId) {
+          return res.status(HttpStatus.BAD_REQUEST).send({
+            error: 'Invalid Steam ID in OpenID response',
+          })
+        }
+
+        res
+          .setCookie(
+            config.get('steam.cookie.steamId'),
+            steamId,
+            {
+              path: '/',
+              httpOnly: true,
+              expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
+            },
+          )
+          .status(HttpStatus.FOUND)
+          .redirect('/home/steam')
+      },
+    )
     .get('/authentication/local/callback', async function handler(req: FastifyRequest<{ Querystring: { code: string } }>) {
       const {
         code,
