@@ -1,5 +1,6 @@
-overrides:
-  lodash@<4.17.21: '>=4.17.21'
-
 onlyBuiltDependencies:
   - '@swc/core'
+
+overrides:
+  diff@<8.0.3: '>=8.0.3'
+  lodash@<4.17.21: '>=4.17.21'
