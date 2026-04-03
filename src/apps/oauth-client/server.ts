@@ -43,6 +43,71 @@ const printRoutesOptions: PrintRoutesOptions = {
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
 
+type XuiClaims = {
+  gtg: string
+  xid: string
+  uhs: string
+  agg: string
+  usr: string
+  utr: string
+  prv: string
+}
+
+async function fetchXboxLiveAuth(accessToken: string): Promise<{ xstsToken: string, xuiData: XuiClaims }> {
+  const jsonHeaders = new Headers()
+  jsonHeaders.append('Content-Type', 'application/json')
+  jsonHeaders.append('Accept', 'application/json')
+
+  const xblAuthResponse = await request(config.get('xbox.xboxLiveAuthUrl'), {
+    method: 'POST',
+    headers: jsonHeaders,
+    body: JSON.stringify({
+      Properties: {
+        AuthMethod: 'RPS',
+        SiteName: 'user.auth.xboxlive.com',
+        RpsTicket: `d=${accessToken}`,
+      },
+      RelyingParty: 'http://auth.xboxlive.com',
+      TokenType: 'JWT',
+    }),
+  })
+  const xblAuth = await xblAuthResponse.body.json() as {
+    Token: string
+    DisplayClaims: { xui: { uhs: string }[] }
+  }
+
+  const xstsHeaders = new Headers()
+  xstsHeaders.append('Content-Type', 'application/json')
+  xstsHeaders.append('Accept', 'application/json')
+
+  const xstsResponse = await request(config.get('xbox.xboxLiveXstsUrl'), {
+    method: 'POST',
+    headers: xstsHeaders,
+    body: JSON.stringify({
+      Properties: {
+        SandboxId: 'RETAIL',
+        UserTokens: [
+          xblAuth.Token,
+        ],
+      },
+      RelyingParty: 'http://xboxlive.com',
+      TokenType: 'JWT',
+    }),
+  })
+  const xsts = await xstsResponse.body.json() as {
+    Token: string
+    DisplayClaims: { xui: XuiClaims[] }
+  }
+
+  const xuiData = xsts.DisplayClaims.xui?.[0]
+  if (!xuiData) throw new Error('No XUI data in XSTS response')
+
+  return {
+    xstsToken: xsts.Token,
+    xuiData,
+  }
+}
+
 export class AppBackend {
   readonly #config: Config
   #adapter = fastify
@@ -101,6 +166,7 @@ export class AppBackend {
           cookies,
         } = req
         const accessToken = cookies[config.get('spotify.cookie.accessToken')] ?? cookies['access_token'] ?? ''
+        if (!accessToken) return res.status(HttpStatus.FOUND).redirect('/')
 
         const headers = new Headers()
         headers.append('Authorization', `Bearer ${accessToken}`)
@@ -200,6 +266,7 @@ export class AppBackend {
       })
       .get('/home/twitter', async (req, res) => {
         const accessToken = req.cookies[config.get('twitter.cookie.accessToken')] ?? req.cookies['access_token'] ?? ''
+        if (!accessToken) return res.status(HttpStatus.FOUND).redirect('/')
         // twitter use cors
         const response = await request(`${config.get('app.url')}/api/twitter/bypass`, {
           headers: {
@@ -225,6 +292,7 @@ export class AppBackend {
           cookies,
         } = req
         const accessToken = cookies[config.get('auth0.cookie.accessToken')] ?? cookies['access_token'] ?? ''
+        if (!accessToken) return res.status(HttpStatus.FOUND).redirect('/')
         return res.viewAsync('./src/apps/oauth-client/auth0Home.ejs', {
           title: 'Home',
           accessToken,
@@ -235,6 +303,7 @@ export class AppBackend {
           cookies,
         } = req
         const accessToken = cookies[config.get('discord.cookie.accessToken')] ?? cookies['discord_access_token'] ?? ''
+        if (!accessToken) return res.status(HttpStatus.FOUND).redirect('/')
 
         const headers = new Headers()
         headers.append('Authorization', `Bearer ${accessToken}`)
@@ -290,6 +359,7 @@ export class AppBackend {
           cookies,
         } = req
         const accessToken = cookies[config.get('google.cookie.accessToken')] ?? cookies['google_access_token'] ?? ''
+        if (!accessToken) return res.status(HttpStatus.FOUND).redirect('/')
 
         const headers = new Headers()
         headers.append('Authorization', `Bearer ${accessToken}`)
@@ -318,6 +388,7 @@ export class AppBackend {
           cookies,
         } = req
         const accessToken = cookies[config.get('microsoft.cookie.accessToken')] ?? cookies['microsoft_access_token'] ?? ''
+        if (!accessToken) return res.status(HttpStatus.FOUND).redirect('/')
 
         const headers = new Headers()
         headers.append('Authorization', `Bearer ${accessToken}`)
@@ -344,88 +415,32 @@ export class AppBackend {
         })
       })
       .get('/home/xbox', async (req, res) => {
-        const {
-          cookies,
-        } = req
-        const accessToken = cookies[config.get('xbox.cookie.accessToken')] ?? cookies['xbox_access_token'] ?? ''
+        const accessToken = req.cookies[config.get('xbox.cookie.accessToken')] ?? req.cookies.xbox_access_token ?? ''
+        if (!accessToken) return res.status(HttpStatus.FOUND).redirect('/')
 
-        const headers = new Headers()
-        headers.append('Content-Type', 'application/json')
-        headers.append('Accept', 'application/json')
-
-        // Step 1: Get Xbox Live token
-        const xblAuthResponse = await request(config.get('xbox.xboxLiveAuthUrl'), {
-          method: 'POST',
-          headers,
-          body: JSON.stringify({
-            Properties: {
-              AuthMethod: 'RPS',
-              SiteName: 'user.auth.xboxlive.com',
-              RpsTicket: `d=${accessToken}`,
-            },
-            RelyingParty: 'http://auth.xboxlive.com',
-            TokenType: 'JWT',
-          }),
-        })
-
-        const xblAuth = await xblAuthResponse.body.json() as {
-          Token: string
-          DisplayClaims: {
-            xui: {
-              uhs: string
-            }[]
-          }
-        }
-
-        // Step 2: Get XSTS token
-        const xstsHeaders = new Headers()
-        xstsHeaders.append('Content-Type', 'application/json')
-        xstsHeaders.append('Accept', 'application/json')
-
-        const xstsResponse = await request(config.get('xbox.xboxLiveXstsUrl'), {
-          method: 'POST',
-          headers: xstsHeaders,
-          body: JSON.stringify({
-            Properties: {
-              SandboxId: 'RETAIL',
-              UserTokens: [
-                xblAuth.Token,
-              ],
-            },
-            RelyingParty: 'http://xboxlive.com',
-            TokenType: 'JWT',
-          }),
-        })
-
-        const xsts = await xstsResponse.body.json() as {
-          Token: string
-          DisplayClaims: {
-            xui: {
-              gtg: string
-              xid: string
-              uhs: string
-              agg: string
-              usr: string
-              utr: string
-              prv: string
-            }[]
-          }
-        }
-
-        const xuiData = xsts.DisplayClaims.xui?.[0]
-        if (!xuiData) {
-          return res.status(HttpStatus.BAD_REQUEST).send({
-            error: 'Failed to get Xbox user data',
+        let xblResult!: Awaited<ReturnType<typeof fetchXboxLiveAuth>>
+        try {
+          xblResult = await fetchXboxLiveAuth(accessToken)
+        } catch (err) {
+          fastify.log.error({
+            err,
+          }, 'Failed to obtain Xbox Live or XSTS token')
+          return res.status(HttpStatus.BAD_GATEWAY).send({
+            error: 'Failed to obtain Xbox Live or XSTS token',
           })
         }
 
-        // Step 3: Get profile using XSTS token
+        const {
+          xstsToken,
+          xuiData,
+        } = xblResult
+        const xuid = xuiData.xid
+
         const profileHeaders = new Headers()
-        profileHeaders.append('Authorization', `XBL3.0 x=${xuiData.uhs};${xsts.Token}`)
+        profileHeaders.append('Authorization', `XBL3.0 x=${xuiData.uhs};${xstsToken}`)
         profileHeaders.append('Accept-Language', 'en-US')
         profileHeaders.append('x-xbl-contract-version', '3')
 
-        const xuid = xuiData.xid
         const settingsQuery = 'Gamertag,GameDisplayName,Gamerscore,ModernGamertag,ModernGamertagSuffix,UniqueModernGamertag'
         const profileResponse = await request(`${config.get('xbox.xboxApiUrl')}/users/xuid(${xuid})/profile/settings?settings=${settingsQuery}`, {
           headers: profileHeaders,
@@ -451,6 +466,7 @@ export class AppBackend {
       })
       .get('/home/steam', async (req, res) => {
         const steamId = req.cookies[config.get('steam.cookie.steamId')] ?? ''
+        if (!steamId) return res.status(HttpStatus.FOUND).redirect('/')
 
         const apiUrl = new URL(`${config.get('steam.apiUrl')}/ISteamUser/GetPlayerSummaries/v0002/`)
         apiUrl.searchParams.set('key', config.get('steam.webApiKey'))

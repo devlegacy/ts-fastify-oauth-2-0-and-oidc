@@ -4,7 +4,7 @@
 <h2 class='username'></h2>
 <article class='user-info'></article>
 <script type='module'>
-  const userInfo = JSON.parse('<%- JSON.stringify(userInfo) %>')
+  const userInfo = <%- JSON.stringify(userInfo) %>
 
   document.querySelector('.username').textContent = userInfo?.displayName || ''
   document.querySelector('.user-info').innerHTML = `

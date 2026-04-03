@@ -20,7 +20,7 @@ import {
   config,
 } from '#@/src/Contexts/OauthClient/Shared/infrastructure/Config/config.js'
 import {
-  ONE_MINUTE_IN_MILLISECONDS,
+  ONE_SECOND_IN_MILLISECONDS,
 } from '#@/src/Contexts/Shared/domain/time.js'
 import {
   accessTokenJwksValidator,
@@ -123,7 +123,7 @@ export default async function (fastify: FastifyInstance) {
             {
               path: '/',
               httpOnly: true,
-              expires: new Date(Date.now() + oauthResource.expires_in * ONE_MINUTE_IN_MILLISECONDS),
+              expires: new Date(Date.now() + oauthResource.expires_in * ONE_SECOND_IN_MILLISECONDS),
             // domain: config.get('app.url'),
             },
           )
@@ -322,10 +322,11 @@ export default async function (fastify: FastifyInstance) {
           {
             path: '/',
             httpOnly: true,
+            sameSite: 'lax',
           },
         )
         .status(HttpStatus.FOUND)
-        .redirect(`https://discord.com/oauth2/authorize?client_id=1261333300505608307&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A8080%2Fapi%2Fauthentication%2Fdiscord-special%2Fcallback&scope=identify+guilds+dm_channels.messages.read+dm_channels.read+messages.read&state=${state}`)
+        .redirect(authorizationUrl.toString())
     })
     .get(
       '/authentication/discord-special/callback',
@@ -371,7 +372,9 @@ export default async function (fastify: FastifyInstance) {
             {
               path: '/',
               httpOnly: true,
-              expires: new Date(Date.now() + oauthResource.expires_in * ONE_MINUTE_IN_MILLISECONDS),
+              sameSite: 'lax',
+              secure: config.get('app.env') !== 'local',
+              expires: new Date(Date.now() + oauthResource.expires_in * ONE_SECOND_IN_MILLISECONDS),
             },
           )
           .status(HttpStatus.FOUND)
@@ -404,6 +407,7 @@ export default async function (fastify: FastifyInstance) {
           {
             path: '/',
             httpOnly: true,
+            sameSite: 'lax',
           },
         )
         .status(HttpStatus.FOUND)
@@ -453,7 +457,9 @@ export default async function (fastify: FastifyInstance) {
             {
               path: '/',
               httpOnly: true,
-              expires: new Date(Date.now() + oauthResource.expires_in * ONE_MINUTE_IN_MILLISECONDS),
+              sameSite: 'lax',
+              secure: config.get('app.env') !== 'local',
+              expires: new Date(Date.now() + oauthResource.expires_in * ONE_SECOND_IN_MILLISECONDS),
             },
           )
           .status(HttpStatus.FOUND)
@@ -486,6 +492,7 @@ export default async function (fastify: FastifyInstance) {
           {
             path: '/',
             httpOnly: true,
+            sameSite: 'lax',
           },
         )
         .status(HttpStatus.FOUND)
@@ -494,30 +501,25 @@ export default async function (fastify: FastifyInstance) {
     .get(
       '/authentication/microsoft/callback',
       async function handler(req: FastifyRequest<{ Querystring: { code: string, state: string } }>, res) {
-        const {
-          cookies,
-        } = req
-        const state = cookies[config.get('microsoft.cookie.oauthState')] ?? ''
+        const state = req.cookies[config.get('microsoft.cookie.oauthState')] ?? ''
         if (state !== req.query.state) {
           return res.status(HttpStatus.BAD_REQUEST).send({
             error: 'State mismatch - possible CSRF attack',
           })
         }
 
-        const tokenParams = new URLSearchParams({
-          grant_type: 'authorization_code',
-          code: req.query.code,
-          redirect_uri: config.get('microsoft.redirectUri'),
-          client_id: config.get('microsoft.clientId'),
-          client_secret: config.get('microsoft.clientSecret'),
-        })
-
         const options = {
           method: 'POST',
           headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
           },
-          body: tokenParams.toString(),
+          body: new URLSearchParams({
+            grant_type: 'authorization_code',
+            code: req.query.code,
+            redirect_uri: config.get('microsoft.redirectUri'),
+            client_id: config.get('microsoft.clientId'),
+            client_secret: config.get('microsoft.clientSecret'),
+          }).toString(),
         } satisfies RequestInit
 
         const oauthRequest = await request(config.get('microsoft.tokenUrl'), options)
@@ -553,7 +555,9 @@ export default async function (fastify: FastifyInstance) {
             {
               path: '/',
               httpOnly: true,
-              expires: new Date(Date.now() + oauthResource.expires_in * ONE_MINUTE_IN_MILLISECONDS),
+              sameSite: 'lax',
+              secure: config.get('app.env') !== 'local',
+              expires: new Date(Date.now() + oauthResource.expires_in * ONE_SECOND_IN_MILLISECONDS),
             },
           )
           .status(HttpStatus.FOUND)
@@ -584,6 +588,7 @@ export default async function (fastify: FastifyInstance) {
           {
             path: '/',
             httpOnly: true,
+            sameSite: 'lax',
           },
         )
         .status(HttpStatus.FOUND)
@@ -618,13 +623,28 @@ export default async function (fastify: FastifyInstance) {
 
         const oauthRequest = await request(config.get('xbox.tokenUrl'), options)
         type XboxTokenResponse = {
-          access_token: string
-          token_type: string
-          expires_in: number
+          access_token?: string
+          token_type?: string
+          expires_in?: number
           refresh_token?: string
-          scope: string
+          scope?: string
+          error?: string
+          error_description?: string
         }
         const oauthResource = await oauthRequest.body.json() as XboxTokenResponse
+
+        if (oauthResource.error) {
+          return res.status(HttpStatus.BAD_REQUEST).send({
+            error: oauthResource.error,
+            error_description: oauthResource.error_description,
+          })
+        }
+
+        if (!oauthResource.access_token || !oauthResource.expires_in) {
+          return res.status(HttpStatus.BAD_REQUEST).send({
+            error: 'No access token received',
+          })
+        }
 
         res
           .setCookie(
@@ -633,7 +653,9 @@ export default async function (fastify: FastifyInstance) {
             {
               path: '/',
               httpOnly: true,
-              expires: new Date(Date.now() + oauthResource.expires_in * ONE_MINUTE_IN_MILLISECONDS),
+              sameSite: 'lax',
+              secure: config.get('app.env') !== 'local',
+              expires: new Date(Date.now() + oauthResource.expires_in * ONE_SECOND_IN_MILLISECONDS),
             },
           )
           .status(HttpStatus.FOUND)
