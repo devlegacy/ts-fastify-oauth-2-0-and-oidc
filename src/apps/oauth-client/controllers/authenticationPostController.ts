@@ -96,7 +96,7 @@ export default async function (fastify: FastifyInstance) {
         headers.append('Authorization', `Basic ${clientCredentials}`)
         const options = {
           method: 'POST',
-          headers,
+          headers: headers as HeadersInit,
           body: new URLSearchParams({
             grant_type: 'authorization_code',
             code: req.query.code,
