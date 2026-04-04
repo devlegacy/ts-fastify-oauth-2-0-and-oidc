@@ -215,6 +215,12 @@ export class AppBackend {
         const meRequest = await request(meUrl, {
           headers,
         })
+        if (meRequest.statusCode < 200 || meRequest.statusCode >= 300) {
+          const body = await meRequest.body.text()
+          return res.status(meRequest.statusCode).send({
+            error: body,
+          })
+        }
         const meResource = await meRequest.body.json() as {
           country: string
           display_name: string
@@ -242,6 +248,12 @@ export class AppBackend {
         const playlistsRequest = await request(playlistsUrl, {
           headers,
         })
+        if (playlistsRequest.statusCode < 200 || playlistsRequest.statusCode >= 300) {
+          const body = await playlistsRequest.body.text()
+          return res.status(playlistsRequest.statusCode).send({
+            error: body,
+          })
+        }
         const playlistResources = await playlistsRequest.body.json() as {
           href: string
           limit: number
