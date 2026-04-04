@@ -337,12 +337,20 @@ export default async function (fastify: FastifyInstance) {
         const {
           cookies,
         } = req
-        const state = cookies[config.get('discord.cookie.oauthState')] ?? ''
-        if (state !== req.query.state) {
+        const stateCookie = cookies[config.get('discord.cookie.oauthState')]
+        const requestState = req.query.state
+
+        if (!stateCookie || !requestState || stateCookie !== requestState) {
           return res.status(HttpStatus.BAD_REQUEST).send({
             error: 'State mismatch - possible CSRF attack',
           })
         }
+        res.clearCookie(config.get('discord.cookie.oauthState'), {
+          path: '/',
+          httpOnly: true,
+          sameSite: 'lax',
+          secure: config.get('app.env') !== 'local',
+        })
 
         const options = {
           method: 'POST',
@@ -505,13 +513,22 @@ export default async function (fastify: FastifyInstance) {
     })
     .get(
       '/authentication/microsoft/callback',
+      // eslint-disable-next-line max-lines-per-function
       async function handler(req: FastifyRequest<{ Querystring: { code: string, state: string } }>, res) {
-        const state = req.cookies[config.get('microsoft.cookie.oauthState')] ?? ''
-        if (state !== req.query.state) {
+        const storedState = req.cookies[config.get('microsoft.cookie.oauthState')]
+        const queryState = req.query.state
+
+        if (!storedState || !queryState || storedState !== queryState) {
           return res.status(HttpStatus.BAD_REQUEST).send({
             error: 'State mismatch - possible CSRF attack',
           })
         }
+        res.clearCookie(config.get('microsoft.cookie.oauthState'), {
+          path: '/',
+          httpOnly: true,
+          sameSite: 'lax',
+          secure: config.get('app.env') !== 'local',
+        })
 
         const options = {
           method: 'POST',
@@ -602,16 +619,25 @@ export default async function (fastify: FastifyInstance) {
     })
     .get(
       '/authentication/xbox/callback',
+      // eslint-disable-next-line max-lines-per-function
       async function handler(req: FastifyRequest<{ Querystring: { code: string, state: string } }>, res) {
         const {
           cookies,
         } = req
-        const state = cookies[config.get('xbox.cookie.oauthState')] ?? ''
-        if (state !== req.query.state) {
+        const cookieState = cookies[config.get('xbox.cookie.oauthState')]
+        const queryState = req.query.state
+
+        if (!cookieState || !queryState || cookieState !== queryState) {
           return res.status(HttpStatus.BAD_REQUEST).send({
             error: 'State mismatch - possible CSRF attack',
           })
         }
+        res.clearCookie(config.get('xbox.cookie.oauthState'), {
+          path: '/',
+          httpOnly: true,
+          sameSite: 'lax',
+          secure: config.get('app.env') !== 'local',
+        })
 
         const options = {
           method: 'POST',

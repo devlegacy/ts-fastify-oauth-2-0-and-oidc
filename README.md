@@ -44,11 +44,12 @@ Both apps follow **Domain-Driven Design (DDD)** with bounded contexts and are st
 
 | Grant Type | Provider(s) | Notes |
 |---|---|---|
-| Authorization Code | Spotify, Local Server | Standard server-side flow |
+| Authorization Code | Spotify, Google, Microsoft, Xbox, Discord (special), Local Server | Standard server-side flow |
 | Authorization Code + PKCE | Twitter/X | RFC 7636, S256 challenge method |
 | Implicit Flow | Twitch, Auth0 | SPA callback pattern |
 | Client Credentials | Discord | Machine-to-machine |
 | Resource Owner Password | Auth0 | Direct credentials exchange |
+| OpenID 2.0 | Steam | Non-OAuth; uses Steam OpenID + Web API key |
 
 ---
 
@@ -61,6 +62,11 @@ Both apps follow **Domain-Driven Design (DDD)** with bounded contexts and are st
 | Twitch | Implicit |
 | Auth0 | Implicit, Password Grant, JWKS validation |
 | Discord | Client Credentials |
+| Discord (special) | Authorization Code (user scopes: identify, guilds, dm_channels.read) |
+| Google | Authorization Code (OIDC) |
+| Microsoft | Authorization Code (OIDC, tenant-aware) |
+| Xbox | Authorization Code → Xbox Live XBL/XSTS token exchange |
+| Steam | OpenID 2.0 + Steam Web API |
 | Local Server | Authorization Code (custom server) |
 
 ---
