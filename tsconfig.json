@@ -15,7 +15,7 @@
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
     "paths": {
-      "#@/*": ["${configDir}/*"]
+      "#/*": ["${configDir}/*"]
     },
     "typeRoots": ["${configDir}/node_modules/@types", "${configDir}/types"],
     "types": ["node"],

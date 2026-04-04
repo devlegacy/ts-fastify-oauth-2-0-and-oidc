@@ -11,7 +11,7 @@ import {
   isNil,
   isString,
   isUndefined,
-} from '#@/src/Contexts/Shared/domain/shared.utils.js'
+} from '#/src/Contexts/Shared/domain/shared.utils.js'
 
 describe('Shared utils', () => {
   it('should return true when the value is null for isNil', () => {

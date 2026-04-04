@@ -23,14 +23,14 @@ import {
 import {
   type Config,
   config,
-} from '#@/src/Contexts/OauthClient/Shared/infrastructure/Config/config.js'
+} from '#/src/Contexts/OauthClient/Shared/infrastructure/Config/config.js'
 import {
   fastifyBootstrap,
-} from '#@/src/Contexts/Shared/infrastructure/http/fastifyBootstrap.js'
+} from '#/src/Contexts/Shared/infrastructure/http/fastifyBootstrap.js'
 import {
   info,
   logger,
-} from '#@/src/Contexts/Shared/infrastructure/Logger/PinoLogger.js'
+} from '#/src/Contexts/Shared/infrastructure/Logger/PinoLogger.js'
 
 const fastify = Fastify({
   loggerInstance: logger() as FastifyBaseLogger,

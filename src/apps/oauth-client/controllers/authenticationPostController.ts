@@ -18,25 +18,25 @@ import {
 
 import {
   config,
-} from '#@/src/Contexts/OauthClient/Shared/infrastructure/Config/config.js'
+} from '#/src/Contexts/OauthClient/Shared/infrastructure/Config/config.js'
 import {
   ONE_SECOND_IN_MILLISECONDS,
-} from '#@/src/Contexts/Shared/domain/time.js'
+} from '#/src/Contexts/Shared/domain/time.js'
 import {
   accessTokenJwksValidator,
-} from '#@/src/Contexts/Shared/infrastructure/accessTokenJwksValidator.js'
+} from '#/src/Contexts/Shared/infrastructure/accessTokenJwksValidator.js'
 import {
   accessTokenSigner,
-} from '#@/src/Contexts/Shared/infrastructure/accessTokenSigner.js'
+} from '#/src/Contexts/Shared/infrastructure/accessTokenSigner.js'
 import {
   codeChallengeGenerator,
-} from '#@/src/Contexts/Shared/infrastructure/codeChallengeGenerator.js'
+} from '#/src/Contexts/Shared/infrastructure/codeChallengeGenerator.js'
 import {
   getBasicCredentials,
-} from '#@/src/Contexts/Shared/infrastructure/http/getBasicCredentials.js'
+} from '#/src/Contexts/Shared/infrastructure/http/getBasicCredentials.js'
 import {
   getUser,
-} from '#@/src/Contexts/Shared/infrastructure/Users/getUser.js'
+} from '#/src/Contexts/Shared/infrastructure/Users/getUser.js'
 // eslint-disable-next-line max-lines-per-function
 export default async function (fastify: FastifyInstance) {
   fastify

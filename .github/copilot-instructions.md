@@ -103,9 +103,9 @@ Design-level security considerations:
 TypeScript and Fastify conventions:
 
 - Use ES modules with `.js` extensions in imports (required for Node.js ESM)
-- Path alias: `#@/*` maps to project root, use `#@/src/` in source, `#@/dist/` in builds
+- Path alias: `#/*` maps to project root, use `#/src/` in source, `#/dist/` in builds
 - Fastify controllers: export default async function receiving fastify instance
-- Error handling: extend `DomainError` from `#@/src/Contexts/Shared/domain/errors/`
+- Error handling: extend `DomainError` from `#/src/Contexts/Shared/domain/errors/`
 - Configuration: use Convict schema validation in `Config/config.ts` files
 - Testing: Node.js native test runner for unit tests, Cucumber for BDD features
 - Build: SWC compiler (not tsc), configured in `.swcrc.build`
@@ -116,7 +116,7 @@ When implementing OAuth flows:
 
 - Structure: authorization endpoint redirects to provider, callback endpoint exchanges code for token
 - Controllers: `authentication{Provider}GetController.ts` for initiation, `authentication{Provider}CallbackGetController.ts` for callback
-- Token extraction: use `getAccessToken()` from `#@/src/Contexts/Shared/infrastructure/http/getAccessToken.js`
+- Token extraction: use `getAccessToken()` from `#/src/Contexts/Shared/infrastructure/http/getAccessToken.js`
 - JWT creation: use `accessTokenSigner.ts` for HS256, `accessTokenAsymmetricSigner.ts` for RS256
 - JWT validation: verify signature, expiration, and claims before trusting
 - Cookie settings: httpOnly, secure (production), appropriate SameSite value

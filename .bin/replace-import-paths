@@ -11,7 +11,7 @@ const result = [
   replaceInFileSync({
     ...options,
     from: /#@\/src\//g,
-    to: '#@/dist/',
+    to: '#/dist/',
   }),
   replaceInFileSync({
     ...options,

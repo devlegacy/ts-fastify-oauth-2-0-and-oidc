@@ -4,7 +4,7 @@ import type {
 
 import {
   UnauthorizedError,
-} from '#@/src/Contexts/Shared/domain/errors/UnauthorizedError.js'
+} from '#/src/Contexts/Shared/domain/errors/UnauthorizedError.js'
 
 export const getBasicCredentials = (req: FastifyRequest) => {
   const {

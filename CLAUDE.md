@@ -112,7 +112,7 @@ tests/
 
 **Error Handling**: Custom domain errors extend base `DomainError` class. The Fastify error handler in `fastifyBootstrap.ts` transforms these into appropriate HTTP responses.
 
-**Path Aliasing**: `#@/*` maps to project root. Build script transforms `#@/src/` → `#@/dist/` in compiled output.
+**Path Aliasing**: `#/*` maps to project root. Build script transforms `#/src/` → `#/dist/` in compiled output.
 
 ## OAuth Implementation Details
 
@@ -223,7 +223,7 @@ Feature: My Feature
 1. Clean `dist/` directory
 2. Compile TypeScript to JavaScript with SWC (minified, source maps)
 3. Copy EJS templates with rsync
-4. Replace import paths (`#@/src/` → `#@/dist/`) with custom script
+4. Replace import paths (`#/src/` → `#/dist/`) with custom script
 
 **Output**: `dist/` directory ready for Node.js execution
 
@@ -342,7 +342,7 @@ Uses `oauth2-server` library with in-memory database structure:
 ### Build System Path Transformation
 
 Custom script `.bin/replace-import-paths` post-processes compiled output:
-- Replaces `#@/src/` → `#@/dist/` in all `dist/**/*.js` files
+- Replaces `#/src/` → `#/dist/` in all `dist/**/*.js` files
 - Replaces `./src/apps/` → `./dist/apps/`
 - Uses `replace-in-file` library
 - Required because SWC doesn't transform path aliases in imports
@@ -383,7 +383,7 @@ process
 
 ```typescript
 // apps/oauth-client/controllers/myProtectedRoute.ts
-import { getAccessToken } from '#@/src/Contexts/Shared/infrastructure/http/getAccessToken.js'
+import { getAccessToken } from '#/src/Contexts/Shared/infrastructure/http/getAccessToken.js'
 
 export default async (fastify) => {
   fastify.get('/my-route', async (request, reply) => {
@@ -400,7 +400,7 @@ export default async (fastify) => {
 
 Throw domain errors that extend `DomainError`:
 ```typescript
-import { UnauthorizedError } from '#@/src/Contexts/Shared/domain/errors/UnauthorizedError.js'
+import { UnauthorizedError } from '#/src/Contexts/Shared/domain/errors/UnauthorizedError.js'
 
 if (!isValid) {
   throw new UnauthorizedError('Invalid credentials', { userId })
