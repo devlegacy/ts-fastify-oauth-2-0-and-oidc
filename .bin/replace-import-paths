@@ -10,7 +10,7 @@ const options = {
 const result = [
   replaceInFileSync({
     ...options,
-    from: /#@\/src\//g,
+    from: /#\/src\//g,
     to: '#/dist/',
   }),
   replaceInFileSync({

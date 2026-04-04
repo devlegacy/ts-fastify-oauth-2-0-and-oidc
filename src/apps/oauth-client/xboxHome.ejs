@@ -5,9 +5,9 @@
 <article class='user-info'></article>
 <article class='profile-settings'></article>
 <script type='module'>
-  const profile = <%- JSON.stringify(profile) %>
-  const gamertag = <%- JSON.stringify(gamertag) %>
-  const xuid = <%- JSON.stringify(xuid) %>
+  const profile = <%- JSON.stringify(profile).replace(/<\//g, '<\\/') %>
+  const gamertag = <%- JSON.stringify(gamertag).replace(/<\//g, '<\\/') %>
+  const xuid = <%- JSON.stringify(xuid).replace(/<\//g, '<\\/') %>
 
   document.querySelector('.gamertag').textContent = gamertag || 'Xbox Player'
 

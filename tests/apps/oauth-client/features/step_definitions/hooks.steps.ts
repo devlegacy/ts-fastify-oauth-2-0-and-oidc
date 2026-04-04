@@ -30,7 +30,7 @@ setDefaultTimeout(60 * ONE_SECOND_IN_MILLISECONDS)
 
 BeforeAll(async () => {
   await application.start()
-  api = supertest(application.httpServer)
+  api = supertest(application.httpServer!)
   await wait(ONE_SECOND_IN_MILLISECONDS)
 })
 

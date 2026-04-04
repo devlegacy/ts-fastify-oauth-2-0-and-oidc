@@ -5,8 +5,8 @@
 <article class='player-info'></article>
 <article class='aliases'></article>
 <script type='module'>
-  const player = <%- JSON.stringify(player) %>
-  const aliases = <%- JSON.stringify(aliases) %>
+  const player = <%- JSON.stringify(player).replace(/<\//g, '<\\/') %>
+  const aliases = <%- JSON.stringify(aliases).replace(/<\//g, '<\\/') %>
 
   document.querySelector('.username').textContent = player?.personaname || ''
 

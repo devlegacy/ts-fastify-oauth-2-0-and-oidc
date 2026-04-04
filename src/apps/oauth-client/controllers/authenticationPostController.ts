@@ -280,10 +280,12 @@ export default async function (fastify: FastifyInstance) {
           headers,
         })
           .then((response) => response.body.json() as Promise<{ id: string, username: string, discriminator: string }>),
+        // Note: Client Credentials grant only supports 'identify' scope; guilds fetch may return empty or fail
         request(`${config.get('discord.apiUrl')}/users/@me/guilds`, {
           headers,
         })
-          .then((response) => response.body.json() as Promise<{ name: string }[]>),
+          .then((response) => response.body.json() as Promise<{ name: string }[]>)
+          .catch(() => [] as { name: string }[]),
       ])
       return {
         user: `${user.username}`,

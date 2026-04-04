@@ -126,7 +126,12 @@ async function resolveXboxToken(
 ): Promise<CachedXboxToken | undefined> {
   if (cachedRaw) {
     try {
-      return JSON.parse(cachedRaw) as CachedXboxToken
+      const cached = JSON.parse(cachedRaw) as CachedXboxToken
+      if (new Date(cached.notAfter).getTime() > Date.now()) {
+        return cached
+      }
+      // Cached token expired — clear it and re-fetch
+      onClearCache()
     } catch {
       onClearCache()
     }
@@ -491,6 +496,13 @@ export class AppBackend {
         const profileResponse = await request(`${config.get('xbox.xboxApiUrl')}/users/xuid(${xuid})/profile/settings?settings=${settingsQuery}`, {
           headers: profileHeaders,
         })
+
+        if (profileResponse.statusCode < 200 || profileResponse.statusCode >= 300) {
+          const body = await profileResponse.body.text()
+          return res.status(HttpStatus.BAD_GATEWAY).send({
+            error: `Xbox profile API returned ${profileResponse.statusCode}: ${body}`,
+          })
+        }
 
         const profile = await profileResponse.body.json() as {
           profileUsers: {
