@@ -6,10 +6,10 @@ import {
 
 import {
   UnauthorizedError,
-} from '#@/src/Contexts/Shared/domain/errors/UnauthorizedError.js'
+} from '#/src/Contexts/Shared/domain/errors/UnauthorizedError.js'
 import {
   ONE_SECOND_IN_MILLISECONDS,
-} from '#@/src/Contexts/Shared/domain/time.js'
+} from '#/src/Contexts/Shared/domain/time.js'
 
 // this is an accessTokenVerifier and accessTokenExpirationVerifier
 // fastJwtAccessTokenVerifier

@@ -1,0 +1,70 @@
+<h1>
+  <%= title %>
+</h1>
+<h2 class='username'></h2>
+<article class='player-info'></article>
+<article class='aliases'></article>
+<script type='module'>
+  const player = <%- JSON.stringify(player).replace(/<\//g, '<\\/') %>
+  const aliases = <%- JSON.stringify(aliases).replace(/<\//g, '<\\/') %>
+
+  document.querySelector('.username').textContent = player?.personaname || ''
+
+  const appendRow = (container, label, value) => {
+    const div = document.createElement('div')
+    const strong = document.createElement('strong')
+    strong.textContent = label
+    div.appendChild(strong)
+    div.appendChild(document.createTextNode(' ' + value))
+    container.appendChild(div)
+  }
+
+  const playerInfoEl = document.querySelector('.player-info')
+
+  if (player?.avatarfull) {
+    const img = document.createElement('img')
+    img.src = player.avatarfull
+    img.alt = 'Steam Avatar'
+    img.style.borderRadius = '4px'
+    playerInfoEl.appendChild(img)
+    playerInfoEl.appendChild(document.createElement('br'))
+  }
+
+  appendRow(playerInfoEl, 'Steam ID:', player?.steamid || '')
+  appendRow(playerInfoEl, 'Username:', player?.personaname || '')
+  if (player?.realname) appendRow(playerInfoEl, 'Real Name:', player.realname)
+  if (player?.loccountrycode) appendRow(playerInfoEl, 'Country:', player.loccountrycode)
+
+  if (player?.profileurl) {
+    const div = document.createElement('div')
+    const strong = document.createElement('strong')
+    strong.textContent = 'Profile:'
+    const link = document.createElement('a')
+    link.href = player.profileurl
+    link.target = '_blank'
+    link.rel = 'noopener noreferrer'
+    link.textContent = 'View on Steam'
+    div.appendChild(strong)
+    div.appendChild(document.createTextNode(' '))
+    div.appendChild(link)
+    playerInfoEl.appendChild(div)
+  }
+
+  const aliasesEl = document.querySelector('.aliases')
+  if (aliases?.length) {
+    const label = document.createElement('strong')
+    label.textContent = `Also played as (${aliases.length}):`
+    aliasesEl.appendChild(label)
+    aliases.forEach((alias) => {
+      const div = document.createElement('div')
+      div.style.margin = '5px 0'
+      div.textContent = alias.newname
+      const span = document.createElement('span')
+      span.style.color = 'gray'
+      span.style.fontSize = '0.85em'
+      span.textContent = ` (${alias.timechanged})`
+      div.appendChild(span)
+      aliasesEl.appendChild(div)
+    })
+  }
+</script>

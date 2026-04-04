@@ -15,7 +15,7 @@ import {
 
 import {
   warn,
-} from '#@/src/Contexts/Shared/infrastructure/Logger/PinoLogger.js'
+} from '#/src/Contexts/Shared/infrastructure/Logger/PinoLogger.js'
 
 const filePath = `${cwd()}/.${env.APP_ENV}.env`
 const path = existsSync(filePath) ? filePath : `${cwd()}/.env`

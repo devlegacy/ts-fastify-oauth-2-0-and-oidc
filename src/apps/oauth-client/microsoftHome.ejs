@@ -1,0 +1,31 @@
+<h1>
+  <%= title %>
+</h1>
+<h2 class='username'></h2>
+<article class='user-info'></article>
+<script type='module'>
+  const userInfo = <%- JSON.stringify(userInfo) %>
+
+  document.querySelector('.username').textContent = userInfo?.displayName || ''
+
+  const appendRow = (container, label, value) => {
+    const div = document.createElement('div')
+    const strong = document.createElement('strong')
+    strong.textContent = label
+    div.appendChild(strong)
+    div.appendChild(document.createTextNode(' ' + value))
+    container.appendChild(div)
+  }
+
+  const userInfoEl = document.querySelector('.user-info')
+  appendRow(userInfoEl, 'User ID:', userInfo?.id || '')
+  appendRow(userInfoEl, 'Display Name:', userInfo?.displayName || '')
+  appendRow(userInfoEl, 'Given Name:', userInfo?.givenName || '')
+  appendRow(userInfoEl, 'Surname:', userInfo?.surname || '')
+  appendRow(userInfoEl, 'User Principal Name:', userInfo?.userPrincipalName || '')
+  appendRow(userInfoEl, 'Email:', userInfo?.mail || 'N/A')
+  appendRow(userInfoEl, 'Job Title:', userInfo?.jobTitle || 'N/A')
+  appendRow(userInfoEl, 'Office Location:', userInfo?.officeLocation || 'N/A')
+  appendRow(userInfoEl, 'Mobile Phone:', userInfo?.mobilePhone || 'N/A')
+  appendRow(userInfoEl, 'Business Phones:', userInfo?.businessPhones?.join(', ') || 'N/A')
+</script>
