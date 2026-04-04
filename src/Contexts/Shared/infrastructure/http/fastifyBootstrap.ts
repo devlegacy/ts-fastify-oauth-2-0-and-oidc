@@ -21,10 +21,10 @@ import HttpStatus from 'http-status'
 
 import {
   config,
-} from '#@/src/Contexts/OauthClient/Shared/infrastructure/Config/config.js'
+} from '#/src/Contexts/OauthClient/Shared/infrastructure/Config/config.js'
 import {
   UnauthorizedError,
-} from '#@/src/Contexts/Shared/domain/errors/UnauthorizedError.js'
+} from '#/src/Contexts/Shared/domain/errors/UnauthorizedError.js'
 
 // eslint-disable-next-line max-lines-per-function
 export const fastifyBootstrap = async (
@@ -64,7 +64,7 @@ export const fastifyBootstrap = async (
 
     .register(import('@fastify/view'), {
       engine: {
-        ejs: import('ejs'),
+        ejs: (await import('ejs')).default,
       },
       layout: `./src/Contexts/Shared/infrastructure/layout.ejs`,
       includeViewExtension: true,

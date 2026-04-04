@@ -8,7 +8,7 @@ import {
 
 import {
   ONE_SECOND_IN_MILLISECONDS,
-} from '#@/src/Contexts/Shared/domain/time.js'
+} from '#/src/Contexts/Shared/domain/time.js'
 
 type SignerOptionsType = SignerOptions & Record<string, string | number>
 

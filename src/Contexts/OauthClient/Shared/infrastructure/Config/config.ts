@@ -15,7 +15,7 @@ import {
 
 import {
   warn,
-} from '#@/src/Contexts/Shared/infrastructure/Logger/PinoLogger.js'
+} from '#/src/Contexts/Shared/infrastructure/Logger/PinoLogger.js'
 
 const filePath = `${cwd()}/.${env.APP_ENV}.env`
 const path = existsSync(filePath) ? filePath : `${cwd()}/.env`
@@ -327,6 +327,140 @@ const config = convict(
         },
       },
     },
+    microsoft: {
+      clientId: {
+        doc: 'The Microsoft client id.',
+        format: String,
+        default: '',
+        env: 'MICROSOFT_CLIENT_ID',
+      },
+      clientSecret: {
+        doc: 'The Microsoft client secret.',
+        format: String,
+        default: '',
+        env: 'MICROSOFT_CLIENT_SECRET',
+      },
+      tenantId: {
+        doc: 'The Microsoft tenant id.',
+        format: String,
+        default: 'consumers',
+        env: 'MICROSOFT_TENANT_ID',
+      },
+      authorizationUrl: {
+        doc: 'The Microsoft authorization url. Derived from tenantId when MICROSOFT_AUTHORIZATION_URL is not set.',
+        format: 'url',
+        default: 'https://login.microsoftonline.com/consumers/oauth2/v2.0/authorize',
+        env: 'MICROSOFT_AUTHORIZATION_URL',
+      },
+      redirectUri: {
+        doc: 'The Microsoft redirect uri.',
+        format: 'url',
+        default: 'http://localhost:8080/api/authentication/microsoft/callback',
+        env: 'MICROSOFT_REDIRECT_URI',
+      },
+      tokenUrl: {
+        doc: 'The Microsoft token url. Derived from tenantId when MICROSOFT_TOKEN_URL is not set.',
+        format: 'url',
+        default: 'https://login.microsoftonline.com/consumers/oauth2/v2.0/token',
+        env: 'MICROSOFT_TOKEN_URL',
+      },
+      apiUrl: {
+        doc: 'The Microsoft Graph api url.',
+        format: 'url',
+        default: 'https://graph.microsoft.com/v1.0',
+        env: 'MICROSOFT_API_URL',
+      },
+      cookie: {
+        accessToken: {
+          doc: 'The Microsoft cookie access token.',
+          format: String,
+          default: 'microsoft_access_token',
+          env: 'MICROSOFT_COOKIE_ACCESS_TOKEN',
+        },
+        oauthState: {
+          doc: 'The Microsoft cookie oauth state.',
+          format: String,
+          default: 'microsoft_oauth_state',
+          env: 'MICROSOFT_COOKIE_OAUTH_STATE',
+        },
+      },
+    },
+    xbox: {
+      clientId: {
+        doc: 'The Xbox client id (same as Microsoft).',
+        format: String,
+        default: '',
+        env: 'XBOX_CLIENT_ID',
+      },
+      clientSecret: {
+        doc: 'The Xbox client secret (same as Microsoft).',
+        format: String,
+        default: '',
+        env: 'XBOX_CLIENT_SECRET',
+      },
+      tenantId: {
+        doc: 'The Xbox tenant id.',
+        format: String,
+        default: 'consumers',
+        env: 'XBOX_TENANT_ID',
+      },
+      authorizationUrl: {
+        doc: 'The Xbox authorization url. Derived from tenantId when XBOX_AUTHORIZATION_URL is not set.',
+        format: 'url',
+        default: 'https://login.microsoftonline.com/consumers/oauth2/v2.0/authorize',
+        env: 'XBOX_AUTHORIZATION_URL',
+      },
+      redirectUri: {
+        doc: 'The Xbox redirect uri.',
+        format: 'url',
+        default: 'http://localhost:8080/api/authentication/xbox/callback',
+        env: 'XBOX_REDIRECT_URI',
+      },
+      tokenUrl: {
+        doc: 'The Xbox token url. Derived from tenantId when XBOX_TOKEN_URL is not set.',
+        format: 'url',
+        default: 'https://login.microsoftonline.com/consumers/oauth2/v2.0/token',
+        env: 'XBOX_TOKEN_URL',
+      },
+      xboxLiveAuthUrl: {
+        doc: 'The Xbox Live authentication url.',
+        format: 'url',
+        default: 'https://user.auth.xboxlive.com/user/authenticate',
+        env: 'XBOX_LIVE_AUTH_URL',
+      },
+      xboxLiveXstsUrl: {
+        doc: 'The Xbox Live XSTS url.',
+        format: 'url',
+        default: 'https://xsts.auth.xboxlive.com/xsts/authorize',
+        env: 'XBOX_LIVE_XSTS_URL',
+      },
+      xboxApiUrl: {
+        doc: 'The Xbox api url.',
+        format: 'url',
+        default: 'https://profile.xboxlive.com',
+        env: 'XBOX_API_URL',
+      },
+      cookie: {
+        accessToken: {
+          doc: 'The Xbox cookie access token.',
+          format: String,
+          default: 'xbox_access_token',
+          env: 'XBOX_COOKIE_ACCESS_TOKEN',
+        },
+        oauthState: {
+          doc: 'The Xbox cookie oauth state.',
+          format: String,
+          default: 'xbox_oauth_state',
+          env: 'XBOX_COOKIE_OAUTH_STATE',
+        },
+        xboxToken: {
+          doc: 'The Xbox cookie xbox token (cached XSTS auth payload).',
+          format: String,
+          default: 'xbox_token',
+          env: 'XBOX_COOKIE_XBOX_TOKEN',
+        },
+      },
+    },
     auth0: {
       clientId: {
         doc: 'The Auth0 client id.',
@@ -429,6 +563,40 @@ const config = convict(
         env: 'LOCAL_TEST_URL',
       },
     },
+    steam: {
+      webApiKey: {
+        doc: 'The Steam Web API key.',
+        format: String,
+        default: '',
+        env: 'STEAM_WEB_API_KEY',
+      },
+      authorizationUrl: {
+        doc: 'The Steam OpenID 2.0 authorization url.',
+        format: 'url',
+        default: 'https://steamcommunity.com/openid/login',
+        env: 'STEAM_AUTHORIZATION_URL',
+      },
+      apiUrl: {
+        doc: 'The Steam Web API url.',
+        format: 'url',
+        default: 'https://api.steampowered.com',
+        env: 'STEAM_API_URL',
+      },
+      redirectUri: {
+        doc: 'The Steam redirect uri.',
+        format: 'url',
+        default: 'http://localhost:8080/api/authentication/steam/callback',
+        env: 'STEAM_REDIRECT_URI',
+      },
+      cookie: {
+        steamId: {
+          doc: 'The name of the cookie to store the Steam ID.',
+          format: String,
+          default: 'steam_id',
+          env: 'STEAM_COOKIE_STEAM_ID',
+        },
+      },
+    },
     // azure: {
     //   clientId: {
     //     doc: 'The Azure client id.',
@@ -474,6 +642,24 @@ const filePaths: string[] = []
 config.loadFile(filePaths).validate({
   allowed: 'strict',
 })
+
+// Derive Microsoft OAuth URLs from tenantId unless explicitly overridden via env
+const microsoftTenantId = config.get('microsoft.tenantId')
+if (!env.MICROSOFT_AUTHORIZATION_URL) {
+  config.set('microsoft.authorizationUrl', `https://login.microsoftonline.com/${microsoftTenantId}/oauth2/v2.0/authorize`)
+}
+if (!env.MICROSOFT_TOKEN_URL) {
+  config.set('microsoft.tokenUrl', `https://login.microsoftonline.com/${microsoftTenantId}/oauth2/v2.0/token`)
+}
+
+// Derive Xbox OAuth URLs from tenantId unless explicitly overridden via env
+const xboxTenantId = config.get('xbox.tenantId')
+if (!env.XBOX_AUTHORIZATION_URL) {
+  config.set('xbox.authorizationUrl', `https://login.microsoftonline.com/${xboxTenantId}/oauth2/v2.0/authorize`)
+}
+if (!env.XBOX_TOKEN_URL) {
+  config.set('xbox.tokenUrl', `https://login.microsoftonline.com/${xboxTenantId}/oauth2/v2.0/token`)
+}
 
 // const _schema = config.getSchema()
 export type Config = typeof config

@@ -1,5 +1,5 @@
 {
-  "$schema": "https://json.schemastore.org/swcrc",
+  "$schema": "https://swc.rs/schema.json",
   "jsc": {
     "target": "esnext",
     "parser": {
@@ -19,13 +19,6 @@
       "compress": true,
       "mangle": true
     }
-    // ,
-    // "baseUrl": "./",
-    // "paths": {
-    //   "#@/*": [
-    //     "./*"
-    //   ]
-    // }
   },
   "module": {
     "type": "es6",

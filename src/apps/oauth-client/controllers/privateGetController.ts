@@ -4,13 +4,13 @@ import type {
 
 import {
   config,
-} from '#@/src/Contexts/OauthClient/Shared/infrastructure/Config/config.js'
+} from '#/src/Contexts/OauthClient/Shared/infrastructure/Config/config.js'
 import {
   accessTokenVerifier,
-} from '#@/src/Contexts/Shared/infrastructure/accessTokenVerifier.js'
+} from '#/src/Contexts/Shared/infrastructure/accessTokenVerifier.js'
 import {
   getAccessToken,
-} from '#@/src/Contexts/Shared/infrastructure/http/getAccessToken.js'
+} from '#/src/Contexts/Shared/infrastructure/http/getAccessToken.js'
 
 export default async function (fastify: FastifyInstance) {
   fastify.get(

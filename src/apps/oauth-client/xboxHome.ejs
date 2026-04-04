@@ -1,0 +1,48 @@
+<h1>
+  <%= title %>
+</h1>
+<h2 class='gamertag'></h2>
+<article class='user-info'></article>
+<article class='profile-settings'></article>
+<script type='module'>
+  const profile = <%- JSON.stringify(profile).replace(/<\//g, '<\\/') %>
+  const gamertag = <%- JSON.stringify(gamertag).replace(/<\//g, '<\\/') %>
+  const xuid = <%- JSON.stringify(xuid).replace(/<\//g, '<\\/') %>
+
+  document.querySelector('.gamertag').textContent = gamertag || 'Xbox Player'
+
+  const appendRow = (container, label, value) => {
+    const div = document.createElement('div')
+    const strong = document.createElement('strong')
+    strong.textContent = label
+    div.appendChild(strong)
+    div.appendChild(document.createTextNode(' ' + value))
+    container.appendChild(div)
+  }
+
+  const userInfoEl = document.querySelector('.user-info')
+  appendRow(userInfoEl, 'Gamertag:', gamertag || 'N/A')
+  appendRow(userInfoEl, 'XUID:', xuid || 'N/A')
+
+  if (profile?.profileUsers?.[0]?.settings) {
+    const settings = profile.profileUsers[0].settings
+    const settingsMap = {}
+    settings.forEach(setting => {
+      settingsMap[setting.id] = setting.value
+    })
+
+    const profileEl = document.querySelector('.profile-settings')
+    const heading = document.createElement('h3')
+    heading.textContent = 'Profile Information'
+    profileEl.appendChild(heading)
+
+    const suffix = settingsMap['ModernGamertagSuffix'] ? '#' + settingsMap['ModernGamertagSuffix'] : ''
+    appendRow(profileEl, 'Gamertag:', settingsMap['Gamertag'] || 'N/A')
+    appendRow(profileEl, 'Modern Gamertag:', (settingsMap['ModernGamertag'] || 'N/A') + suffix)
+    appendRow(profileEl, 'Unique Modern Gamertag:', settingsMap['UniqueModernGamertag'] || 'N/A')
+    appendRow(profileEl, 'Game Display Name:', settingsMap['GameDisplayName'] || 'N/A')
+    appendRow(profileEl, 'Gamerscore:', settingsMap['Gamerscore'] || '0')
+  } else {
+    document.querySelector('.profile-settings').textContent = 'No profile settings available'
+  }
+</script>
