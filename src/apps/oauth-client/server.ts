@@ -330,7 +330,13 @@ export class AppBackend {
         const {
           me,
           tweets,
-        } = await response.body.json() as { me: { id: string }, tweets: unknown[] }
+          error: twitterError,
+        } = await response.body.json() as { me: { id: string } | null, tweets: unknown[], error?: unknown }
+        if (!me) {
+          return res.status(HttpStatus.BAD_GATEWAY).send({
+            error: twitterError ?? 'Twitter API returned no user data',
+          })
+        }
         return res.viewAsync('./src/apps/oauth-client/twitterHome.ejs', {
           title: 'Home',
           accessToken,
