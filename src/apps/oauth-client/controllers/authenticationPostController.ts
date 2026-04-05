@@ -140,9 +140,10 @@ export default async function (fastify: FastifyInstance) {
           'tweet.read',
           'users.read',
         ]
-        const state = randomBytes(16).toString('base64')
+        const state = randomBytes(16).toString('base64url')
         // proof key for code exchange (PKCE)
-        const codeVerifier = randomBytes(128).toString('base64')
+        // RFC 7636: verifier must be 43-128 unreserved chars; 32 bytes → 43 base64url chars
+        const codeVerifier = randomBytes(32).toString('base64url')
         const codeChallenge = codeChallengeGenerator(codeVerifier)
         const query = new URLSearchParams({
           response_type: 'code',
@@ -194,22 +195,25 @@ export default async function (fastify: FastifyInstance) {
         const {
           cookies,
         } = req
-        const state = cookies[config.get('twitter.cookie.oauthState')] ?? cookies['state'] ?? ''
+        const state = cookies[config.get('twitter.cookie.oauthState')] ?? ''
         if (state !== req.query.state) {
-          res.status(HttpStatus.FOUND).redirect('/home/twitter/#?error=ERROR_STATE_MISMATCH')
+          return res.status(HttpStatus.FOUND).redirect('/?error=ERROR_STATE_MISMATCH')
         }
 
-        const codeVerifier = cookies[config.get('twitter.cookie.oauthCodeVerifier')] ?? cookies['verifier'] ?? ''
+        const codeVerifier = cookies[config.get('twitter.cookie.oauthCodeVerifier')] ?? ''
+        const clientCredentials = Buffer.from(
+          `${config.get('twitter.clientId')}:${config.get('twitter.clientSecret')}`,
+        ).toString('base64')
         const options = {
           method: 'POST',
           headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
+            Authorization: `Basic ${clientCredentials}`,
           },
           body: new URLSearchParams({
             code: req.query.code,
             grant_type: 'authorization_code',
             redirect_uri: config.get('twitter.redirectUri'),
-            client_id: config.get('twitter.clientId'),
             code_verifier: codeVerifier,
           }).toString(),
         } satisfies RequestInit
@@ -219,10 +223,17 @@ export default async function (fastify: FastifyInstance) {
           expires_in: number
           access_token: string
           scope: string
+          error?: string
+          error_description?: string
         }
         const oauthResource = await oauthRequest.body.json() as TwitterTokenResponse
+        if (oauthResource.error || !oauthResource.access_token) {
+          return res.status(HttpStatus.BAD_REQUEST).send({
+            error: oauthResource.error ?? 'Token exchange failed',
+            error_description: oauthResource.error_description,
+          })
+        }
         res
-          // .setCookie('access_token', json.access_token, {
           .setCookie(
             config.get('twitter.cookie.accessToken'),
             oauthResource.access_token,

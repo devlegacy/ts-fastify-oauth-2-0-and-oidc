@@ -62,7 +62,14 @@ export default async function (fastify: FastifyInstance) {
       const {
         cookies,
       } = req
-      const accessToken = cookies[config.get('twitter.cookie.accessToken')] || cookies.access_token || ''
+      const accessToken = cookies[config.get('twitter.cookie.accessToken')] || ''
+      if (!accessToken) {
+        return {
+          error: 'No access token — complete the Twitter OAuth flow first',
+          me: null,
+          tweets: [],
+        }
+      }
 
       const {
         error,
