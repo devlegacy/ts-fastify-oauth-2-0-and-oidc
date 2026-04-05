@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.7.0](https://github.com/devlegacy/ts-fastify-oauth-2-0-and-oidc/compare/ts-fastify-oauth-2-0-and-oidc@v1.6.0...ts-fastify-oauth-2-0-and-oidc@v1.7.0) (2026-04-05)
+
+
+### Features
+
+* **x:** changes ([#35](https://github.com/devlegacy/ts-fastify-oauth-2-0-and-oidc/issues/35)) ([d98ce3e](https://github.com/devlegacy/ts-fastify-oauth-2-0-and-oidc/commit/d98ce3e5ccfedea3f4a41a3fc4c17068cdd49152))
+
 ## [1.6.0](https://github.com/devlegacy/ts-fastify-oauth-2-0-and-oidc/compare/ts-fastify-oauth-2-0-and-oidc@v1.5.0...ts-fastify-oauth-2-0-and-oidc@v1.6.0) (2026-04-04)
 
 
