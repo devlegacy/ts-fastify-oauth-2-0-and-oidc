@@ -155,7 +155,7 @@ const config = convict(
       authorizationUrl: {
         doc: 'The Twitter authorization url.',
         format: 'url',
-        default: 'https://api.twitter.com/oauth/authorize',
+        default: 'https://x.com/i/oauth2/authorize',
         env: 'TWITTER_AUTHORIZATION_URL',
       },
       redirectUri: {
@@ -167,13 +167,13 @@ const config = convict(
       tokenUrl: {
         doc: 'The Twitter token url.',
         format: 'url',
-        default: 'https://api.twitter.com/2/oauth2/token',
+        default: 'https://api.x.com/2/oauth2/token',
         env: 'TWITTER_TOKEN_URL',
       },
       apiUrl: {
         doc: 'The Twitter api url.',
         format: 'url',
-        default: 'https://api.twitter.com/2',
+        default: 'https://api.x.com/2',
         env: 'TWITTER_API_URL',
       },
       cookie: {

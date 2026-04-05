@@ -55,12 +55,12 @@ Both apps follow **Domain-Driven Design (DDD)** with bounded contexts and are st
 
 ## Providers
 
-| Provider | Flow |
-|---|---|
-| Spotify | Authorization Code |
-| Twitter / X | Authorization Code + PKCE |
-| Twitch | Implicit |
-| Auth0 | Implicit, Password Grant, JWKS validation |
+| Provider | Flow | Dashboard |
+|---|---|---|
+| Spotify | Authorization Code | [Spotify Developer Dashboard](https://developer.spotify.com/dashboard/applications) |
+| Twitter / X | Authorization Code + PKCE | [Twitter/X Developer Dashboard](https://console.x.com/) |
+| Twitch | Implicit | [Twitch Developer Dashboard](https://dev.twitch.tv/console/apps) |
+| Auth0 | Implicit, Password Grant, JWKS validation | [Auth0 Dashboard](https://manage.auth0.com/dashboard) |
 | Discord | Client Credentials |
 | Discord (special) | Authorization Code (user scopes: identify, guilds, dm_channels.read) |
 | Google | Authorization Code (OIDC) |
