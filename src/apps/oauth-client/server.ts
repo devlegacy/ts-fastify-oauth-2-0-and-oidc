@@ -323,9 +323,8 @@ export class AppBackend {
         const response = await request(`${config.get('app.url')}/api/twitter/bypass`, {
           headers: {
             Authorization: accessToken,
-            ...req.headers,
+            Accept: 'application/json',
           },
-          // credentials: 'include',
         })
         const {
           me,
