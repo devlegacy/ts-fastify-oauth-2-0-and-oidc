@@ -314,7 +314,7 @@ export default async function (fastify: FastifyInstance) {
       const scopes = [
         'identify',
         'guilds',
-        'dm_channels.read',
+        // 'dm_channels.read',
         // 'messages.read',
         // 'dm_channels.messages.read',
       ]
