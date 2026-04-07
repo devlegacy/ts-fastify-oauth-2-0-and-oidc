@@ -322,7 +322,7 @@ export class AppBackend {
         // twitter use cors
         const response = await request(`${config.get('app.url')}/api/twitter/bypass`, {
           headers: {
-            Authorization: accessToken,
+            Authorization: `Bearer ${accessToken}`,
             Accept: 'application/json',
           },
         })
