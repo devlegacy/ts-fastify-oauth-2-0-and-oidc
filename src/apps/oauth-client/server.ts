@@ -368,7 +368,6 @@ export class AppBackend {
         const [
           user,
           guilds,
-          dmChannels,
         ] = await Promise.all([
           request(`${config.get('discord.apiUrl')}/users/@me`, {
             headers,
@@ -389,20 +388,18 @@ export class AppBackend {
               icon: string
               owner: boolean
             }[]>),
-          request(`${config.get('discord.apiUrl')}/users/@me/channels`, {
-            headers,
-          })
-            .then((response) => response.body.json() as Promise<{
-              id: string
-              type: number
-              recipients: {
-                id: string
-                username: string
-                discriminator: string
-                avatar: string
-              }[]
-            }[]>),
         ])
+        // dm_channels.read scope is not valid for Discord OAuth2; keep empty list for view rendering
+        const dmChannels: {
+          id: string
+          type: number
+          recipients: {
+            id: string
+            username: string
+            discriminator: string
+            avatar: string
+          }[]
+        }[] = []
 
         return res.viewAsync('./src/apps/oauth-client/discordSpecialHome.ejs', {
           title: 'Home Discord 🎮',
