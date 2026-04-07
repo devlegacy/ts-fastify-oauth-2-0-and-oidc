@@ -346,7 +346,18 @@ export default async function (fastify: FastifyInstance) {
     })
     .get(
       '/authentication/discord-special/callback',
-      async function handler(req: FastifyRequest<{ Querystring: { code: string, state: string } }>, res) {
+      async function handler(req: FastifyRequest<{ Querystring: { code?: string, state?: string, error?: string, error_description?: string } }>, res) {
+        if (req.query.error) {
+          return res.status(HttpStatus.BAD_REQUEST).send({
+            error: req.query.error,
+            error_description: req.query.error_description,
+          })
+        }
+        if (!req.query.code) {
+          return res.status(HttpStatus.BAD_REQUEST).send({
+            error: 'Missing authorization code',
+          })
+        }
         const {
           cookies,
         } = req
@@ -380,6 +391,12 @@ export default async function (fastify: FastifyInstance) {
         } satisfies RequestInit
 
         const oauthRequest = await request(config.get('discord.tokenUrl'), options)
+        if (oauthRequest.statusCode < 200 || oauthRequest.statusCode >= 300) {
+          return res.status(HttpStatus.BAD_GATEWAY).send({
+            error: 'Discord token exchange failed',
+            details: await oauthRequest.body.text(),
+          })
+        }
         type DiscordTokenResponse = {
           access_token: string
           token_type: string
@@ -388,6 +405,11 @@ export default async function (fastify: FastifyInstance) {
           scope: string
         }
         const oauthResource = await oauthRequest.body.json() as DiscordTokenResponse
+        if (!oauthResource.access_token || !oauthResource.expires_in) {
+          return res.status(HttpStatus.BAD_GATEWAY).send({
+            error: 'Discord token response missing access token',
+          })
+        }
 
         res
           .setCookie(
