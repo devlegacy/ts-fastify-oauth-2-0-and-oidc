@@ -1,0 +1,64 @@
+name: PR Checks 🔍
+run-name: PR Checks — ${{ github.event.pull_request.title }}
+
+on:
+  pull_request:
+    branches: [master]
+    types: [opened, edited, synchronize, reopened]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  pr-title:
+    name: PR Title Lint 💬
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Enable Corepack and pnpm ⚙️
+        run: |
+          corepack enable
+          corepack prepare pnpm@latest --activate
+          pnpm config set store-dir ~/.pnpm-store
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24.x
+          cache: pnpm
+      - uses: actions/cache@v5
+        with:
+          path: ~/.pnpm-store
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: ${{ runner.os }}-pnpm-store-
+      - run: pnpm install --frozen-lockfile
+      - name: Validate PR title matches conventional commit format
+        run: echo "${{ github.event.pull_request.title }}" | npx --no -- commitlint
+
+  pr-size:
+    name: PR Size 📏
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - name: Check diff size and warn if large
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          REPO: ${{ github.repository }}
+        run: |
+          ADDITIONS=$(gh pr view $PR_NUMBER --repo $REPO --json additions -q '.additions')
+          DELETIONS=$(gh pr view $PR_NUMBER --repo $REPO --json deletions -q '.deletions')
+          TOTAL=$((ADDITIONS + DELETIONS))
+          echo "PR size: +${ADDITIONS} -${DELETIONS} = ${TOTAL} lines changed"
+
+          if [ "$TOTAL" -gt 500 ]; then
+            gh pr comment $PR_NUMBER --repo $REPO \
+              --body "⚠️ **Large PR** — ${TOTAL} lines changed (+${ADDITIONS} / -${DELETIONS}). Split into smaller atomic diffs (~150 lines) for faster reviews." \
+              2>/dev/null || true
+            echo "::warning title=Large PR::${TOTAL} lines changed. Prefer diffs ≤150 lines."
+          elif [ "$TOTAL" -gt 150 ]; then
+            echo "::warning title=Medium PR::${TOTAL} lines changed. Consider splitting for easier review."
+          else
+            echo "✅ PR size OK: ${TOTAL} lines"
+          fi

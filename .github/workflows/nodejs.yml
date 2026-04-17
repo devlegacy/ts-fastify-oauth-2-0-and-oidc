@@ -13,21 +13,61 @@ env:
   TS_NODE_PROJECT: tsconfig.json
 
 jobs:
-  build:
+  lint:
+    name: Lint 🧹
     runs-on: ubuntu-latest
-
-    strategy:
-      # fail-fast: false
-      matrix:
-        # REVIEW: In node 23 we can't use node --run yet
-        node-version: [24.x, 25.x] # current versions + next versions o prepare future migrations
-        # node-version: [22.x] # current versions + next versions o prepare future migrations
     steps:
       ## Setup workspace
       # https://github.com/actions/checkout
       # This action is typically used as one of the first steps in a workflow to gain access to the repository's content. Without this step, none of the repository files would be available to the workflow, and tasks like building, testing, or deploying the code would be impossible.
       - name: Checkout 📖
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
+      ## Setup Node.js
+      - name: Enable Corepack and pnpm ⚙️
+        run: |
+          corepack enable
+          corepack prepare pnpm@latest --activate
+          pnpm config set store-dir ~/.pnpm-store
+      # https://github.com/actions/setup-node
+      - name: Use Node.js ⚙️ 24.x
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24.x
+          cache: pnpm
+      # https://github.com/actions/cache
+      - name: Cache dependencies 🔒
+        id: cache-pnpm-store
+        uses: actions/cache@v5
+        with:
+          # path: node_modules
+          path: ~/.pnpm-store
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('pnpm-lock.yaml') }}-${{ hashFiles('.github/workflows/nodejs.yml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+      - name: pnpm install 📦
+        # if: steps.cache-pnpm-store.outputs.cache-hit != 'true'
+        # npm ci vs npm install
+        run: |
+          pnpm install --frozen-lockfile
+      - name: node --run lint 🧹
+        run: |
+          node --run lint
+
+  test:
+    name: Test 🧪
+    runs-on: ubuntu-latest
+    strategy:
+      # fail-fast: false
+      matrix:
+        # REVIEW: In node 23 we can't use node --run yet
+        node-version: [24.x, 25.x] # current versions + next versions to prepare future migrations
+        # node-version: [22.x] # LTS fallback
+    steps:
+      ## Setup workspace
+      # https://github.com/actions/checkout
+      # This action is typically used as one of the first steps in a workflow to gain access to the repository's content. Without this step, none of the repository files would be available to the workflow, and tasks like building, testing, or deploying the code would be impossible.
+      - name: Checkout 📖
+        uses: actions/checkout@v6
       # https://github.com/actions/cache
       - name: Create env file 🖥️
         run: |
@@ -43,18 +83,17 @@ jobs:
           pnpm config set store-dir ~/.pnpm-store
       # https://github.com/actions/setup-node
       - name: Use Node.js ⚙️ ${{ matrix.node-version }}
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: ${{ matrix.node-version }}
-          # cache: npm
-          cache: "pnpm"
+          cache: pnpm
       - name: Cache dependencies 🔒
         id: cache-pnpm-store
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           # path: node_modules
           path: ~/.pnpm-store
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('package.json') }}-${{ hashFiles('pnpm-lock.yaml') }}-${{ hashFiles('.github/workflows/nodejs.yml') }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('pnpm-lock.yaml') }}-${{ matrix.node-version }}-${{ hashFiles('.github/workflows/nodejs.yml') }}
           restore-keys: |
             ${{ runner.os }}-pnpm-store-
       - name: pnpm install 📦
@@ -62,12 +101,47 @@ jobs:
         # npm ci vs npm install
         run: |
           pnpm install --frozen-lockfile
-      - name: node --run lint 🧹
-        run: |
-          node --run lint
       - name: pnpm test 🧪
         run: |
           node --run test
+
+  build:
+    name: Build 🏗️
+    needs: [lint, test]
+    runs-on: ubuntu-latest
+    steps:
+      ## Setup workspace
+      # https://github.com/actions/checkout
+      # This action is typically used as one of the first steps in a workflow to gain access to the repository's content. Without this step, none of the repository files would be available to the workflow, and tasks like building, testing, or deploying the code would be impossible.
+      - name: Checkout 📖
+        uses: actions/checkout@v6
+      ## Setup Node.js
+      - name: Enable Corepack and pnpm ⚙️
+        run: |
+          corepack enable
+          corepack prepare pnpm@latest --activate
+          pnpm config set store-dir ~/.pnpm-store
+      # https://github.com/actions/setup-node
+      - name: Use Node.js ⚙️ 24.x
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24.x
+          cache: pnpm
+      # https://github.com/actions/cache
+      - name: Cache dependencies 🔒
+        id: cache-pnpm-store
+        uses: actions/cache@v5
+        with:
+          # path: node_modules
+          path: ~/.pnpm-store
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('pnpm-lock.yaml') }}-${{ hashFiles('.github/workflows/nodejs.yml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+      - name: pnpm install 📦
+        # if: steps.cache-pnpm-store.outputs.cache-hit != 'true'
+        # npm ci vs npm install
+        run: |
+          pnpm install --frozen-lockfile
       - name: node --run build 🏗️
         run: |
           node --run build
