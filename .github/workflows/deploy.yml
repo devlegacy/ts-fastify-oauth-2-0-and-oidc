@@ -1,0 +1,92 @@
+name: Deploy 🚀
+run-name: Deploy ${{ github.ref_name }} → ${{ inputs.environment || 'staging' }}
+
+on:
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+'
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: Target environment
+        required: true
+        default: staging
+        type: choice
+        options: [staging, production]
+      tag:
+        description: Tag or ref to deploy (e.g. v1.10.0)
+        required: true
+
+permissions:
+  contents: read
+  deployments: write
+
+jobs:
+  deploy-staging:
+    name: Deploy → Staging 🟡
+    runs-on: ubuntu-latest
+    environment:
+      name: staging
+      url: https://staging.example.com
+    concurrency:
+      group: deploy-staging
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ inputs.tag || github.ref }}
+      - name: Enable Corepack and pnpm ⚙️
+        run: |
+          corepack enable
+          corepack prepare pnpm@latest --activate
+          pnpm config set store-dir ~/.pnpm-store
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24.x
+          cache: pnpm
+      - uses: actions/cache@v5
+        with:
+          path: ~/.pnpm-store
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: ${{ runner.os }}-pnpm-store-
+      - run: pnpm install --frozen-lockfile
+      - run: node --run build
+      - name: Deploy to Staging 🟡
+        run: |
+          echo "Deploying ${{ inputs.tag || github.ref_name }} to staging..."
+          # TODO: replace with actual deploy (docker push, ssh, kubectl, etc.)
+
+  deploy-production:
+    name: Deploy → Production 🟢
+    needs: deploy-staging
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: https://example.com
+    concurrency:
+      group: deploy-production
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ inputs.tag || github.ref }}
+      - name: Enable Corepack and pnpm ⚙️
+        run: |
+          corepack enable
+          corepack prepare pnpm@latest --activate
+          pnpm config set store-dir ~/.pnpm-store
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24.x
+          cache: pnpm
+      - uses: actions/cache@v5
+        with:
+          path: ~/.pnpm-store
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: ${{ runner.os }}-pnpm-store-
+      - run: pnpm install --frozen-lockfile
+      - run: node --run build
+      - name: Deploy to Production 🟢
+        run: |
+          echo "Deploying ${{ inputs.tag || github.ref_name }} to production..."
+          # TODO: replace with actual deploy

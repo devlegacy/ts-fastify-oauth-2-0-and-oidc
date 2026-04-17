@@ -1,4 +1,4 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
 
 COLORS_PATH=$(dirname "$0")/../.bin/colors.sh
 [ -f "${COLORS_PATH}" ] && source "${COLORS_PATH}"
@@ -8,9 +8,12 @@ if [[ "$is_commit_available" ]]; then
   # Validate branch name
   # Read more on: https://www.devwithimagination.com/2020/04/13/git-commit-hooks-for-branch-naming-using-husky/
   local_branch_name="$(git rev-parse --abbrev-ref HEAD)"
-  recommend_branch_name='^((fix|feat|imp|hotfix)\/[a-zA-Z0-9\-]+)$'
+  recommend_branch_name='^((feat|fix|chore|docs|refactor|test|ci|style|perf|imp|hotfix)\/[a-zA-Z0-9\-]+)$'
+  trunk_branches='^(master|main|develop)$'
 
-  if [[ ! $local_branch_name =~ $recommend_branch_name ]]; then
+  if [[ $local_branch_name =~ $trunk_branches ]]; then
+    : # trunk branch — skip name check
+  elif [[ ! $local_branch_name =~ $recommend_branch_name ]]; then
       echo "${COLOR_RED}There is something wrong with your branch name <${COLOR_YELLOW}$local_branch_name${COLOR_RED}>. Branch names in this project must adhere to this contract: <${COLOR_GREEN}$recommend_branch_name${COLOR_RED}>. Your commit will be rejected. You should rename your branch to a valid name and try again.${COLOR_RESET}"
       exit 1
   fi
